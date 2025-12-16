@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스테이지 & 장르 선택 - Rewrite Moment</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">🎬</div>
+        <span class="nav-logo-text">Rewrite Moment</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features" class="nav-link">기능</a></li>
+        <li><a href="index.html#how" class="nav-link">이용방법</a></li>
+        <li><a href="pricing.html" class="nav-link">가격</a></li>
+      </ul>
+      <div class="nav-credits">
+        <span class="nav-credits-icon">💎</span>
+        <span class="nav-credits-value" id="creditBalance">0</span>
+        <span style="color: var(--text-muted)">크레딧</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="page" style="padding-top: 100px;">
+    <div class="container container-sm">
+      
+      <!-- Progress Steps -->
+      <div class="steps">
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <span class="step-text">업로드</span>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step active">
+          <div class="step-number">2</div>
+          <span class="step-text">선택</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <span class="step-text">Rewrite</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <span class="step-text">결과</span>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header" data-animate>
+        <h1 class="page-title">
+          어떤 <span class="text-gradient">이야기</span>를<br>
+          만들까요?
+        </h1>
+        <p class="page-subtitle">
+          라이프 스테이지와 장르를 선택하고,<br>
+          원하는 분위기로 조절해보세요.
+        </p>
+      </div>
+
+      <!-- Mode Selection -->
+      <section class="select-section" data-animate style="animation-delay: 0.1s">
+        <h3 class="select-section-title">
+          <span class="select-section-icon">📦</span>
+          길이 선택
+        </h3>
+        <div class="mode-cards">
+          <label class="mode-card active">
+            <input type="radio" name="mode" value="quick" checked>
+            <div class="mode-badge free">무료</div>
+            <h4 class="mode-title">Quick Pack</h4>
+            <div class="mode-duration">8초 × 3개 클립</div>
+            <ul class="mode-features">
+              <li>Hook + Main + Ending</li>
+              <li>하루 1팩 무료</li>
+              <li>720p + 워터마크</li>
+            </ul>
+          </label>
+
+          <label class="mode-card">
+            <input type="radio" name="mode" value="story">
+            <div class="mode-badge paid">2 크레딧</div>
+            <h4 class="mode-title">Story Pack</h4>
+            <div class="mode-duration">15초 × 3개 클립</div>
+            <ul class="mode-features">
+              <li>상황→감정→전환 비트</li>
+              <li>클립별 재생성</li>
+              <li>1080p + 워터마크 옵션</li>
+            </ul>
+          </label>
+
+          <label class="mode-card">
+            <input type="radio" name="mode" value="trailer">
+            <div class="mode-badge premium">5 크레딧</div>
+            <h4 class="mode-title">Trailer</h4>
+            <div class="mode-duration">45~60초 × 1개</div>
+            <ul class="mode-features">
+              <li>6~10장면 예고편</li>
+              <li>타이틀/내레이션</li>
+              <li>1080p + 워터마크 옵션</li>
+            </ul>
+          </label>
+        </div>
+      </section>
+
+      <!-- Stage Selection -->
+      <section class="select-section" data-animate style="animation-delay: 0.2s">
+        <h3 class="select-section-title">
+          <span class="select-section-icon">🎭</span>
+          라이프 스테이지
+        </h3>
+        <div class="selection-grid stage-grid">
+          <label class="selection-card active">
+            <input type="radio" name="stage" value="teen" checked>
+            <div class="selection-card-icon">🎒</div>
+            <div class="selection-card-title">청소년</div>
+            <div class="selection-card-desc">학교, 친구, 성장</div>
+          </label>
+
+          <label class="selection-card">
+            <input type="radio" name="stage" value="twenties">
+            <div class="selection-card-icon">💼</div>
+            <div class="selection-card-title">20대</div>
+            <div class="selection-card-desc">첫 시작, 도전</div>
+          </label>
+
+          <label class="selection-card">
+            <input type="radio" name="stage" value="newlywed">
+            <div class="selection-card-icon">💑</div>
+            <div class="selection-card-title">신혼</div>
+            <div class="selection-card-desc">새 출발, 함께</div>
+          </label>
+
+          <label class="selection-card">
+            <input type="radio" name="stage" value="early_parenting">
+            <div class="selection-card-icon">👶</div>
+            <div class="selection-card-title">초기 육아</div>
+            <div class="selection-card-desc">아이와 함께</div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Genre Selection -->
+      <section class="select-section" data-animate style="animation-delay: 0.3s">
+        <h3 class="select-section-title">
+          <span class="select-section-icon">🎬</span>
+          장르
+        </h3>
+        <div class="selection-grid genre-grid">
+          <label class="selection-card">
+            <input type="radio" name="genre" value="docu">
+            <div class="selection-card-icon">📹</div>
+            <div class="selection-card-title">다큐</div>
+            <div class="selection-card-desc">담백한 기록</div>
+          </label>
+
+          <label class="selection-card active">
+            <input type="radio" name="genre" value="comedy" checked>
+            <div class="selection-card-icon">😂</div>
+            <div class="selection-card-title">코미디</div>
+            <div class="selection-card-desc">유쾌한 해프닝</div>
+          </label>
+
+          <label class="selection-card">
+            <input type="radio" name="genre" value="drama">
+            <div class="selection-card-icon">🎭</div>
+            <div class="selection-card-title">드라마</div>
+            <div class="selection-card-desc">감정의 서사</div>
+          </label>
+
+          <label class="selection-card">
+            <input type="radio" name="genre" value="melo">
+            <div class="selection-card-icon">💕</div>
+            <div class="selection-card-title">멜로</div>
+            <div class="selection-card-desc">로맨틱 감성</div>
+          </label>
+
+          <label class="selection-card">
+            <input type="radio" name="genre" value="fantasy">
+            <div class="selection-card-icon">✨</div>
+            <div class="selection-card-title">판타지</div>
+            <div class="selection-card-desc">상상의 세계</div>
+          </label>
+        </div>
+      </section>
+
+      <!-- Sliders -->
+      <section class="select-section" data-animate style="animation-delay: 0.4s">
+        <h3 class="select-section-title">
+          <span class="select-section-icon">🎚️</span>
+          분위기 조절
+        </h3>
+        <div class="card">
+          <!-- Realism Slider -->
+          <div class="range-slider">
+            <div class="range-slider-header">
+              <span class="range-slider-label">현실감</span>
+              <span class="range-slider-value" id="realismValue">60%</span>
+            </div>
+            <input type="range" id="realism" min="0" max="100" value="60">
+            <div class="range-slider-labels">
+              <span>영화처럼</span>
+              <span>현실적으로</span>
+            </div>
+          </div>
+
+          <!-- Intensity Slider -->
+          <div class="range-slider mt-lg">
+            <div class="range-slider-header">
+              <span class="range-slider-label">강도</span>
+              <span class="range-slider-value" id="intensityValue">40%</span>
+            </div>
+            <input type="range" id="intensity" min="0" max="100" value="40">
+            <div class="range-slider-labels">
+              <span>순한맛</span>
+              <span>진한맛</span>
+            </div>
+          </div>
+
+          <!-- Pace Slider -->
+          <div class="range-slider mt-lg">
+            <div class="range-slider-header">
+              <span class="range-slider-label">속도</span>
+              <span class="range-slider-value" id="paceValue">70%</span>
+            </div>
+            <input type="range" id="pace" min="0" max="100" value="70">
+            <div class="range-slider-labels">
+              <span>느리게</span>
+              <span>빠르게</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cost Summary -->
+      <div class="cost-summary mt-xl" data-animate style="animation-delay: 0.5s">
+        <div class="cost-summary-inner">
+          <div class="cost-item">
+            <span class="cost-label">선택한 팩</span>
+            <span class="cost-value" id="selectedPack">Quick Pack (무료)</span>
+          </div>
+          <div class="cost-item cost-total">
+            <span class="cost-label">필요 크레딧</span>
+            <span class="cost-value" id="totalCost">0</span>
+          </div>
+        </div>
+        <div class="cost-note" id="costNote">
+          <span>✓</span> 무료 Quick Pack은 하루 1팩 제한이 있어요
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-row mt-xl" data-animate style="animation-delay: 0.6s">
+        <a href="upload.html" class="btn btn-ghost">
+          ← 이전
+        </a>
+        <button class="btn btn-primary btn-lg" id="nextBtn">
+          다음 단계로
+          <span>→</span>
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <style>
+    /* Select Page Specific Styles */
+    .select-section {
+      margin-bottom: 40px;
+    }
+
+    .select-section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.125rem;
+      margin-bottom: 20px;
+    }
+
+    .select-section-icon {
+      font-size: 1.25rem;
+    }
+
+    .stage-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .genre-grid {
+      grid-template-columns: repeat(5, 1fr);
+    }
+
+    /* Cost Summary */
+    .cost-summary {
+      background: var(--bg-secondary);
+      border: var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+    }
+
+    .cost-summary-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: var(--border-subtle);
+      margin-bottom: 16px;
+    }
+
+    .cost-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .cost-label {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+    }
+
+    .cost-value {
+      font-size: 1.125rem;
+      font-weight: 600;
+    }
+
+    .cost-total .cost-value {
+      font-size: 1.5rem;
+      color: var(--accent-primary);
+    }
+
+    .cost-note {
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cost-note span {
+      color: var(--success);
+    }
+
+    .cost-note.warning {
+      color: var(--warning);
+    }
+
+    .cost-note.warning span {
+      color: var(--warning);
+    }
+
+    .actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .mode-cards {
+        grid-template-columns: 1fr !important;
+      }
+
+      .stage-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .genre-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .cost-summary-inner {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+
+      .actions-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .actions-row .btn {
+        width: 100%;
+      }
+    }
+  </style>
+  <script>
+    // Selection functionality
+    const modeCards = document.querySelectorAll('.mode-card');
+    const stageCards = document.querySelectorAll('[name="stage"]');
+    const genreCards = document.querySelectorAll('[name="genre"]');
+    const nextBtn = document.getElementById('nextBtn');
+
+    // Credit balance (simulated)
+    let creditBalance = 0;
+
+    // Slider values
+    const sliders = {
+      realism: document.getElementById('realism'),
+      intensity: document.getElementById('intensity'),
+      pace: document.getElementById('pace')
+    };
+
+    const sliderValues = {
+      realism: document.getElementById('realismValue'),
+      intensity: document.getElementById('intensityValue'),
+      pace: document.getElementById('paceValue')
+    };
+
+    // Update slider displays
+    Object.keys(sliders).forEach(key => {
+      sliders[key].addEventListener('input', (e) => {
+        sliderValues[key].textContent = e.target.value + '%';
+      });
+    });
+
+    // Mode selection
+    modeCards.forEach(card => {
+      card.addEventListener('click', () => {
+        modeCards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        updateCostSummary();
+      });
+    });
+
+    // Stage selection
+    document.querySelectorAll('.selection-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const name = card.querySelector('input').name;
+        document.querySelectorAll(`[name="${name}"]`).forEach(input => {
+          input.closest('.selection-card').classList.remove('active');
+        });
+        card.classList.add('active');
+      });
+    });
+
+    function updateCostSummary() {
+      const selectedMode = document.querySelector('[name="mode"]:checked').value;
+      const packElement = document.getElementById('selectedPack');
+      const costElement = document.getElementById('totalCost');
+      const noteElement = document.getElementById('costNote');
+
+      let packName, cost;
+
+      switch(selectedMode) {
+        case 'quick':
+          packName = 'Quick Pack (무료)';
+          cost = 0;
+          noteElement.innerHTML = '<span>✓</span> 무료 Quick Pack은 하루 1팩 제한이 있어요';
+          noteElement.className = 'cost-note';
+          break;
+        case 'story':
+          packName = 'Story Pack';
+          cost = 2;
+          if (creditBalance < cost) {
+            noteElement.innerHTML = '<span>!</span> 크레딧이 부족해요. 충전이 필요합니다.';
+            noteElement.className = 'cost-note warning';
+          } else {
+            noteElement.innerHTML = '<span>✓</span> 크레딧에서 차감됩니다';
+            noteElement.className = 'cost-note';
+          }
+          break;
+        case 'trailer':
+          packName = 'Trailer';
+          cost = 5;
+          if (creditBalance < cost) {
+            noteElement.innerHTML = '<span>!</span> 크레딧이 부족해요. 충전이 필요합니다.';
+            noteElement.className = 'cost-note warning';
+          } else {
+            noteElement.innerHTML = '<span>✓</span> 크레딧에서 차감됩니다';
+            noteElement.className = 'cost-note';
+          }
+          break;
+      }
+
+      packElement.textContent = packName;
+      costElement.textContent = cost;
+    }
+
+    // Initialize
+    updateCostSummary();
+
+    // Next button
+    nextBtn.addEventListener('click', () => {
+      const selectedMode = document.querySelector('[name="mode"]:checked').value;
+      const selectedStage = document.querySelector('[name="stage"]:checked').value;
+      const selectedGenre = document.querySelector('[name="genre"]:checked').value;
+
+      // Store selections
+      sessionStorage.setItem('selectedMode', selectedMode);
+      sessionStorage.setItem('selectedStage', selectedStage);
+      sessionStorage.setItem('selectedGenre', selectedGenre);
+      sessionStorage.setItem('sliders', JSON.stringify({
+        realism: sliders.realism.value,
+        intensity: sliders.intensity.value,
+        pace: sliders.pace.value
+      }));
+
+      // Navigate to rewrite page
+      window.location.href = 'rewrite.html';
+    });
+  </script>
+</body>
+</html>
+

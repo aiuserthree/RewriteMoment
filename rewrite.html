@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewrite Moment - 나만의 영화 만들기</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">🎬</div>
+        <span class="nav-logo-text">Rewrite Moment</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features" class="nav-link">기능</a></li>
+        <li><a href="index.html#how" class="nav-link">이용방법</a></li>
+        <li><a href="pricing.html" class="nav-link">가격</a></li>
+      </ul>
+      <div class="nav-credits">
+        <span class="nav-credits-icon">💎</span>
+        <span class="nav-credits-value">0</span>
+        <span style="color: var(--text-muted)">크레딧</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="page" style="padding-top: 100px;">
+    <div class="container container-sm">
+      
+      <!-- Progress Steps -->
+      <div class="steps">
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <span class="step-text">업로드</span>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <span class="step-text">선택</span>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step active">
+          <div class="step-number">3</div>
+          <span class="step-text">Rewrite</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <span class="step-text">결과</span>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header" data-animate>
+        <h1 class="page-title">
+          <span class="text-gradient">Rewrite</span> Moment
+        </h1>
+        <p class="page-subtitle">
+          잊지 못하는 순간을 다른 결말로 재구성해보세요.<br>
+          <span style="color: var(--text-muted);">(선택 사항 - 건너뛰어도 됩니다)</span>
+        </p>
+      </div>
+
+      <!-- Rewrite Toggle -->
+      <div class="rewrite-toggle card" data-animate style="animation-delay: 0.1s">
+        <label class="toggle-switch">
+          <input type="checkbox" id="rewriteEnabled">
+          <span class="toggle-slider"></span>
+          <span class="toggle-label">
+            <span class="toggle-title">Rewrite Moment 사용하기</span>
+            <span class="toggle-desc">바꾸고 싶은 기억을 입력하면 다른 결말로 재구성됩니다 (+1 크레딧)</span>
+          </span>
+        </label>
+      </div>
+
+      <!-- Rewrite Content (Initially Hidden) -->
+      <div class="rewrite-content" id="rewriteContent">
+        
+        <!-- Safety Notice -->
+        <div class="safety-notice" data-animate style="animation-delay: 0.2s">
+          <div class="safety-icon">🔒</div>
+          <div class="safety-text">
+            <strong>안전 가이드</strong>
+            <p>실명, 학교, 회사, 주소는 적지 말아주세요.<br>입력한 내용은 유사 상황으로 상징화되어 재구성됩니다.</p>
+          </div>
+        </div>
+
+        <!-- Event Input -->
+        <section class="rewrite-section" data-animate style="animation-delay: 0.3s">
+          <h3 class="rewrite-section-title">바꾸고 싶은 순간</h3>
+          <div class="form-group">
+            <textarea 
+              class="form-textarea" 
+              id="eventText"
+              placeholder="예: 그날 발표에서 너무 창피했어… 준비를 열심히 했는데 머리가 새하얘졌어."
+              rows="4"
+              maxlength="300"
+            ></textarea>
+            <div class="form-hint">
+              <span id="charCount">0</span>/300자 · 구체적인 감정과 상황을 적어주세요
+            </div>
+          </div>
+        </section>
+
+        <!-- Distance Mode -->
+        <section class="rewrite-section" data-animate style="animation-delay: 0.4s">
+          <h3 class="rewrite-section-title">거리두기</h3>
+          <p class="rewrite-section-desc">원본 사건과 얼마나 비슷하게 재구성할까요?</p>
+          <div class="distance-options">
+            <label class="distance-card">
+              <input type="radio" name="distance" value="symbolic">
+              <div class="distance-card-inner">
+                <div class="distance-icon">🌫️</div>
+                <div class="distance-title">상징적으로</div>
+                <div class="distance-desc">가장 안전한 방식<br>메타포로 표현</div>
+              </div>
+            </label>
+
+            <label class="distance-card active">
+              <input type="radio" name="distance" value="similar" checked>
+              <div class="distance-card-inner">
+                <div class="distance-icon">🔄</div>
+                <div class="distance-title">유사 상황</div>
+                <div class="distance-desc">비슷하지만 다른<br>상황으로 재구성</div>
+              </div>
+            </label>
+
+            <label class="distance-card">
+              <input type="radio" name="distance" value="quite_similar">
+              <div class="distance-card-inner">
+                <div class="distance-icon">🎯</div>
+                <div class="distance-title">꽤 비슷하게</div>
+                <div class="distance-desc">더 몰입되지만<br>직접 재현은 금지</div>
+              </div>
+            </label>
+          </div>
+        </section>
+
+        <!-- Desired Ending -->
+        <section class="rewrite-section" data-animate style="animation-delay: 0.5s">
+          <h3 class="rewrite-section-title">바꿀 결말</h3>
+          <p class="rewrite-section-desc">어떤 방향의 엔딩을 원하시나요?</p>
+          <div class="ending-options">
+            <label class="ending-card">
+              <input type="radio" name="ending" value="recovery">
+              <span class="ending-emoji">💚</span>
+              <span class="ending-text">회복</span>
+            </label>
+
+            <label class="ending-card active">
+              <input type="radio" name="ending" value="growth" checked>
+              <span class="ending-emoji">🌱</span>
+              <span class="ending-text">성장</span>
+            </label>
+
+            <label class="ending-card">
+              <input type="radio" name="ending" value="reconcile">
+              <span class="ending-emoji">🤝</span>
+              <span class="ending-text">화해</span>
+            </label>
+
+            <label class="ending-card">
+              <input type="radio" name="ending" value="self_protect">
+              <span class="ending-emoji">🛡️</span>
+              <span class="ending-text">자기보호</span>
+            </label>
+
+            <label class="ending-card">
+              <input type="radio" name="ending" value="new_start">
+              <span class="ending-emoji">🚀</span>
+              <span class="ending-text">새출발</span>
+            </label>
+
+            <label class="ending-card">
+              <input type="radio" name="ending" value="comedy">
+              <span class="ending-emoji">😄</span>
+              <span class="ending-text">코미디 승화</span>
+            </label>
+          </div>
+        </section>
+
+        <!-- What Happens -->
+        <div class="what-happens card" data-animate style="animation-delay: 0.6s">
+          <h4>🎬 이렇게 재구성됩니다</h4>
+          <ul>
+            <li>입력한 사건은 <strong>유사한 가상 상황</strong>으로 변환됩니다</li>
+            <li>실명, 학교, 회사 등 식별 가능한 정보는 <strong>자동으로 제거</strong>됩니다</li>
+            <li>선택한 결말 방향으로 <strong>엔딩 클립(Clip 3)</strong>이 재구성됩니다</li>
+            <li>Trailer 모드에서는 중간 장면에도 Rewrite가 반영됩니다</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-row mt-xl" data-animate style="animation-delay: 0.7s">
+        <a href="select.html" class="btn btn-ghost">
+          ← 이전
+        </a>
+        <div class="actions-right">
+          <button class="btn btn-secondary" id="skipBtn">
+            건너뛰기
+          </button>
+          <button class="btn btn-primary btn-lg" id="generateBtn">
+            영상 생성하기
+            <span>🎬</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer mt-xl" data-animate style="animation-delay: 0.8s">
+        <strong>안내:</strong> Rewrite Moment의 모든 결과물은 가상의 재구성입니다. 
+        실제 사건의 재현이 아니며, 치료적 목적으로 사용되지 않습니다. 
+        도움이 필요하시면 전문 상담을 받아주세요.
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <h3 class="loading-title">영상을 생성하고 있어요</h3>
+      <p class="loading-text" id="loadingText">스토리보드 생성 중...</p>
+      <div class="loading-progress">
+        <div class="loading-progress-bar" id="loadingBar"></div>
+      </div>
+      <div class="loading-steps">
+        <div class="loading-step active" data-step="1">스토리보드</div>
+        <div class="loading-step" data-step="2">키프레임</div>
+        <div class="loading-step" data-step="3">영상 생성</div>
+        <div class="loading-step" data-step="4">후처리</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <style>
+    /* Rewrite Page Specific Styles */
+    .rewrite-toggle {
+      margin-bottom: 24px;
+    }
+
+    .toggle-switch {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      cursor: pointer;
+    }
+
+    .toggle-switch input {
+      display: none;
+    }
+
+    .toggle-slider {
+      width: 52px;
+      height: 28px;
+      background: var(--bg-tertiary);
+      border-radius: 14px;
+      position: relative;
+      transition: background var(--transition-fast);
+      flex-shrink: 0;
+    }
+
+    .toggle-slider::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 22px;
+      height: 22px;
+      background: white;
+      border-radius: 50%;
+      transition: transform var(--transition-fast);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+      background: var(--accent-primary);
+    }
+
+    .toggle-switch input:checked + .toggle-slider::after {
+      transform: translateX(24px);
+    }
+
+    .toggle-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .toggle-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+
+    .toggle-desc {
+      font-size: 0.9rem;
+      color: var(--text-tertiary);
+    }
+
+    .rewrite-content {
+      display: none;
+    }
+
+    .rewrite-content.show {
+      display: block;
+    }
+
+    .safety-notice {
+      display: flex;
+      gap: 16px;
+      padding: 20px;
+      background: rgba(240, 180, 41, 0.08);
+      border: 1px solid rgba(240, 180, 41, 0.2);
+      border-radius: var(--radius-lg);
+      margin-bottom: 32px;
+    }
+
+    .safety-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .safety-text strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--accent-primary);
+    }
+
+    .safety-text p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    .rewrite-section {
+      margin-bottom: 32px;
+    }
+
+    .rewrite-section-title {
+      font-size: 1.125rem;
+      margin-bottom: 8px;
+    }
+
+    .rewrite-section-desc {
+      color: var(--text-tertiary);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    /* Distance Cards */
+    .distance-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .distance-card {
+      cursor: pointer;
+    }
+
+    .distance-card input {
+      display: none;
+    }
+
+    .distance-card-inner {
+      padding: 24px 16px;
+      background: var(--bg-secondary);
+      border: 2px solid transparent;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      transition: all var(--transition-base);
+    }
+
+    .distance-card:hover .distance-card-inner {
+      background: var(--bg-tertiary);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .distance-card.active .distance-card-inner,
+    .distance-card input:checked + .distance-card-inner {
+      border-color: var(--accent-primary);
+      background: rgba(240, 180, 41, 0.08);
+    }
+
+    .distance-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .distance-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .distance-desc {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      line-height: 1.4;
+    }
+
+    /* Ending Options */
+    .ending-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .ending-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border: 2px solid transparent;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-base);
+    }
+
+    .ending-card input {
+      display: none;
+    }
+
+    .ending-card:hover {
+      background: var(--bg-tertiary);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .ending-card.active,
+    .ending-card:has(input:checked) {
+      border-color: var(--accent-primary);
+      background: rgba(240, 180, 41, 0.08);
+    }
+
+    .ending-emoji {
+      font-size: 1.25rem;
+    }
+
+    .ending-text {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    /* What Happens */
+    .what-happens {
+      background: var(--bg-secondary);
+    }
+
+    .what-happens h4 {
+      margin-bottom: 16px;
+    }
+
+    .what-happens ul {
+      list-style: none;
+    }
+
+    .what-happens li {
+      position: relative;
+      padding-left: 24px;
+      padding-bottom: 12px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .what-happens li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent-primary);
+    }
+
+    .what-happens li:last-child {
+      padding-bottom: 0;
+    }
+
+    .what-happens strong {
+      color: var(--text-primary);
+    }
+
+    .actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .actions-right {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* Loading Overlay */
+    .loading-overlay {
+      display: none;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .loading-content {
+      text-align: center;
+    }
+
+    .loading-title {
+      margin-top: 24px;
+      margin-bottom: 8px;
+      font-size: 1.5rem;
+    }
+
+    .loading-text {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .loading-progress {
+      width: 300px;
+      margin: 0 auto 24px;
+    }
+
+    .loading-steps {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .loading-step {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      position: relative;
+    }
+
+    .loading-step.active {
+      color: var(--accent-primary);
+    }
+
+    .loading-step.completed {
+      color: var(--success);
+    }
+
+    .loading-step.completed::before {
+      content: '✓ ';
+    }
+
+    @media (max-width: 768px) {
+      .distance-options {
+        grid-template-columns: 1fr;
+      }
+
+      .ending-options {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .actions-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .actions-right {
+        width: 100%;
+        flex-direction: column;
+      }
+
+      .actions-right .btn {
+        width: 100%;
+      }
+
+      .loading-steps {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+    }
+  </style>
+  <script>
+    // Rewrite functionality
+    const rewriteEnabled = document.getElementById('rewriteEnabled');
+    const rewriteContent = document.getElementById('rewriteContent');
+    const eventText = document.getElementById('eventText');
+    const charCount = document.getElementById('charCount');
+    const generateBtn = document.getElementById('generateBtn');
+    const skipBtn = document.getElementById('skipBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // Toggle rewrite content
+    rewriteEnabled.addEventListener('change', () => {
+      if (rewriteEnabled.checked) {
+        rewriteContent.classList.add('show');
+      } else {
+        rewriteContent.classList.remove('show');
+      }
+    });
+
+    // Character count
+    eventText.addEventListener('input', () => {
+      charCount.textContent = eventText.value.length;
+    });
+
+    // Distance selection
+    document.querySelectorAll('.distance-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.distance-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+    });
+
+    // Ending selection
+    document.querySelectorAll('.ending-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.ending-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+    });
+
+    // Generate function
+    function startGeneration() {
+      // Store rewrite data
+      if (rewriteEnabled.checked) {
+        sessionStorage.setItem('rewriteEnabled', 'true');
+        sessionStorage.setItem('rewriteText', eventText.value);
+        sessionStorage.setItem('distance', document.querySelector('[name="distance"]:checked').value);
+        sessionStorage.setItem('ending', document.querySelector('[name="ending"]:checked').value);
+      } else {
+        sessionStorage.setItem('rewriteEnabled', 'false');
+      }
+
+      // Show loading
+      loadingOverlay.classList.add('show');
+
+      // Simulate generation progress
+      const loadingText = document.getElementById('loadingText');
+      const loadingBar = document.getElementById('loadingBar');
+      const steps = document.querySelectorAll('.loading-step');
+      
+      const stages = [
+        { text: '스토리보드 생성 중...', progress: 25, step: 1 },
+        { text: '키프레임 이미지 생성 중...', progress: 50, step: 2 },
+        { text: '영상을 생성하고 있어요...', progress: 75, step: 3 },
+        { text: '마무리 중...', progress: 95, step: 4 }
+      ];
+
+      let currentStage = 0;
+
+      const interval = setInterval(() => {
+        if (currentStage < stages.length) {
+          const stage = stages[currentStage];
+          loadingText.textContent = stage.text;
+          loadingBar.style.width = stage.progress + '%';
+          
+          steps.forEach((s, i) => {
+            if (i < stage.step - 1) {
+              s.classList.remove('active');
+              s.classList.add('completed');
+            } else if (i === stage.step - 1) {
+              s.classList.add('active');
+              s.classList.remove('completed');
+            } else {
+              s.classList.remove('active', 'completed');
+            }
+          });
+          
+          currentStage++;
+        } else {
+          clearInterval(interval);
+          loadingBar.style.width = '100%';
+          
+          // Navigate to result page
+          setTimeout(() => {
+            window.location.href = 'result.html';
+          }, 500);
+        }
+      }, 1500);
+    }
+
+    // Event listeners
+    generateBtn.addEventListener('click', startGeneration);
+    skipBtn.addEventListener('click', () => {
+      sessionStorage.setItem('rewriteEnabled', 'false');
+      startGeneration();
+    });
+  </script>
+</body>
+</html>
+

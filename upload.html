@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>사진 업로드 - Rewrite Moment</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">🎬</div>
+        <span class="nav-logo-text">Rewrite Moment</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features" class="nav-link">기능</a></li>
+        <li><a href="index.html#how" class="nav-link">이용방법</a></li>
+        <li><a href="pricing.html" class="nav-link">가격</a></li>
+      </ul>
+      <div class="nav-credits">
+        <span class="nav-credits-icon">💎</span>
+        <span class="nav-credits-value">0</span>
+        <span style="color: var(--text-muted)">크레딧</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="page" style="padding-top: 100px;">
+    <div class="container container-sm">
+      
+      <!-- Progress Steps -->
+      <div class="steps">
+        <div class="step active">
+          <div class="step-number">1</div>
+          <span class="step-text">업로드</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-number">2</div>
+          <span class="step-text">선택</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-number">3</div>
+          <span class="step-text">Rewrite</span>
+        </div>
+        <div class="step-line"></div>
+        <div class="step">
+          <div class="step-number">4</div>
+          <span class="step-text">결과</span>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header" data-animate>
+        <h1 class="page-title">
+          <span class="text-gradient">내 사진</span>으로<br>
+          영화를 만들어봐
+        </h1>
+        <p class="page-subtitle">
+          정면/밝은 사진 1~3장이 가장 잘 나와요.<br>
+          다양한 표정과 각도가 있으면 더 좋아요.
+        </p>
+      </div>
+
+      <!-- Upload Card -->
+      <div class="card" data-animate style="animation-delay: 0.1s">
+        <!-- Upload Zone -->
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple>
+          <div class="upload-icon">📸</div>
+          <h3 class="upload-title">사진을 드래그하거나 클릭해서 업로드</h3>
+          <p class="upload-desc">최대 3장까지 선택할 수 있어요</p>
+          <p class="upload-formats">JPG, PNG, WEBP · 최대 10MB</p>
+        </div>
+
+        <!-- Preview Grid -->
+        <div class="preview-grid" id="previewGrid">
+          <div class="preview-item preview-item-placeholder" data-slot="0">
+            <span>+</span>
+            필수
+          </div>
+          <div class="preview-item preview-item-placeholder" data-slot="1">
+            <span>+</span>
+            선택
+          </div>
+          <div class="preview-item preview-item-placeholder" data-slot="2">
+            <span>+</span>
+            선택
+          </div>
+        </div>
+
+        <!-- Tips -->
+        <div class="upload-tips mt-xl">
+          <h4 style="font-size: 0.95rem; margin-bottom: 12px; color: var(--text-secondary);">
+            💡 좋은 사진 팁
+          </h4>
+          <div class="tips-grid">
+            <div class="tip-item tip-good">
+              <span class="tip-icon">✓</span>
+              <span>정면 얼굴이 잘 보이는 사진</span>
+            </div>
+            <div class="tip-item tip-good">
+              <span class="tip-icon">✓</span>
+              <span>밝은 조명에서 찍은 사진</span>
+            </div>
+            <div class="tip-item tip-good">
+              <span class="tip-icon">✓</span>
+              <span>다양한 표정/각도 포함</span>
+            </div>
+            <div class="tip-item tip-bad">
+              <span class="tip-icon">✗</span>
+              <span>선글라스/마스크 착용</span>
+            </div>
+            <div class="tip-item tip-bad">
+              <span class="tip-icon">✗</span>
+              <span>얼굴이 작게 나온 사진</span>
+            </div>
+            <div class="tip-item tip-bad">
+              <span class="tip-icon">✗</span>
+              <span>심하게 흐릿한 사진</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consent -->
+      <div class="consent-card mt-lg" data-animate style="animation-delay: 0.2s">
+        <label class="form-check">
+          <input type="checkbox" class="form-check-input" id="consent1">
+          <span class="form-check-label">
+            업로드하는 사진은 본인 또는 정당한 권리가 있는 사진입니다.
+          </span>
+        </label>
+        <label class="form-check mt-md">
+          <input type="checkbox" class="form-check-input" id="consent2">
+          <span class="form-check-label">
+            결과물은 <strong>가상의 창작물(Fiction/Simulation)</strong>이며 예측이나 사실이 아님을 이해합니다.
+          </span>
+        </label>
+      </div>
+
+      <!-- Actions -->
+      <div class="actions-row mt-xl" data-animate style="animation-delay: 0.3s">
+        <a href="index.html" class="btn btn-ghost">
+          ← 돌아가기
+        </a>
+        <button class="btn btn-primary btn-lg" id="nextBtn" disabled>
+          다음 단계로
+          <span>→</span>
+        </button>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer mt-xl" data-animate style="animation-delay: 0.4s">
+        <strong>안내:</strong> 업로드된 사진은 영상 생성 목적으로만 사용되며, 
+        생성 완료 후 서버에서 삭제됩니다. 제3자와 공유되지 않습니다.
+      </div>
+
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <style>
+    /* Upload Page Specific Styles */
+    .page-title {
+      font-size: 2.25rem;
+    }
+
+    .upload-tips {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-md);
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .tip-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+    }
+
+    .tip-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      flex-shrink: 0;
+    }
+
+    .tip-good .tip-icon {
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--success);
+    }
+
+    .tip-bad .tip-icon {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--error);
+    }
+
+    .consent-card {
+      padding: 20px;
+      background: var(--bg-secondary);
+      border: var(--border-subtle);
+      border-radius: var(--radius-lg);
+    }
+
+    .consent-card strong {
+      color: var(--accent-primary);
+    }
+
+    .actions-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Preview with images */
+    .preview-item.has-image {
+      cursor: default;
+    }
+
+    .preview-item.has-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @media (max-width: 768px) {
+      .tips-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions-row {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .actions-row .btn {
+        width: 100%;
+      }
+    }
+  </style>
+  <script>
+    // Upload functionality
+    const uploadZone = document.getElementById('uploadZone');
+    const fileInput = document.getElementById('fileInput');
+    const previewGrid = document.getElementById('previewGrid');
+    const nextBtn = document.getElementById('nextBtn');
+    const consent1 = document.getElementById('consent1');
+    const consent2 = document.getElementById('consent2');
+
+    let uploadedFiles = [];
+    const maxFiles = 3;
+
+    // Drag and drop handlers
+    uploadZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadZone.classList.add('drag-over');
+    });
+
+    uploadZone.addEventListener('dragleave', () => {
+      uploadZone.classList.remove('drag-over');
+    });
+
+    uploadZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadZone.classList.remove('drag-over');
+      handleFiles(e.dataTransfer.files);
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+      handleFiles(e.target.files);
+    });
+
+    function handleFiles(files) {
+      const validFiles = Array.from(files).filter(file => {
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        return validTypes.includes(file.type) && file.size <= maxSize;
+      });
+
+      validFiles.forEach(file => {
+        if (uploadedFiles.length < maxFiles) {
+          uploadedFiles.push(file);
+        }
+      });
+
+      updatePreviews();
+      checkCanProceed();
+    }
+
+    function updatePreviews() {
+      const slots = previewGrid.querySelectorAll('.preview-item');
+      
+      slots.forEach((slot, index) => {
+        if (uploadedFiles[index]) {
+          const file = uploadedFiles[index];
+          const reader = new FileReader();
+          
+          reader.onload = (e) => {
+            slot.innerHTML = `
+              <img src="${e.target.result}" alt="Preview ${index + 1}">
+              <button class="preview-item-remove" onclick="removeFile(${index})">×</button>
+            `;
+            slot.classList.add('has-image');
+            slot.classList.remove('preview-item-placeholder');
+          };
+          
+          reader.readAsDataURL(file);
+        } else {
+          slot.innerHTML = `
+            <span>+</span>
+            ${index === 0 ? '필수' : '선택'}
+          `;
+          slot.classList.remove('has-image');
+          slot.classList.add('preview-item-placeholder');
+        }
+      });
+    }
+
+    function removeFile(index) {
+      uploadedFiles.splice(index, 1);
+      updatePreviews();
+      checkCanProceed();
+    }
+
+    // Make removeFile globally accessible
+    window.removeFile = removeFile;
+
+    function checkCanProceed() {
+      const hasFiles = uploadedFiles.length >= 1;
+      const hasConsent = consent1.checked && consent2.checked;
+      nextBtn.disabled = !(hasFiles && hasConsent);
+    }
+
+    consent1.addEventListener('change', checkCanProceed);
+    consent2.addEventListener('change', checkCanProceed);
+
+    // Next button click
+    nextBtn.addEventListener('click', () => {
+      if (!nextBtn.disabled) {
+        // In a real app, you'd save the files to session/local storage or upload them
+        // For demo, we'll just navigate
+        sessionStorage.setItem('uploadedCount', uploadedFiles.length);
+        window.location.href = 'select.html';
+      }
+    });
+  </script>
+</body>
+</html>
+

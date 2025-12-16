@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rewrite Moment - 내가 주인공인 영화를 만들어봐</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">🎬</div>
+        <span class="nav-logo-text">Rewrite Moment</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features" class="nav-link">기능</a></li>
+        <li><a href="#how" class="nav-link">이용방법</a></li>
+        <li><a href="pricing.html" class="nav-link">가격</a></li>
+      </ul>
+      <div class="nav-credits">
+        <span class="nav-credits-icon">💎</span>
+        <span class="nav-credits-value">0</span>
+        <span style="color: var(--text-muted)">크레딧</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="container">
+      <div class="hero-content" data-animate>
+        <div class="hero-badge">
+          <span>✨ AI 영상 생성</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="text-gradient">내가 주인공</span>인<br>
+          영화를 만들어봐
+        </h1>
+        <p class="hero-desc">
+          사진 한 장으로 나만의 오리지널 세계관 영상을 만들어보세요.<br>
+          청소년부터 신혼까지, 5가지 장르로 바이럴 숏폼을 생성합니다.
+        </p>
+        <div class="hero-actions">
+          <a href="upload.html" class="btn btn-primary btn-lg">
+            <span>🚀</span>
+            무료로 시작하기
+          </a>
+          <a href="#how" class="btn btn-secondary btn-lg">
+            이용방법 보기
+          </a>
+        </div>
+        <div class="hero-note">
+          <span>✓</span> 하루 1팩 무료
+          <span>✓</span> 회원가입 불필요
+          <span>✓</span> 저작권 걱정 없는 오리지널
+        </div>
+      </div>
+
+      <!-- Preview Mockup -->
+      <div class="hero-preview" data-animate style="animation-delay: 0.2s">
+        <div class="hero-preview-frame">
+          <div class="hero-preview-phone">
+            <div class="hero-preview-notch"></div>
+            <div class="hero-preview-screen">
+              <div class="hero-preview-content">
+                <div class="hero-preview-video">
+                  <div class="hero-preview-play">▶</div>
+                  <div class="hero-preview-caption">하필 오늘…</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="hero-preview-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header" data-animate>
+        <h2 class="section-title">왜 <span class="text-gradient">Rewrite Moment</span>인가요?</h2>
+        <p class="section-desc">당신의 이야기를 영화처럼 만들어드립니다</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card" data-animate style="animation-delay: 0.1s">
+          <div class="feature-icon">👤</div>
+          <h3 class="feature-title">나 중심 몰입</h3>
+          <p class="feature-desc">내 사진으로 내가 주인공인 영상을 생성합니다. 완벽한 몰입감을 경험하세요.</p>
+        </div>
+
+        <div class="feature-card" data-animate style="animation-delay: 0.2s">
+          <div class="feature-icon">🎭</div>
+          <h3 class="feature-title">5가지 장르</h3>
+          <p class="feature-desc">다큐, 코미디, 드라마, 멜로, 판타지. 원하는 분위기로 나만의 이야기를 만드세요.</p>
+        </div>
+
+        <div class="feature-card" data-animate style="animation-delay: 0.3s">
+          <div class="feature-icon">🔄</div>
+          <h3 class="feature-title">Rewrite Moment</h3>
+          <p class="feature-desc">잊지 못하는 순간을 다른 결말로. 과거를 재구성해 새로운 엔딩을 만나보세요.</p>
+        </div>
+
+        <div class="feature-card" data-animate style="animation-delay: 0.4s">
+          <div class="feature-icon">⚡</div>
+          <h3 class="feature-title">빠른 생성</h3>
+          <p class="feature-desc">8초 클립부터 60초 예고편까지. 원하는 길이로 빠르게 생성됩니다.</p>
+        </div>
+
+        <div class="feature-card" data-animate style="animation-delay: 0.5s">
+          <div class="feature-icon">🔒</div>
+          <h3 class="feature-title">저작권 안전</h3>
+          <p class="feature-desc">완전한 오리지널 세계관으로 생성됩니다. 저작권 걱정 없이 공유하세요.</p>
+        </div>
+
+        <div class="feature-card" data-animate style="animation-delay: 0.6s">
+          <div class="feature-icon">📱</div>
+          <h3 class="feature-title">바로 공유</h3>
+          <p class="feature-desc">9:16 세로 포맷으로 숏폼에 최적화. 다운로드 후 바로 업로드 가능합니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="section section-dark" id="how">
+    <div class="container">
+      <div class="section-header" data-animate>
+        <h2 class="section-title">어떻게 <span class="text-gradient">만들어지나요?</span></h2>
+        <p class="section-desc">4단계로 나만의 영화를 완성하세요</p>
+      </div>
+
+      <div class="how-steps">
+        <div class="how-step" data-animate style="animation-delay: 0.1s">
+          <div class="how-step-number">01</div>
+          <div class="how-step-content">
+            <h3>사진 업로드</h3>
+            <p>정면/밝은 사진 1~3장을 업로드하세요. 다양한 표정이면 더 좋아요.</p>
+          </div>
+          <div class="how-step-visual">📸</div>
+        </div>
+
+        <div class="how-step" data-animate style="animation-delay: 0.2s">
+          <div class="how-step-number">02</div>
+          <div class="how-step-content">
+            <h3>스테이지 & 장르 선택</h3>
+            <p>청소년/20대/신혼/초기육아 중 선택하고, 원하는 장르를 골라요.</p>
+          </div>
+          <div class="how-step-visual">🎬</div>
+        </div>
+
+        <div class="how-step" data-animate style="animation-delay: 0.3s">
+          <div class="how-step-number">03</div>
+          <div class="how-step-content">
+            <h3>Rewrite Moment (선택)</h3>
+            <p>바꾸고 싶은 기억이 있다면 입력하세요. 다른 결말로 재구성됩니다.</p>
+          </div>
+          <div class="how-step-visual">✨</div>
+        </div>
+
+        <div class="how-step" data-animate style="animation-delay: 0.4s">
+          <div class="how-step-number">04</div>
+          <div class="how-step-content">
+            <h3>결과 확인 & 공유</h3>
+            <p>생성된 클립을 확인하고 다운로드하거나 공유 링크를 만드세요.</p>
+          </div>
+          <div class="how-step-visual">🎉</div>
+        </div>
+      </div>
+
+      <div class="text-center mt-2xl" data-animate>
+        <a href="upload.html" class="btn btn-primary btn-lg">
+          지금 시작하기
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Packs Section -->
+  <section class="section" id="packs">
+    <div class="container">
+      <div class="section-header" data-animate>
+        <h2 class="section-title"><span class="text-gradient">3가지 팩</span>으로 선택하세요</h2>
+        <p class="section-desc">원하는 길이와 퀄리티로 생성할 수 있어요</p>
+      </div>
+
+      <div class="pack-cards">
+        <div class="pack-card" data-animate style="animation-delay: 0.1s">
+          <div class="pack-badge free">무료</div>
+          <h3 class="pack-title">Quick Pack</h3>
+          <div class="pack-duration">8초 × 3개 클립</div>
+          <ul class="pack-features">
+            <li>Hook + Main + Ending 구성</li>
+            <li>720p 해상도</li>
+            <li>워터마크 포함</li>
+            <li>하루 1팩 제한</li>
+          </ul>
+          <div class="pack-price">
+            <span class="pack-price-value">0</span>
+            <span class="pack-price-unit">크레딧</span>
+          </div>
+        </div>
+
+        <div class="pack-card featured" data-animate style="animation-delay: 0.2s">
+          <div class="pack-badge paid">인기</div>
+          <h3 class="pack-title">Story Pack</h3>
+          <div class="pack-duration">15초 × 3개 클립</div>
+          <ul class="pack-features">
+            <li>상황→감정→전환 비트 구성</li>
+            <li>1080p 해상도</li>
+            <li>워터마크 옵션</li>
+            <li>클립별 재생성 가능</li>
+          </ul>
+          <div class="pack-price">
+            <span class="pack-price-value">2</span>
+            <span class="pack-price-unit">크레딧</span>
+          </div>
+        </div>
+
+        <div class="pack-card" data-animate style="animation-delay: 0.3s">
+          <div class="pack-badge premium">프리미엄</div>
+          <h3 class="pack-title">Trailer</h3>
+          <div class="pack-duration">45~60초 × 1개</div>
+          <ul class="pack-features">
+            <li>6~10장면 예고편 구성</li>
+            <li>내레이션/타이틀 카드</li>
+            <li>1080p 해상도</li>
+            <li>장면별 재생성 가능</li>
+          </ul>
+          <div class="pack-price">
+            <span class="pack-price-value">5</span>
+            <span class="pack-price-unit">크레딧</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-xl">
+        <p style="color: var(--text-tertiary); font-size: 0.9rem;">
+          Rewrite Moment 추가 시 +1 크레딧 | 재생성은 클립/장면당 1 크레딧
+        </p>
+        <a href="pricing.html" class="btn btn-ghost mt-md">크레딧 구매하기 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="section-cta">
+    <div class="container">
+      <div class="cta-content" data-animate>
+        <h2 class="cta-title">지금 <span class="text-gradient">나만의 영화</span>를 만들어보세요</h2>
+        <p class="cta-desc">무료로 Quick Pack을 체험하고, 내가 주인공인 영상을 공유해보세요.</p>
+        <a href="upload.html" class="btn btn-primary btn-lg">
+          <span>🎬</span>
+          무료로 시작하기
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <div class="nav-logo">
+            <div class="nav-logo-icon">🎬</div>
+            <span class="nav-logo-text">Rewrite Moment</span>
+          </div>
+        </div>
+        <div class="footer-links">
+          <a href="#">이용약관</a>
+          <a href="#">개인정보처리방침</a>
+          <a href="#">문의하기</a>
+        </div>
+        <p class="footer-copyright">
+          © 2025 Rewrite Moment. All rights reserved.<br>
+          <span style="font-size: 0.8rem; opacity: 0.6;">결과물은 가상의 창작물(Fiction/Simulation)이며 예측이나 사실이 아닙니다.</span>
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+  <style>
+    /* Hero Specific Styles */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 0 80px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(ellipse at 30% 20%, rgba(240, 180, 41, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(240, 180, 41, 0.06) 0%, transparent 40%);
+      pointer-events: none;
+    }
+
+    .hero .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(240, 180, 41, 0.1);
+      border: 1px solid rgba(240, 180, 41, 0.2);
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: var(--accent-primary);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      line-height: 1.15;
+      margin-bottom: 24px;
+      font-weight: 800;
+    }
+
+    .hero-desc {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+
+    .hero-note {
+      display: flex;
+      gap: 24px;
+      font-size: 0.9rem;
+      color: var(--text-tertiary);
+    }
+
+    .hero-note span {
+      color: var(--success);
+      margin-right: 4px;
+    }
+
+    /* Hero Preview */
+    .hero-preview {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-preview-frame {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-preview-phone {
+      width: 280px;
+      height: 560px;
+      background: #1a1a26;
+      border-radius: 40px;
+      padding: 12px;
+      box-shadow: 
+        0 50px 100px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 2px rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-preview-notch {
+      width: 120px;
+      height: 28px;
+      background: #0a0a0f;
+      border-radius: 20px;
+      margin: 0 auto 12px;
+    }
+
+    .hero-preview-screen {
+      height: calc(100% - 40px);
+      background: linear-gradient(180deg, #2a1a3a 0%, #1a1025 100%);
+      border-radius: 28px;
+      overflow: hidden;
+    }
+
+    .hero-preview-content {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero-preview-video {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: 
+        linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%),
+        linear-gradient(135deg, #3a2a4a 0%, #2a1a3a 100%);
+    }
+
+    .hero-preview-play {
+      width: 60px;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      backdrop-filter: blur(10px);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .hero-preview-caption {
+      position: absolute;
+      bottom: 40px;
+      left: 20px;
+      right: 20px;
+      text-align: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .hero-preview-glow {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(240, 180, 41, 0.2) 0%, transparent 70%);
+      filter: blur(60px);
+      z-index: 0;
+    }
+
+    /* Sections */
+    .section {
+      padding: 100px 0;
+      position: relative;
+    }
+
+    .section-dark {
+      background: var(--bg-secondary);
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    .section-desc {
+      font-size: 1.125rem;
+      color: var(--text-secondary);
+    }
+
+    /* Features Grid */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .feature-card {
+      padding: 32px;
+      background: var(--bg-secondary);
+      border: var(--border-subtle);
+      border-radius: 20px;
+      transition: all var(--transition-base);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(240, 180, 41, 0.2);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    .feature-title {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .feature-desc {
+      color: var(--text-tertiary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* How Steps */
+    .how-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .how-step {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 24px;
+      align-items: center;
+      padding: 32px;
+      background: var(--bg-tertiary);
+      border: var(--border-subtle);
+      border-radius: 20px;
+      transition: all var(--transition-base);
+    }
+
+    .how-step:hover {
+      border-color: rgba(240, 180, 41, 0.2);
+      transform: translateX(8px);
+    }
+
+    .how-step-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2.5rem;
+      color: var(--accent-primary);
+      letter-spacing: 0.05em;
+    }
+
+    .how-step-content h3 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+
+    .how-step-content p {
+      color: var(--text-tertiary);
+      font-size: 0.95rem;
+    }
+
+    .how-step-visual {
+      font-size: 2.5rem;
+      opacity: 0.5;
+    }
+
+    /* Pack Cards */
+    .pack-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .pack-card {
+      padding: 32px;
+      background: var(--bg-secondary);
+      border: 2px solid transparent;
+      border-radius: 24px;
+      transition: all var(--transition-base);
+      position: relative;
+    }
+
+    .pack-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .pack-card.featured {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 40px var(--accent-glow);
+    }
+
+    .pack-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .pack-badge.free {
+      background: rgba(74, 222, 128, 0.15);
+      color: var(--success);
+    }
+
+    .pack-badge.paid {
+      background: var(--gradient-gold);
+      color: #0a0a0f;
+    }
+
+    .pack-badge.premium {
+      background: rgba(240, 180, 41, 0.15);
+      color: var(--accent-primary);
+    }
+
+    .pack-title {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .pack-duration {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .pack-features {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+
+    .pack-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      font-size: 0.9rem;
+      color: var(--text-tertiary);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .pack-features li:last-child {
+      border-bottom: none;
+    }
+
+    .pack-features li::before {
+      content: '✓';
+      color: var(--accent-primary);
+    }
+
+    .pack-price {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .pack-price-value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+    }
+
+    .pack-price-unit {
+      color: var(--text-secondary);
+    }
+
+    /* CTA Section */
+    .section-cta {
+      padding: 100px 0;
+      background: 
+        linear-gradient(180deg, var(--bg-primary) 0%, rgba(240, 180, 41, 0.05) 50%, var(--bg-primary) 100%);
+    }
+
+    .cta-content {
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .cta-title {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    .cta-desc {
+      color: var(--text-secondary);
+      font-size: 1.125rem;
+      margin-bottom: 32px;
+    }
+
+    /* Footer */
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      color: var(--text-tertiary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color var(--transition-fast);
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-primary);
+    }
+
+    .footer-copyright {
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .hero .container {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .hero-actions {
+        justify-content: center;
+      }
+
+      .hero-note {
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .hero-preview {
+        order: -1;
+        margin-bottom: 40px;
+      }
+
+      .hero-preview-phone {
+        width: 220px;
+        height: 440px;
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .pack-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 2.25rem;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .how-step {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+
+      .how-step-visual {
+        display: none;
+      }
+
+      .section-title {
+        font-size: 1.75rem;
+      }
+
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+      }
+    }
+  </style>
+</body>
+</html>
+

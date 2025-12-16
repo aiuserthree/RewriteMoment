@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>크레딧 가격 - Rewrite Moment</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">🎬</div>
+        <span class="nav-logo-text">Rewrite Moment</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features" class="nav-link">기능</a></li>
+        <li><a href="index.html#how" class="nav-link">이용방법</a></li>
+        <li><a href="pricing.html" class="nav-link" style="color: var(--accent-primary)">가격</a></li>
+      </ul>
+      <div class="nav-credits">
+        <span class="nav-credits-icon">💎</span>
+        <span class="nav-credits-value" id="currentCredits">0</span>
+        <span style="color: var(--text-muted)">크레딧</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="page" style="padding-top: 100px;">
+    <div class="container">
+      
+      <!-- Page Header -->
+      <div class="page-header" data-animate>
+        <div class="pricing-badge">💎 크레딧 충전</div>
+        <h1 class="page-title">
+          <span class="text-gradient">크레딧</span>으로<br>
+          더 많은 영상을 만드세요
+        </h1>
+        <p class="page-subtitle">
+          Story Pack, Trailer, 재생성 기능을 이용하려면 크레딧이 필요해요.<br>
+          한 번 충전하면 기한 없이 사용할 수 있어요.
+        </p>
+      </div>
+
+      <!-- Pricing Grid -->
+      <div class="pricing-grid" data-animate style="animation-delay: 0.1s">
+        
+        <!-- Starter -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3 class="pricing-name">Starter</h3>
+            <div class="pricing-credits">
+              10
+              <span>크레딧</span>
+            </div>
+          </div>
+          <p class="pricing-desc">처음 시작하기 좋은 패키지</p>
+          <ul class="pricing-features">
+            <li>Story Pack 4~5회</li>
+            <li>또는 Trailer 2회</li>
+            <li>재생성 10회</li>
+            <li>유효기간 없음</li>
+          </ul>
+          <div class="pricing-price">
+            <span class="price-original"></span>
+            <span class="price-value">₩4,900</span>
+          </div>
+          <button class="btn btn-secondary w-full pricing-btn" data-credits="10" data-price="4900">
+            충전하기
+          </button>
+        </div>
+
+        <!-- Value - Featured -->
+        <div class="pricing-card featured">
+          <div class="pricing-header">
+            <h3 class="pricing-name">Value</h3>
+            <div class="pricing-credits">
+              50
+              <span>크레딧</span>
+            </div>
+          </div>
+          <p class="pricing-desc">가장 인기 있는 선택</p>
+          <ul class="pricing-features">
+            <li>Story Pack 20회+</li>
+            <li>또는 Trailer 10회</li>
+            <li>재생성 50회</li>
+            <li>유효기간 없음</li>
+            <li class="highlight">✨ 20% 할인</li>
+          </ul>
+          <div class="pricing-price">
+            <span class="price-original">₩24,500</span>
+            <span class="price-value">₩19,900</span>
+          </div>
+          <button class="btn btn-primary w-full pricing-btn" data-credits="50" data-price="19900">
+            충전하기
+          </button>
+        </div>
+
+        <!-- Pro -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3 class="pricing-name">Pro</h3>
+            <div class="pricing-credits">
+              120
+              <span>크레딧</span>
+            </div>
+          </div>
+          <p class="pricing-desc">바이럴 실험/AB 테스트용</p>
+          <ul class="pricing-features">
+            <li>Story Pack 50회+</li>
+            <li>또는 Trailer 24회</li>
+            <li>재생성 120회</li>
+            <li>유효기간 없음</li>
+            <li class="highlight">✨ 30% 할인</li>
+          </ul>
+          <div class="pricing-price">
+            <span class="price-original">₩58,800</span>
+            <span class="price-value">₩39,900</span>
+          </div>
+          <button class="btn btn-secondary w-full pricing-btn" data-credits="120" data-price="39900">
+            충전하기
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Credit Usage Table -->
+      <div class="usage-section mt-3xl" data-animate style="animation-delay: 0.2s">
+        <h2 class="section-title text-center">
+          <span class="text-gradient">크레딧</span> 사용 안내
+        </h2>
+        
+        <div class="usage-table-wrapper">
+          <table class="usage-table">
+            <thead>
+              <tr>
+                <th>기능</th>
+                <th>크레딧</th>
+                <th>설명</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <span class="usage-icon">📦</span>
+                  Quick Pack
+                </td>
+                <td class="usage-credit free">무료</td>
+                <td>8초×3 클립, 하루 1팩 제한</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="usage-icon">📦</span>
+                  Story Pack
+                </td>
+                <td class="usage-credit">2</td>
+                <td>15초×3 클립, 상황→감정→전환 비트</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="usage-icon">🎬</span>
+                  Trailer
+                </td>
+                <td class="usage-credit">5</td>
+                <td>45~60초 예고편, 6~10장면</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="usage-icon">✨</span>
+                  Rewrite Moment
+                </td>
+                <td class="usage-credit">+1</td>
+                <td>기본 팩 가격에 추가</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="usage-icon">🔄</span>
+                  클립 재생성 (Story)
+                </td>
+                <td class="usage-credit">1</td>
+                <td>선택한 클립만 다시 생성</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="usage-icon">🔄</span>
+                  장면 재생성 (Trailer)
+                </td>
+                <td class="usage-credit">1</td>
+                <td>선택한 장면만 다시 생성</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- FAQ Section -->
+      <div class="faq-section mt-3xl" data-animate style="animation-delay: 0.3s">
+        <h2 class="section-title text-center">
+          자주 묻는 <span class="text-gradient">질문</span>
+        </h2>
+        
+        <div class="faq-list">
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>크레딧 유효기간이 있나요?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>아니요, 충전한 크레딧은 유효기간 없이 사용할 수 있어요. 편하게 필요할 때 충전하시면 됩니다.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>무료로 얼마나 사용할 수 있나요?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>Quick Pack(8초×3 클립)은 하루 1팩까지 무료로 이용할 수 있어요. 더 긴 영상이나 재생성을 원하시면 크레딧이 필요합니다.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>환불이 가능한가요?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>결제 후 7일 이내, 크레딧을 사용하지 않은 경우 전액 환불이 가능합니다. 일부 사용 시에는 잔여 크레딧에 대해 환불받으실 수 있어요.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>생성된 영상의 저작권은 누구에게 있나요?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>생성된 영상은 오리지널 세계관으로 제작되어 저작권 문제 없이 자유롭게 공유하실 수 있어요. 단, 상업적 이용 시에는 이용약관을 확인해주세요.</p>
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-question" onclick="toggleFaq(this)">
+              <span>영상 생성에 얼마나 걸리나요?</span>
+              <span class="faq-icon">+</span>
+            </button>
+            <div class="faq-answer">
+              <p>Quick Pack은 약 1~2분, Story Pack은 3~5분, Trailer는 5~10분 정도 소요됩니다. 서버 상황에 따라 다소 차이가 있을 수 있어요.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="pricing-cta mt-3xl" data-animate style="animation-delay: 0.4s">
+        <div class="pricing-cta-content">
+          <h3>아직 결정이 어려우신가요?</h3>
+          <p>먼저 무료 Quick Pack으로 체험해보세요!</p>
+          <a href="upload.html" class="btn btn-primary btn-lg">
+            <span>🎬</span>
+            무료로 시작하기
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <div class="nav-logo">
+            <div class="nav-logo-icon">🎬</div>
+            <span class="nav-logo-text">Rewrite Moment</span>
+          </div>
+        </div>
+        <div class="footer-links">
+          <a href="#">이용약관</a>
+          <a href="#">개인정보처리방침</a>
+          <a href="#">문의하기</a>
+        </div>
+        <p class="footer-copyright">
+          © 2025 Rewrite Moment. All rights reserved.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Purchase Modal -->
+  <div class="modal-overlay" id="purchaseModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">크레딧 충전</h3>
+        <button class="modal-close" onclick="closePurchaseModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="purchase-summary">
+          <div class="purchase-item">
+            <span>선택한 패키지</span>
+            <span id="purchasePackage">Value</span>
+          </div>
+          <div class="purchase-item">
+            <span>충전 크레딧</span>
+            <span id="purchaseCredits">50 크레딧</span>
+          </div>
+          <div class="purchase-item total">
+            <span>결제 금액</span>
+            <span id="purchasePrice">₩19,900</span>
+          </div>
+        </div>
+        
+        <div class="payment-methods mt-lg">
+          <h4>결제 수단</h4>
+          <div class="payment-options">
+            <label class="payment-option active">
+              <input type="radio" name="payment" value="card" checked>
+              <span class="payment-icon">💳</span>
+              <span>신용카드</span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="kakao">
+              <span class="payment-icon">💬</span>
+              <span>카카오페이</span>
+            </label>
+            <label class="payment-option">
+              <input type="radio" name="payment" value="naver">
+              <span class="payment-icon">🟢</span>
+              <span>네이버페이</span>
+            </label>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg w-full mt-lg" id="confirmPurchaseBtn">
+          결제하기
+        </button>
+        
+        <p class="purchase-note mt-md">
+          결제 시 <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>에 동의하는 것으로 간주됩니다.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast toast-success" id="toast">
+    <span>✓</span>
+    <span id="toastMessage">충전이 완료되었어요!</span>
+  </div>
+
+  <script src="app.js"></script>
+  <style>
+    /* Pricing Page Specific Styles */
+    .pricing-badge {
+      display: inline-block;
+      padding: 8px 16px;
+      background: rgba(240, 180, 41, 0.1);
+      border: 1px solid rgba(240, 180, 41, 0.2);
+      border-radius: var(--radius-full);
+      font-size: 0.9rem;
+      color: var(--accent-primary);
+      margin-bottom: 24px;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .pricing-card {
+      position: relative;
+      padding: 32px;
+      background: var(--gradient-card);
+      border: 2px solid rgba(255, 255, 255, 0.06);
+      border-radius: var(--radius-xl);
+      transition: all var(--transition-base);
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .pricing-card.featured {
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .pricing-card.featured::before {
+      content: 'BEST VALUE';
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 6px 16px;
+      background: var(--gradient-gold);
+      color: #0a0a0f;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      border-radius: var(--radius-full);
+    }
+
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .pricing-name {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .pricing-credits {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--accent-primary);
+      line-height: 1;
+    }
+
+    .pricing-credits span {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      margin-top: 4px;
+    }
+
+    .pricing-desc {
+      text-align: center;
+      color: var(--text-tertiary);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+
+    .pricing-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .pricing-features li:last-child {
+      border-bottom: none;
+    }
+
+    .pricing-features li::before {
+      content: '✓';
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .pricing-features li.highlight {
+      color: var(--accent-primary);
+    }
+
+    .pricing-features li.highlight::before {
+      content: '';
+    }
+
+    .pricing-price {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .price-original {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      margin-right: 8px;
+    }
+
+    .price-value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    /* Usage Table */
+    .usage-section {
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .usage-table-wrapper {
+      margin-top: 32px;
+      background: var(--bg-secondary);
+      border: var(--border-subtle);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .usage-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .usage-table th,
+    .usage-table td {
+      padding: 16px 20px;
+      text-align: left;
+    }
+
+    .usage-table th {
+      background: var(--bg-tertiary);
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .usage-table td {
+      border-bottom: var(--border-subtle);
+    }
+
+    .usage-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .usage-icon {
+      margin-right: 8px;
+    }
+
+    .usage-credit {
+      font-weight: 700;
+      color: var(--accent-primary);
+    }
+
+    .usage-credit.free {
+      color: var(--success);
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .faq-list {
+      margin-top: 32px;
+    }
+
+    .faq-item {
+      border-bottom: var(--border-subtle);
+    }
+
+    .faq-question {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      background: none;
+      border: none;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .faq-question:hover {
+      color: var(--accent-primary);
+    }
+
+    .faq-icon {
+      font-size: 1.5rem;
+      color: var(--accent-primary);
+      transition: transform var(--transition-fast);
+    }
+
+    .faq-item.open .faq-icon {
+      transform: rotate(45deg);
+    }
+
+    .faq-answer {
+      display: none;
+      padding-bottom: 20px;
+    }
+
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+
+    .faq-answer p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* Pricing CTA */
+    .pricing-cta {
+      text-align: center;
+      padding: 60px 40px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+    }
+
+    .pricing-cta h3 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+
+    .pricing-cta p {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* Purchase Modal */
+    .purchase-summary {
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .purchase-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      font-size: 0.95rem;
+    }
+
+    .purchase-item.total {
+      border-top: var(--border-subtle);
+      margin-top: 10px;
+      padding-top: 16px;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .purchase-item.total span:last-child {
+      color: var(--accent-primary);
+    }
+
+    .payment-methods h4 {
+      font-size: 1rem;
+      margin-bottom: 12px;
+    }
+
+    .payment-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .payment-option {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 16px;
+      background: var(--bg-tertiary);
+      border: 2px solid transparent;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .payment-option input {
+      display: none;
+    }
+
+    .payment-option:hover {
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .payment-option.active,
+    .payment-option:has(input:checked) {
+      border-color: var(--accent-primary);
+      background: rgba(240, 180, 41, 0.08);
+    }
+
+    .payment-icon {
+      font-size: 1.5rem;
+    }
+
+    .purchase-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .purchase-note a {
+      color: var(--accent-primary);
+      text-decoration: none;
+    }
+
+    /* Footer */
+    .footer-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 32px;
+    }
+
+    .footer-links a {
+      color: var(--text-tertiary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color var(--transition-fast);
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-primary);
+    }
+
+    .footer-copyright {
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .usage-table th,
+      .usage-table td {
+        padding: 12px;
+        font-size: 0.85rem;
+      }
+
+      .payment-options {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px;
+      }
+    }
+  </style>
+  <script>
+    // Pricing page functionality
+    const purchaseModal = document.getElementById('purchaseModal');
+    const toast = document.getElementById('toast');
+    let currentCredits = 0;
+    let selectedCredits = 0;
+    let selectedPrice = 0;
+
+    // Load current credits from storage
+    const savedCredits = localStorage.getItem('rewrite_moment_credits');
+    if (savedCredits) {
+      currentCredits = parseInt(savedCredits);
+      document.getElementById('currentCredits').textContent = currentCredits;
+    }
+
+    // Pricing buttons
+    document.querySelectorAll('.pricing-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selectedCredits = parseInt(btn.dataset.credits);
+        selectedPrice = parseInt(btn.dataset.price);
+        
+        // Update modal
+        const packages = { 10: 'Starter', 50: 'Value', 120: 'Pro' };
+        document.getElementById('purchasePackage').textContent = packages[selectedCredits];
+        document.getElementById('purchaseCredits').textContent = `${selectedCredits} 크레딧`;
+        document.getElementById('purchasePrice').textContent = `₩${selectedPrice.toLocaleString()}`;
+        
+        purchaseModal.classList.add('show');
+      });
+    });
+
+    function closePurchaseModal() {
+      purchaseModal.classList.remove('show');
+    }
+
+    purchaseModal.addEventListener('click', (e) => {
+      if (e.target === purchaseModal) {
+        closePurchaseModal();
+      }
+    });
+
+    // Payment options
+    document.querySelectorAll('.payment-option').forEach(option => {
+      option.addEventListener('click', () => {
+        document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
+        option.classList.add('active');
+      });
+    });
+
+    // Confirm purchase (demo)
+    document.getElementById('confirmPurchaseBtn').addEventListener('click', () => {
+      // Simulate purchase
+      currentCredits += selectedCredits;
+      localStorage.setItem('rewrite_moment_credits', currentCredits);
+      document.getElementById('currentCredits').textContent = currentCredits;
+      
+      closePurchaseModal();
+      showToast(`${selectedCredits} 크레딧이 충전되었어요!`);
+    });
+
+    // Toast
+    function showToast(message) {
+      document.getElementById('toastMessage').textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // FAQ toggle
+    function toggleFaq(btn) {
+      const item = btn.closest('.faq-item');
+      item.classList.toggle('open');
+    }
+
+    // Make toggleFaq global
+    window.toggleFaq = toggleFaq;
+  </script>
+</body>
+</html>
+

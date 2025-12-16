@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>결과 - Rewrite Moment</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="noise-overlay"></div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="nav-logo-icon">🎬</div>
+        <span class="nav-logo-text">Rewrite Moment</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html#features" class="nav-link">기능</a></li>
+        <li><a href="index.html#how" class="nav-link">이용방법</a></li>
+        <li><a href="pricing.html" class="nav-link">가격</a></li>
+      </ul>
+      <div class="nav-credits">
+        <span class="nav-credits-icon">💎</span>
+        <span class="nav-credits-value">0</span>
+        <span style="color: var(--text-muted)">크레딧</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="page" style="padding-top: 100px;">
+    <div class="container">
+      
+      <!-- Progress Steps -->
+      <div class="steps">
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <span class="step-text">업로드</span>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <span class="step-text">선택</span>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step completed">
+          <div class="step-number">✓</div>
+          <span class="step-text">Rewrite</span>
+        </div>
+        <div class="step-line completed"></div>
+        <div class="step active">
+          <div class="step-number">4</div>
+          <span class="step-text">결과</span>
+        </div>
+      </div>
+
+      <!-- Page Header -->
+      <div class="page-header" data-animate>
+        <h1 class="page-title">
+          🎉 <span class="text-gradient">영상이 완성</span>되었어요!
+        </h1>
+        <p class="page-subtitle">
+          Quick Pack · 청소년 · 코미디
+        </p>
+      </div>
+
+      <!-- Result Layout -->
+      <div class="result-layout">
+        
+        <!-- Video Section -->
+        <div class="result-video-section" data-animate style="animation-delay: 0.1s">
+          <!-- Clip Tabs -->
+          <div class="clip-tabs">
+            <button class="clip-tab active" data-clip="1">
+              <span class="clip-tab-icon">🎬</span>
+              Clip 1<span class="clip-tab-role">Hook</span>
+            </button>
+            <button class="clip-tab" data-clip="2">
+              <span class="clip-tab-icon">🎬</span>
+              Clip 2<span class="clip-tab-role">Main</span>
+            </button>
+            <button class="clip-tab" data-clip="3">
+              <span class="clip-tab-icon">✨</span>
+              Clip 3<span class="clip-tab-role">Ending</span>
+            </button>
+          </div>
+
+          <!-- Video Player -->
+          <div class="video-player-wrapper">
+            <div class="video-container">
+              <div class="video-placeholder" id="videoPlaceholder">
+                <div class="video-placeholder-icon">🎬</div>
+                <p>영상 미리보기</p>
+                <span class="video-duration">8초</span>
+              </div>
+              <!-- In production, this would be replaced with actual video -->
+              <!-- <video id="videoPlayer" controls></video> -->
+            </div>
+
+            <!-- Video Info -->
+            <div class="video-info">
+              <div class="video-caption" id="videoCaption">
+                "하필 오늘…"
+              </div>
+              <div class="video-meta">
+                <span>🎭 청소년</span>
+                <span>😂 코미디</span>
+                <span>⏱️ 8초</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Video Actions -->
+          <div class="video-actions">
+            <button class="btn btn-secondary btn-icon" title="이전 클립">
+              ◀
+            </button>
+            <button class="btn btn-primary" id="playBtn">
+              <span>▶</span>
+              재생하기
+            </button>
+            <button class="btn btn-secondary btn-icon" title="다음 클립">
+              ▶
+            </button>
+          </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="result-info-section">
+          
+          <!-- Download & Share -->
+          <div class="card result-card" data-animate style="animation-delay: 0.2s">
+            <h3 class="result-card-title">다운로드 & 공유</h3>
+            <div class="result-card-actions">
+              <button class="btn btn-primary w-full" id="downloadBtn">
+                <span>⬇️</span>
+                전체 다운로드
+              </button>
+              <button class="btn btn-secondary w-full" id="shareBtn">
+                <span>🔗</span>
+                공유 링크 만들기
+              </button>
+            </div>
+            <div class="download-options mt-md">
+              <button class="btn btn-ghost btn-sm">Clip 1만 다운로드</button>
+              <button class="btn btn-ghost btn-sm">Clip 2만 다운로드</button>
+              <button class="btn btn-ghost btn-sm">Clip 3만 다운로드</button>
+            </div>
+          </div>
+
+          <!-- Regenerate -->
+          <div class="card result-card" data-animate style="animation-delay: 0.3s" id="regenCard">
+            <h3 class="result-card-title">재생성</h3>
+            <p class="result-card-desc">마음에 들지 않는 클립만 다시 만들 수 있어요</p>
+            <div class="regen-options">
+              <button class="btn btn-secondary btn-sm regen-btn" data-clip="1">
+                <span>🔄</span> Clip 1 다시
+              </button>
+              <button class="btn btn-secondary btn-sm regen-btn" data-clip="2">
+                <span>🔄</span> Clip 2 다시
+              </button>
+              <button class="btn btn-secondary btn-sm regen-btn" data-clip="3">
+                <span>🔄</span> Clip 3 다시
+              </button>
+            </div>
+            <div class="regen-note">
+              <span>💎</span> 재생성은 클립당 1 크레딧이 필요해요
+            </div>
+          </div>
+
+          <!-- Upgrade Card -->
+          <div class="upgrade-card" data-animate style="animation-delay: 0.4s" id="upgradeCard">
+            <div class="upgrade-header">
+              <span class="upgrade-badge">🚀 업그레이드</span>
+              <h3 class="upgrade-card-title">더 길게 만들기</h3>
+            </div>
+            <p class="upgrade-card-desc">
+              Story Pack(15초×3)은 <strong>상황→감정→전환</strong>이 들어가고,<br>
+              Trailer는 예고편처럼 이어집니다.
+            </p>
+            <div class="upgrade-options">
+              <button class="btn btn-outline upgrade-btn" data-mode="story">
+                <span>📦</span>
+                Story Pack으로
+                <span class="upgrade-cost">2 크레딧</span>
+              </button>
+              <button class="btn btn-outline upgrade-btn" data-mode="trailer">
+                <span>🎬</span>
+                Trailer로
+                <span class="upgrade-cost">5 크레딧</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Rewrite Info (if enabled) -->
+          <div class="card result-card rewrite-result-card hidden" data-animate style="animation-delay: 0.5s" id="rewriteCard">
+            <div class="rewrite-result-header">
+              <span>✨</span>
+              <h3>Rewrite Moment 적용됨</h3>
+            </div>
+            <p class="rewrite-result-desc">
+              Clip 3(엔딩)에 다른 결말이 적용되었어요
+            </p>
+            <div class="rewrite-result-meta">
+              <span class="rewrite-meta-item">
+                <span class="meta-label">거리두기:</span>
+                <span class="meta-value" id="rewriteDistance">유사 상황</span>
+              </span>
+              <span class="rewrite-meta-item">
+                <span class="meta-label">결말:</span>
+                <span class="meta-value" id="rewriteEnding">성장</span>
+              </span>
+            </div>
+            <button class="btn btn-secondary btn-sm mt-md" id="rewriteAgainBtn">
+              <span>🔄</span> 엔딩만 다시 만들기
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- New Creation CTA -->
+      <div class="new-creation-cta mt-2xl" data-animate style="animation-delay: 0.6s">
+        <a href="upload.html" class="btn btn-secondary btn-lg">
+          <span>✨</span>
+          새로운 영상 만들기
+        </a>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer mt-xl" data-animate style="animation-delay: 0.7s">
+        <strong>Fiction / Simulation</strong> - 이 결과물은 가상의 창작물이며 예측이나 사실이 아닙니다.
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Share Modal -->
+  <div class="modal-overlay" id="shareModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">공유 링크</h3>
+        <button class="modal-close" onclick="closeShareModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 16px; color: var(--text-secondary);">
+          아래 링크를 복사해서 공유하세요
+        </p>
+        <div class="share-link-box">
+          <input type="text" class="form-input" id="shareLink" value="https://cliplife.app/s/abc123xyz" readonly>
+          <button class="btn btn-primary" id="copyLinkBtn">복사</button>
+        </div>
+        <div class="share-buttons mt-lg">
+          <button class="btn btn-secondary share-social-btn">
+            <span>📱</span> 카카오톡
+          </button>
+          <button class="btn btn-secondary share-social-btn">
+            <span>🐦</span> 트위터
+          </button>
+          <button class="btn btn-secondary share-social-btn">
+            <span>📷</span> 인스타
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast toast-success" id="toast">
+    <span>✓</span>
+    <span id="toastMessage">링크가 복사되었어요!</span>
+  </div>
+
+  <script src="app.js"></script>
+  <style>
+    /* Result Page Specific Styles */
+    .result-layout {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 40px;
+      align-items: start;
+    }
+
+    .result-video-section {
+      position: sticky;
+      top: 100px;
+    }
+
+    .clip-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .clip-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--bg-secondary);
+      border: 2px solid transparent;
+      border-radius: var(--radius-full);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .clip-tab:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .clip-tab.active {
+      background: var(--accent-primary);
+      color: #0a0a0f;
+      border-color: var(--accent-primary);
+    }
+
+    .clip-tab-icon {
+      font-size: 1rem;
+    }
+
+    .clip-tab-role {
+      font-size: 0.75rem;
+      opacity: 0.8;
+      margin-left: 4px;
+    }
+
+    .video-player-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .video-container {
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 9/16;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 0 40px var(--accent-glow);
+      border: 2px solid rgba(240, 180, 41, 0.2);
+    }
+
+    .video-placeholder {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #2a1a3a 0%, #1a1025 100%);
+      color: var(--text-secondary);
+    }
+
+    .video-placeholder-icon {
+      font-size: 4rem;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .video-duration {
+      margin-top: 8px;
+      padding: 4px 12px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+    }
+
+    .video-info {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .video-caption {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--accent-tertiary);
+    }
+
+    .video-meta {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: var(--text-tertiary);
+    }
+
+    .video-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    /* Result Cards */
+    .result-card {
+      margin-bottom: 20px;
+    }
+
+    .result-card-title {
+      font-size: 1.125rem;
+      margin-bottom: 12px;
+    }
+
+    .result-card-desc {
+      font-size: 0.9rem;
+      color: var(--text-tertiary);
+      margin-bottom: 16px;
+    }
+
+    .result-card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .download-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .regen-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .regen-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Upgrade Card */
+    .upgrade-card {
+      background: linear-gradient(135deg, rgba(240, 180, 41, 0.1) 0%, rgba(240, 180, 41, 0.03) 100%);
+      border: 1px solid rgba(240, 180, 41, 0.2);
+      padding: 24px;
+      border-radius: var(--radius-xl);
+      margin-bottom: 20px;
+    }
+
+    .upgrade-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .upgrade-badge {
+      padding: 4px 10px;
+      background: var(--gradient-gold);
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #0a0a0f;
+    }
+
+    .upgrade-card-title {
+      font-size: 1.25rem;
+      margin: 0;
+    }
+
+    .upgrade-card-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .upgrade-card-desc strong {
+      color: var(--accent-primary);
+    }
+
+    .upgrade-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .upgrade-btn {
+      justify-content: space-between;
+      padding: 16px 20px;
+    }
+
+    .upgrade-cost {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+
+    /* Rewrite Result Card */
+    .rewrite-result-card {
+      background: rgba(240, 180, 41, 0.05);
+      border-color: rgba(240, 180, 41, 0.2);
+    }
+
+    .rewrite-result-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .rewrite-result-header span {
+      font-size: 1.25rem;
+    }
+
+    .rewrite-result-header h3 {
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .rewrite-result-desc {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .rewrite-result-meta {
+      display: flex;
+      gap: 24px;
+    }
+
+    .rewrite-meta-item {
+      font-size: 0.85rem;
+    }
+
+    .meta-label {
+      color: var(--text-tertiary);
+    }
+
+    .meta-value {
+      color: var(--accent-primary);
+      font-weight: 600;
+      margin-left: 4px;
+    }
+
+    /* Share Modal */
+    .share-link-box {
+      display: flex;
+      gap: 12px;
+    }
+
+    .share-link-box input {
+      flex: 1;
+    }
+
+    .share-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .share-social-btn {
+      flex: 1;
+    }
+
+    /* New Creation CTA */
+    .new-creation-cta {
+      text-align: center;
+    }
+
+    @media (max-width: 1024px) {
+      .result-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .result-video-section {
+        position: static;
+      }
+
+      .result-info-section {
+        order: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .clip-tabs {
+        justify-content: center;
+      }
+
+      .video-container {
+        max-width: 280px;
+      }
+
+      .share-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+  <script>
+    // Result page functionality
+    const clipTabs = document.querySelectorAll('.clip-tab');
+    const videoCaption = document.getElementById('videoCaption');
+    const shareModal = document.getElementById('shareModal');
+    const toast = document.getElementById('toast');
+    const rewriteCard = document.getElementById('rewriteCard');
+
+    // Clip captions (sample data)
+    const clipData = {
+      1: { caption: '"하필 오늘…"', duration: '8초', role: 'Hook' },
+      2: { caption: '"내가 왜 그랬지"', duration: '8초', role: 'Main' },
+      3: { caption: '"근데… 의외로"', duration: '8초', role: 'Ending' }
+    };
+
+    // Clip tab switching
+    clipTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        clipTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        const clipNo = tab.dataset.clip;
+        const data = clipData[clipNo];
+        videoCaption.textContent = data.caption;
+      });
+    });
+
+    // Check if rewrite was enabled
+    const rewriteEnabled = sessionStorage.getItem('rewriteEnabled') === 'true';
+    if (rewriteEnabled) {
+      rewriteCard.classList.remove('hidden');
+      
+      // Update rewrite meta
+      const distance = sessionStorage.getItem('distance');
+      const ending = sessionStorage.getItem('ending');
+      
+      const distanceMap = {
+        'symbolic': '상징적으로',
+        'similar': '유사 상황',
+        'quite_similar': '꽤 비슷하게'
+      };
+      
+      const endingMap = {
+        'recovery': '회복',
+        'growth': '성장',
+        'reconcile': '화해',
+        'self_protect': '자기보호',
+        'new_start': '새출발',
+        'comedy': '코미디 승화'
+      };
+      
+      document.getElementById('rewriteDistance').textContent = distanceMap[distance] || '유사 상황';
+      document.getElementById('rewriteEnding').textContent = endingMap[ending] || '성장';
+    }
+
+    // Share modal
+    document.getElementById('shareBtn').addEventListener('click', () => {
+      shareModal.classList.add('show');
+    });
+
+    function closeShareModal() {
+      shareModal.classList.remove('show');
+    }
+
+    shareModal.addEventListener('click', (e) => {
+      if (e.target === shareModal) {
+        closeShareModal();
+      }
+    });
+
+    // Copy link
+    document.getElementById('copyLinkBtn').addEventListener('click', () => {
+      const input = document.getElementById('shareLink');
+      input.select();
+      document.execCommand('copy');
+      
+      showToast('링크가 복사되었어요!');
+    });
+
+    // Toast notification
+    function showToast(message) {
+      const toastMessage = document.getElementById('toastMessage');
+      toastMessage.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Download button
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      showToast('다운로드가 시작됩니다...');
+    });
+
+    // Upgrade buttons
+    document.querySelectorAll('.upgrade-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const mode = btn.dataset.mode;
+        const cost = mode === 'story' ? 2 : 5;
+        
+        // In production, this would check credits and process the upgrade
+        alert(`${mode === 'story' ? 'Story Pack' : 'Trailer'}으로 업그레이드하려면 ${cost} 크레딧이 필요해요.\n\n크레딧 충전 페이지로 이동합니다.`);
+        window.location.href = 'pricing.html';
+      });
+    });
+
+    // Regenerate buttons
+    document.querySelectorAll('.regen-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const clipNo = btn.dataset.clip;
+        
+        // In production, this would check credits and process regeneration
+        alert(`Clip ${clipNo} 재생성에 1 크레딧이 필요해요.\n\n크레딧을 충전하시겠습니까?`);
+      });
+    });
+
+    // Rewrite again button
+    if (document.getElementById('rewriteAgainBtn')) {
+      document.getElementById('rewriteAgainBtn').addEventListener('click', () => {
+        alert('엔딩 재생성에 1 크레딧이 필요해요.\n\n크레딧을 충전하시겠습니까?');
+      });
+    }
+  </script>
+</body>
+</html>
+
