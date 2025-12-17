@@ -688,8 +688,25 @@
         const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
         const mode = sessionStorage.getItem('selectedMode') || 'quick';
 
+        // 슬라이더 설정 가져오기
+        const sliders = JSON.parse(sessionStorage.getItem('sliders') || '{}');
+        
+        // Rewrite 설정
+        const distance = rewriteEnabled.checked ? document.querySelector('[name="distance"]:checked')?.value : null;
+        const ending = rewriteEnabled.checked ? document.querySelector('[name="ending"]:checked')?.value : null;
+
         // 2. 영상 생성 API 호출
         updateStep(2, '영상 생성 요청 중...', 25);
+        
+        console.log('=== Sending to API ===');
+        console.log('Stage:', stage);
+        console.log('Genre:', genre);
+        console.log('Mode:', mode);
+        console.log('Sliders:', sliders);
+        console.log('Rewrite:', rewriteEnabled.checked);
+        console.log('Distance:', distance);
+        console.log('Ending:', ending);
+        console.log('======================');
         
         const response = await fetch('/api/generate', {
           method: 'POST',
@@ -699,7 +716,10 @@
             mode,
             stage,
             genre,
+            sliders,
             rewriteText: rewriteEnabled.checked ? eventText.value : null,
+            distance,
+            ending,
           }),
         });
 
