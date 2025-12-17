@@ -1,11 +1,11 @@
 {
+  "framework": "nextjs",
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/upload", "destination": "/upload.html" },
-    { "source": "/select", "destination": "/select.html" },
-    { "source": "/rewrite", "destination": "/rewrite.html" },
-    { "source": "/result", "destination": "/result.html" },
-    { "source": "/pricing", "destination": "/pricing.html" }
+    { "source": "/index.html", "destination": "/index.html" },
+    { "source": "/upload.html", "destination": "/upload.html" },
+    { "source": "/select.html", "destination": "/select.html" },
+    { "source": "/rewrite.html", "destination": "/rewrite.html" },
+    { "source": "/result.html", "destination": "/result.html" },
+    { "source": "/pricing.html", "destination": "/pricing.html" }
   ]
 }
-
