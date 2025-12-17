@@ -75,165 +75,54 @@ export default async function handler(req, res) {
 // Build comprehensive prompt based on all user selections
 function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, sliders }) {
   
-  // ========================================
-  // 1. LIFE STAGE - 라이프 스테이지별 장면 설정
-  // ========================================
-  const stageSettings = {
-    teen: {
-      scene: 'A teenage student in a high school classroom or campus',
-      context: 'surrounded by friends, backpacks, lockers, school uniform',
-      emotion: 'youthful energy, curiosity, growing pains, friendship bonds',
-      props: 'textbooks, smartphone, school bag, sports equipment',
-    },
-    twenties: {
-      scene: 'A young adult in their 20s at a coffee shop or modern office',
-      context: 'laptop, career ambitions, first apartment, dating life',
-      emotion: 'hopeful uncertainty, self-discovery, ambition, romantic tension',
-      props: 'coffee cup, resume, apartment keys, dating app notifications',
-    },
-    newlywed: {
-      scene: 'A newlywed couple in their cozy new home',
-      context: 'wedding rings, shared space, building life together',
-      emotion: 'tender love, excitement, partnership, domestic bliss',
-      props: 'wedding photo, cooking together, unpacking boxes, couple activities',
-    },
-    early_parenting: {
-      scene: 'A parent with their toddler in a warm family home',
-      context: 'toys scattered, baby items, exhausted but happy',
-      emotion: 'unconditional love, tired joy, protective instincts, precious moments',
-      props: 'baby toys, stroller, family photos, children books',
-    },
+  // 라이프 스테이지별 장면
+  const stageScenes = {
+    teen: 'teenage student at school with friends, youthful energy',
+    twenties: 'young adult in their 20s at cafe or office, hopeful and ambitious',
+    newlywed: 'newlywed couple at home, tender love and partnership',
+    early_parenting: 'parent with young child, warm family moments',
   };
 
-  // ========================================
-  // 2. GENRE - 장르별 시각적 스타일
-  // ========================================
+  // 장르별 스타일
   const genreStyles = {
-    docu: {
-      visual: 'Documentary style cinematography, handheld camera feel, natural available lighting',
-      color: 'Muted earth tones, desaturated colors, authentic raw look',
-      mood: 'Intimate, observational, truthful, slice-of-life',
-      camera: 'Close-up interviews, candid moments, fly-on-the-wall perspective',
-    },
-    comedy: {
-      visual: 'Bright saturated colors, well-lit scenes, sitcom-style framing',
-      color: 'Vibrant warm colors, high contrast, cheerful palette',
-      mood: 'Lighthearted, playful, amusing, feel-good',
-      camera: 'Wide shots for physical comedy, quick cuts, reaction shots',
-    },
-    drama: {
-      visual: 'Cinematic dramatic lighting, deep shadows, high contrast',
-      color: 'Rich deep colors, moody tones, dramatic color grading',
-      mood: 'Intense, emotional, powerful, thought-provoking',
-      camera: 'Slow dolly movements, meaningful close-ups, dramatic angles',
-    },
-    melo: {
-      visual: 'Soft diffused lighting, romantic glow, dreamy atmosphere',
-      color: 'Warm golden hour tones, soft pastels, romantic pink hues',
-      mood: 'Tender, emotional, bittersweet, heart-touching',
-      camera: 'Slow motion moments, lingering gazes, intimate framing',
-    },
-    fantasy: {
-      visual: 'Magical ethereal lighting, lens flares, surreal elements',
-      color: 'Vibrant otherworldly colors, magical glows, iridescent highlights',
-      mood: 'Whimsical, dreamlike, enchanting, wonder-filled',
-      camera: 'Sweeping movements, magical reveals, fantastical angles',
-    },
+    docu: 'documentary style, natural lighting, authentic candid moments',
+    comedy: 'bright cheerful colors, playful mood, lighthearted funny atmosphere',
+    drama: 'cinematic dramatic lighting, emotional intensity, powerful atmosphere',
+    melo: 'soft romantic lighting, warm golden tones, tender emotional moments',
+    fantasy: 'magical ethereal lighting, dreamy surreal atmosphere, enchanting',
   };
 
-  // ========================================
-  // 3. SLIDERS - 분위기 조절
-  // ========================================
-  const realismLevel = sliders.realism || 60;
-  const intensityLevel = sliders.intensity || 40;
-  const paceLevel = sliders.pace || 70;
+  // 슬라이더 값
+  const realismLevel = parseInt(sliders?.realism) || 60;
+  const intensityLevel = parseInt(sliders?.intensity) || 40;
+  const paceLevel = parseInt(sliders?.pace) || 70;
 
-  // 현실감 (0=영화적, 100=현실적)
-  const realismDesc = realismLevel < 30 
-    ? 'highly stylized cinematic look, movie-like aesthetics' 
-    : realismLevel < 70 
-    ? 'balanced cinematic realism, natural yet polished' 
-    : 'ultra-realistic, documentary authenticity, raw and genuine';
+  // 분위기 설명
+  const realismDesc = realismLevel < 40 ? 'stylized cinematic' : realismLevel > 70 ? 'ultra realistic' : 'natural balanced';
+  const intensityDesc = intensityLevel < 40 ? 'gentle subtle' : intensityLevel > 70 ? 'intense dramatic' : 'moderate';
+  const paceDesc = paceLevel < 40 ? 'slow contemplative' : paceLevel > 70 ? 'dynamic fast' : 'natural rhythm';
 
-  // 강도 (0=순한맛, 100=진한맛)
-  const intensityDesc = intensityLevel < 30 
-    ? 'subtle gentle emotions, understated expressions' 
-    : intensityLevel < 70 
-    ? 'moderate emotional intensity, balanced drama' 
-    : 'powerful intense emotions, dramatic peaks, heightened feelings';
-
-  // 속도 (0=느리게, 100=빠르게)
-  const paceDesc = paceLevel < 30 
-    ? 'slow contemplative pacing, lingering moments, meditative rhythm' 
-    : paceLevel < 70 
-    ? 'natural moderate pacing, comfortable rhythm' 
-    : 'dynamic fast pacing, energetic movements, quick transitions';
-
-  // ========================================
-  // 4. REWRITE MOMENT - 결말 재구성
-  // ========================================
-  let rewriteSection = '';
+  // 기본 프롬프트 구성
+  const scene = stageScenes[stage] || stageScenes.teen;
+  const style = genreStyles[genre] || genreStyles.drama;
   
+  let prompt = `${scene}. ${style}. ${realismDesc} look, ${intensityDesc} emotion, ${paceDesc} pacing. Face clearly visible, smooth motion, high quality cinematic video.`;
+
+  // Rewrite Moment 추가
   if (rewriteText) {
-    // 거리두기 설정
-    const distanceStyles = {
-      symbolic: 'expressed through abstract metaphors and symbols, not literal',
-      similar: 'reimagined in a parallel situation, similar but different context',
-      quite_similar: 'closely mirrored scenario with key differences',
+    const endingTypes = {
+      recovery: 'healing and peace',
+      growth: 'learning and becoming stronger',
+      reconcile: 'forgiveness and understanding',
+      self_protect: 'setting healthy boundaries',
+      new_start: 'fresh hopeful beginning',
+      comedy: 'finding humor and lightness',
     };
-
-    // 결말 방향
-    const endingStyles = {
-      recovery: 'finding healing and inner peace, wounds slowly mending',
-      growth: 'learning and becoming stronger, wisdom gained from experience',
-      reconcile: 'making amends, rebuilding bridges, forgiveness and understanding',
-      self_protect: 'setting healthy boundaries, self-care, protecting inner peace',
-      new_start: 'fresh beginnings, leaving the past behind, hopeful new chapter',
-      comedy: 'finding humor in adversity, laughing through tears, lighthearted resolution',
-    };
-
-    const distanceDesc = distanceStyles[distance] || distanceStyles.similar;
-    const endingDesc = endingStyles[ending] || endingStyles.growth;
-
-    rewriteSection = `
-    
-REWRITE MOMENT TRANSFORMATION:
-The video shows a pivotal moment being rewritten. The original difficult experience "${rewriteText}" is ${distanceDesc}.
-The scene transforms to show: ${endingDesc}.
-The ending conveys hope, resolution, and emotional catharsis.`;
+    const endingDesc = endingTypes[ending] || 'positive transformation';
+    prompt += ` Scene transforms showing ${endingDesc}.`;
   }
 
-  // ========================================
-  // 5. BUILD FINAL PROMPT
-  // ========================================
-  const stageInfo = stageSettings[stage] || stageSettings.teen;
-  const genreInfo = genreStyles[genre] || genreStyles.drama;
-
-  const finalPrompt = `
-SCENE: ${stageInfo.scene}
-CONTEXT: ${stageInfo.context}
-EMOTIONAL TONE: ${stageInfo.emotion}
-
-VISUAL STYLE: ${genreInfo.visual}
-COLOR PALETTE: ${genreInfo.color}
-MOOD: ${genreInfo.mood}
-CAMERA WORK: ${genreInfo.camera}
-
-ATMOSPHERE SETTINGS:
-- Realism: ${realismDesc}
-- Intensity: ${intensityDesc}
-- Pacing: ${paceDesc}
-${rewriteSection}
-
-TECHNICAL REQUIREMENTS:
-- The person's face must remain clear and consistent throughout
-- Smooth natural motion, no jarring movements
-- High quality cinematic production value
-- Portrait orientation (9:16) for social media
-- 5 seconds of engaging content
-`.trim();
-
-  return finalPrompt;
+  return prompt;
 }
 
 export const config = {
