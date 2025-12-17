@@ -109,13 +109,15 @@
       <!-- Video Section -->
       <div class="video-showcase" data-animate>
         <div class="video-container">
-          <iframe 
-            src="https://www.youtube.com/embed/iECOcj8jAvU?autoplay=1&mute=1&loop=1&playlist=iECOcj8jAvU&controls=1&rel=0&modestbranding=1" 
-            title="Rewrite Moment Demo Video"
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen>
-          </iframe>
+          <video 
+            autoplay 
+            muted 
+            loop 
+            playsinline
+            controls>
+            <source src="KakaoTalk_20251217_093253033.mp4" type="video/mp4">
+            브라우저가 비디오를 지원하지 않습니다.
+          </video>
         </div>
       </div>
 
@@ -510,12 +512,13 @@
       border: 2px solid rgba(240, 180, 41, 0.2);
     }
 
-    .video-container iframe {
+    .video-container video {
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
+      object-fit: cover;
     }
 
     /* Sections */
