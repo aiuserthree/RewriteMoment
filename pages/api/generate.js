@@ -73,35 +73,35 @@ export default async function handler(req, res) {
 // Build comprehensive prompt based on all user selections
 function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, sliders }) {
   
-  // 라이프 스테이지별 상세 설정 (옷, 환경, 사람들)
+  // 라이프 스테이지별 상세 설정 (한국 배경, 한국 사람)
   const stageSettings = {
     teen: {
-      people: 'A group of 3-4 teenage students (ages 16-18)',
-      clothes: 'wearing school uniforms (white shirts, navy blazers, plaid skirts or slacks)',
-      location: 'in a bright high school hallway with lockers and notice boards',
-      activity: 'walking together, laughing and chatting, carrying backpacks and books',
-      props: 'smartphones, textbooks, sports bags, headphones',
+      people: 'A group of 3-4 Korean teenage students (ages 16-18, Asian Korean faces)',
+      clothes: 'wearing Korean high school uniforms (white dress shirts, navy blue blazers, plaid skirts for girls or navy slacks for boys)',
+      location: 'in a bright Korean high school hallway (복도) with shoe lockers and bulletin boards',
+      activity: 'walking together, laughing and chatting in Korean style, carrying backpacks',
+      props: 'Korean textbooks, smartphones, school bags, Korean snacks',
     },
     twenties: {
-      people: 'A group of young adults in their 20s',
-      clothes: 'wearing casual trendy outfits (jeans, sweaters, sneakers, light jackets)',
-      location: 'at a modern coffee shop or coworking space with large windows',
-      activity: 'having coffee, working on laptops, animated conversation',
-      props: 'laptops, coffee cups, notebooks, earbuds',
+      people: 'A group of Korean young adults in their 20s (Asian Korean faces)',
+      clothes: 'wearing trendy Korean fashion (청청패션, oversized sweaters, wide pants, minimal Korean style)',
+      location: 'at a stylish Korean cafe (한국 카페) with aesthetic interior, neon signs',
+      activity: 'having Americano coffee, chatting, taking photos for Instagram',
+      props: 'iced Americano, Korean desserts, MacBooks, AirPods',
     },
     newlywed: {
-      people: 'A young married couple in their late 20s to early 30s',
-      clothes: 'wearing comfortable home clothes (matching pajamas, casual sweaters)',
-      location: 'in a cozy modern apartment living room with warm lighting',
-      activity: 'cooking together, cuddling on sofa, unpacking moving boxes',
-      props: 'wedding photos on wall, cooking utensils, wine glasses, moving boxes',
+      people: 'A young Korean married couple in their late 20s (Asian Korean faces)',
+      clothes: 'wearing comfortable Korean home clothes (편한 옷, matching loungewear)',
+      location: 'in a modern Korean apartment (아파트) living room with warm lighting',
+      activity: 'cooking Korean food together, watching TV on sofa, cozy moments',
+      props: 'Korean wedding photos, rice cooker, soju glasses, Korean home decor',
     },
     early_parenting: {
-      people: 'Parents with a toddler (age 2-3)',
-      clothes: 'wearing casual comfortable clothes (t-shirts, joggers, cardigan)',
-      location: 'in a warm family living room with toys scattered around',
-      activity: 'playing with the child, reading picture books, tender family moments',
-      props: 'colorful toys, baby stroller, family photos, picture books',
+      people: 'Korean parents with a toddler (age 2-3, Asian Korean family)',
+      clothes: 'wearing casual Korean style clothes (편한 옷, 카디건)',
+      location: 'in a warm Korean family apartment living room with play mat',
+      activity: 'playing with the child, reading Korean picture books, tender family moments',
+      props: 'Korean toys, baby items, family photos, Korean childrens books',
     },
   };
 
