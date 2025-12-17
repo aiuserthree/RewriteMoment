@@ -43,18 +43,14 @@ export default async function handler(req, res) {
     console.log('Full Prompt:', fullPrompt);
     console.log('================================');
 
-    // Use Hunyuan Video for high quality Text-to-Video generation
-    // 텍스트 기반으로 완전한 장면 생성 (옷, 환경, 여러 사람 등)
+    // Use Minimax Video-01 with subject_reference for face preservation
+    // 업로드한 얼굴을 유지하면서 새로운 장면 생성 (옷, 환경, 여러 사람 등)
     const prediction = await replicate.predictions.create({
-      model: "tencent/hunyuan-video",
+      model: "minimax/video-01",
       input: {
         prompt: fullPrompt,
-        width: 1280,           // 16:9 비율
-        height: 720,
-        video_length: 129,     // ~5초 (25fps 기준)
-        fps: 25,
-        infer_steps: 50,       // 품질 (높을수록 좋음)
-        embedded_guidance_scale: 6.0,
+        subject_reference: imageUrl,  // 사용자 얼굴 참조
+        prompt_optimizer: true,
       },
     });
 
