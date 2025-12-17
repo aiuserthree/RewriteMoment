@@ -47,13 +47,12 @@ export default async function handler(req, res) {
     console.log('Full Prompt:', fullPrompt);
     console.log('================================');
 
-    // Use Luma Dream Machine for high quality video generation
+    // Use Minimax Video-01 for high quality video generation
     const prediction = await replicate.predictions.create({
-      model: "luma/dream-machine",
+      model: "minimax/video-01",
       input: {
         prompt: fullPrompt,
-        start_image_url: imageUrl,
-        aspect_ratio: "9:16",  // 세로 영상 (릴스/쇼츠 형식)
+        first_frame_image: imageUrl,
       },
     });
 
