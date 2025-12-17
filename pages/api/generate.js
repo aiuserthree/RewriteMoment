@@ -43,20 +43,15 @@ export default async function handler(req, res) {
     console.log('Full Prompt:', fullPrompt);
     console.log('================================');
 
-    // Use LTX Video for longer videos (10 seconds)
-    // 시작 이미지로 업로드한 사진 사용, 긴 영상 생성
+    // Use Luma Ray (Dream Machine) for high quality video generation
+    // 최고 품질 모델, 얼굴 보존 좋음, ~5초 영상
     const prediction = await replicate.predictions.create({
-      version: "8c47da666861d081eeb4d1261853087de23923a268a69b63febdf5dc1dee08e4",  // lightricks/ltx-video
+      model: "luma/ray",
       input: {
         prompt: fullPrompt,
-        image: imageUrl,              // 시작 프레임으로 사용
-        length: 161,                  // ~6.5초 (24fps) - 너무 길면 에러날 수 있음
+        start_image: imageUrl,        // 시작 이미지 (얼굴 보존)
         aspect_ratio: "16:9",
-        target_size: 640,             // 640p (안정성)
-        steps: 35,                    // 품질
-        cfg: 4,                       // 프롬프트 따르는 강도
-        image_noise_scale: 0.15,      // 시작 이미지 유지 강도
-        negative_prompt: "low quality, worst quality, deformed, distorted, ugly, blurry, western, caucasian, american, european",
+        loop: false,
       },
     });
 
