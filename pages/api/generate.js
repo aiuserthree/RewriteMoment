@@ -1,9 +1,9 @@
-import RunwayML from '@runwayml/sdk';
+import Replicate from 'replicate';
 
-// Runway API 키 (Vercel 환경변수에서 가져옴)
-const runwayApiKey = (process.env.RUNWAY_API_KEY || '').replace(/^\uFEFF/, '').trim();
+// Replicate API 키
+const apiToken = (process.env.REPLICATE_API_TOKEN || '').replace(/^\uFEFF/, '').trim();
 
-const runway = new RunwayML({ apiKey: runwayApiKey });
+const replicate = new Replicate({ auth: apiToken });
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -26,10 +26,6 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Image is required' });
     }
 
-    if (!runwayApiKey) {
-      return res.status(500).json({ error: 'Runway API key not configured' });
-    }
-
     // Build comprehensive prompt based on all selections
     const fullPrompt = buildPrompt({ 
       rewriteText, 
@@ -41,32 +37,34 @@ export default async function handler(req, res) {
       sliders: sliders || { realism: 60, intensity: 40, pace: 70 }
     });
 
-    console.log('=== Runway Gen-3 Video Generation ===');
+    console.log('=== Luma Ray Video Generation ===');
     console.log('Stage:', stage);
     console.log('Genre:', genre);
     console.log('Mode:', mode);
     console.log('Rewrite:', rewriteText ? 'Yes' : 'No');
     console.log('Prompt:', fullPrompt.substring(0, 200) + '...');
-    console.log('=====================================');
+    console.log('=================================');
 
-    // Runway Gen-3 Alpha Turbo - 최고 품질, 얼굴 보존
-    const task = await runway.imageToVideo.create({
-      model: 'gen3a_turbo',           // Gen-3 Alpha Turbo (빠르고 고품질)
-      promptImage: imageUrl,           // 시작 이미지 (얼굴 보존)
-      promptText: fullPrompt,          // 프롬프트
-      duration: 10,                    // 10초 영상
-      ratio: '16:9',                   // 16:9 비율
+    // Luma Ray (Dream Machine) - 고품질, 얼굴 보존
+    const prediction = await replicate.predictions.create({
+      model: 'luma/ray',
+      input: {
+        prompt: fullPrompt,
+        start_image: imageUrl,    // 시작 이미지 (얼굴 보존)
+        aspect_ratio: '16:9',
+        loop: false,
+      },
     });
 
-    // Return task ID for polling
+    // Return prediction ID for polling
     return res.status(200).json({
-      id: task.id,
-      status: task.status,
-      message: 'Video generation started with Runway Gen-3',
+      id: prediction.id,
+      status: prediction.status,
+      message: 'Video generation started with Luma Ray',
     });
 
   } catch (error) {
-    console.error('Runway Generation error:', error);
+    console.error('Generation error:', error);
     return res.status(500).json({ 
       error: 'Failed to start video generation',
       details: error.message 
