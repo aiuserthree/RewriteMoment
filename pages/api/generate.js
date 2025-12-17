@@ -43,14 +43,20 @@ export default async function handler(req, res) {
     console.log('Full Prompt:', fullPrompt);
     console.log('================================');
 
-    // Use Minimax Video-01 with subject_reference for face preservation
-    // 업로드한 얼굴을 유지하면서 새로운 장면 생성 (옷, 환경, 여러 사람 등)
+    // Use LTX Video for longer videos (10 seconds)
+    // 시작 이미지로 업로드한 사진 사용, 긴 영상 생성
     const prediction = await replicate.predictions.create({
-      model: "minimax/video-01",
+      model: "lightricks/ltx-video",
       input: {
         prompt: fullPrompt,
-        subject_reference: imageUrl,  // 사용자 얼굴 참조
-        prompt_optimizer: true,
+        image: imageUrl,              // 시작 프레임으로 사용
+        length: 241,                  // 10초 (24fps × 10 + 1)
+        aspect_ratio: "16:9",
+        target_size: 720,             // 720p
+        steps: 40,                    // 품질 (높을수록 좋음)
+        cfg: 4,                       // 프롬프트 따르는 강도
+        image_noise_scale: 0.1,       // 시작 이미지 유지 강도 (낮을수록 유지)
+        negative_prompt: "low quality, worst quality, deformed, distorted, ugly, blurry, western, caucasian, american",
       },
     });
 
