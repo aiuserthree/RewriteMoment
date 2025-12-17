@@ -1,9 +1,13 @@
-import Replicate from 'replicate';
+import { GoogleAuth } from 'google-auth-library';
 
-// Replicate API 키
-const apiToken = (process.env.REPLICATE_API_TOKEN || '').replace(/^\uFEFF/, '').trim();
+// Google Cloud 설정
+const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || 'rewritemoment';
+const LOCATION = 'us-central1';
 
-const replicate = new Replicate({ auth: apiToken });
+// 서비스 계정 인증 정보
+const credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON 
+  ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
+  : null;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -26,6 +30,10 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Image is required' });
     }
 
+    if (!credentials) {
+      return res.status(500).json({ error: 'Google Cloud credentials not configured' });
+    }
+
     // Build comprehensive prompt based on all selections
     const fullPrompt = buildPrompt({ 
       rewriteText, 
@@ -37,30 +45,77 @@ export default async function handler(req, res) {
       sliders: sliders || { realism: 60, intensity: 40, pace: 70 }
     });
 
-    console.log('=== Minimax Video-01 Generation ===');
+    console.log('=== Veo 3.1 Video Generation ===');
     console.log('Stage:', stage);
     console.log('Genre:', genre);
     console.log('Mode:', mode);
     console.log('Rewrite:', rewriteText ? 'Yes' : 'No');
     console.log('Prompt:', fullPrompt.substring(0, 200) + '...');
-    console.log('===================================');
+    console.log('================================');
 
-    // Minimax Video-01 with subject_reference - 얼굴 보존!
-    const prediction = await replicate.predictions.create({
-      model: 'minimax/video-01',
-      input: {
-        prompt: fullPrompt,
-        subject_reference: imageUrl,  // 🔑 얼굴 참조 - 업로드한 얼굴이 영상에 나옴!
-        prompt_optimizer: true,
-      },
+    // Google Auth 설정
+    const auth = new GoogleAuth({
+      credentials: credentials,
+      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
     });
 
-    // Return prediction ID for polling
+    const client = await auth.getClient();
+    const accessToken = await client.getAccessToken();
+
+    // 이미지 Base64 처리
+    let imageBase64 = imageUrl;
+    if (imageUrl.startsWith('data:')) {
+      // data:image/jpeg;base64,XXXX 형식에서 base64 부분만 추출
+      imageBase64 = imageUrl.split(',')[1];
+    }
+
+    // Veo API 엔드포인트
+    const endpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-3.0-generate-preview:predictLongRunning`;
+
+    // Veo API 호출 - Image-to-Video with Start Frame
+    const veoResponse = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        instances: [{
+          prompt: fullPrompt,
+          image: {
+            bytesBase64Encoded: imageBase64,
+          },
+        }],
+        parameters: {
+          aspectRatio: '16:9',
+          sampleCount: 1,
+          durationSeconds: 8,
+          personGeneration: 'allow_adult',
+          enhancePrompt: true,
+        },
+      }),
+    });
+
+    const veoData = await veoResponse.json();
+
+    if (!veoResponse.ok) {
+      console.error('Veo API Error:', veoData);
+      return res.status(veoResponse.status).json({ 
+        error: 'Veo API error',
+        details: veoData.error?.message || JSON.stringify(veoData)
+      });
+    }
+
+    console.log('Veo Response:', JSON.stringify(veoData, null, 2));
+
+    // Long running operation name 반환
+    const operationName = veoData.name;
+
     return res.status(200).json({
-      id: prediction.id,
-      status: prediction.status,
-      message: 'Video generation started with Minimax Video-01',
-      provider: 'replicate'
+      id: operationName,
+      status: 'processing',
+      message: 'Video generation started with Veo 3.1',
+      provider: 'google-veo'
     });
 
   } catch (error) {
