@@ -7,16 +7,6 @@ const replicate = new Replicate({
   auth: apiToken,
 });
 
-// Video generation models on Replicate
-const MODELS = {
-  // Stable Video Diffusion - Image to Video
-  svd: "stability-ai/stable-video-diffusion:3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438",
-  // Minimax Video (Hailuo) - High quality
-  minimax: "minimax/video-01",
-  // Kling - Good for character consistency  
-  kling: "fofr/kling-video:abb95f9b7093e7c0e0c05297df0e9e7a1cdd9c9e1a0f2f4e1a0f2f4e1a0f2f4e",
-};
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -41,16 +31,12 @@ export default async function handler(req, res) {
 
     console.log('Starting video generation with prompt:', fullPrompt);
 
-    // Use Stable Video Diffusion for image-to-video
+    // Use Minimax Video-01 for high quality image-to-video with text prompt
     const prediction = await replicate.predictions.create({
-      version: "3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438",
+      model: "minimax/video-01",
       input: {
-        input_image: imageUrl,
-        // SVD parameters
-        motion_bucket_id: 127, // Higher = more motion
-        fps: 7,
-        cond_aug: 0.02,
-        decoding_t: 14,
+        prompt: fullPrompt,
+        first_frame_image: imageUrl,
       },
     });
 
@@ -72,33 +58,42 @@ export default async function handler(req, res) {
 
 // Build prompt based on user selections
 function buildPrompt({ prompt, rewriteText, stage, genre, mode }) {
-  const stagePrompts = {
-    teen: '청소년기, 학교, 친구들, 성장',
-    '20s': '20대, 대학생활, 취업, 연애, 자아찾기',
-    newlywed: '신혼, 결혼, 새로운 시작, 함께하는 삶',
-    parenting: '육아, 부모됨, 가족, 아이와 함께',
+  // Stage-specific scene descriptions
+  const stageScenes = {
+    teen: 'A teenager in a school setting, with classmates and friends, experiencing youth and growth moments',
+    twenties: 'A young adult in their 20s, navigating college life, career beginnings, relationships, and self-discovery',
+    newlywed: 'A newlywed couple starting their new life together, moments of love and partnership',
+    early_parenting: 'A parent with their young child, tender family moments, the journey of parenthood',
   };
 
+  // Genre-specific visual styles and moods
   const genreStyles = {
-    docu: 'cinematic documentary style, natural lighting, authentic moments',
-    comedy: 'bright colors, comedic timing, lighthearted mood, funny situations',
-    drama: 'dramatic lighting, emotional depth, intense atmosphere',
-    melo: 'romantic atmosphere, soft lighting, emotional, touching moments',
-    fantasy: 'magical elements, surreal visuals, dreamlike atmosphere, fantasy world',
+    docu: 'Documentary style, natural lighting, authentic candid moments, warm color grading, intimate camera angles',
+    comedy: 'Bright cheerful lighting, vibrant colors, playful expressions, comedic timing, light-hearted atmosphere, subtle humor',
+    drama: 'Cinematic dramatic lighting, deep shadows, emotional intensity, meaningful glances, powerful atmosphere',
+    melo: 'Soft romantic lighting, warm golden tones, tender emotional moments, gentle movements, touching atmosphere',
+    fantasy: 'Magical ethereal lighting, dreamy soft focus, surreal elements, sparkles and gentle glow, whimsical atmosphere',
   };
 
-  let finalPrompt = prompt || 'A person in a meaningful moment of their life';
+  // Base scene description
+  let sceneDesc = stageScenes[stage] || 'A person in a meaningful moment of their life';
   
-  if (stage && stagePrompts[stage]) {
-    finalPrompt += `, ${stagePrompts[stage]}`;
-  }
+  // Add genre style
+  let styleDesc = genreStyles[genre] || 'Cinematic quality, professional lighting';
   
-  if (genre && genreStyles[genre]) {
-    finalPrompt += `. Style: ${genreStyles[genre]}`;
-  }
+  // Combine into final prompt
+  let finalPrompt = `${sceneDesc}. ${styleDesc}. The person's face is clearly visible and well-preserved throughout the video. Smooth natural motion, high quality, 4K cinematic`;
   
+  // Add rewrite transformation if provided
   if (rewriteText) {
-    finalPrompt += `. The scene transforms to show: ${rewriteText}`;
+    finalPrompt += `. The scene shows a moment of transformation: ${rewriteText}, leading to a positive resolution`;
+  }
+
+  // Add mode-specific instructions
+  if (mode === 'trailer') {
+    finalPrompt += '. Epic cinematic trailer style with dramatic pacing';
+  } else if (mode === 'story') {
+    finalPrompt += '. Narrative storytelling with emotional arc';
   }
 
   return finalPrompt;
