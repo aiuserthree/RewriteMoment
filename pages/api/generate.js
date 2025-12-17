@@ -40,15 +40,14 @@ export default async function handler(req, res) {
 
     // Use Stable Video Diffusion for image-to-video
     const prediction = await replicate.predictions.create({
-      model: MODELS.svd,
+      version: "3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438",
       input: {
-        image: imageUrl,
+        input_image: imageUrl,
         // SVD parameters
         motion_bucket_id: 127, // Higher = more motion
         fps: 7,
         cond_aug: 0.02,
         decoding_t: 14,
-        video_length: mode === 'quick' ? 'short' : 'long',
       },
     });
 
