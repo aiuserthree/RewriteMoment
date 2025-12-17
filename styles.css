@@ -1344,3 +1344,332 @@ h4 { font-size: 1.25rem; }
 .opacity-50 { opacity: 0.5; }
 .opacity-75 { opacity: 0.75; }
 
+/* ========================================
+   Auth Modal Styles
+   ======================================== */
+
+/* Auth Modal */
+.auth-modal {
+  max-width: 420px;
+}
+
+.auth-modal-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.auth-modal-logo {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+}
+
+.auth-modal-title {
+  font-size: 1.5rem;
+  margin-bottom: var(--space-xs);
+}
+
+.auth-modal-subtitle {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+}
+
+/* Social Login Buttons */
+.social-login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.btn-social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border: none;
+}
+
+.btn-social:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-social svg,
+.btn-social img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Kakao */
+.btn-kakao {
+  background: #FEE500;
+  color: #191919;
+}
+
+.btn-kakao:hover {
+  background: #F5DC00;
+}
+
+/* Naver */
+.btn-naver {
+  background: #03C75A;
+  color: white;
+}
+
+.btn-naver:hover {
+  background: #02B350;
+}
+
+/* Google */
+.btn-google {
+  background: white;
+  color: #333;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-google:hover {
+  background: #f8f8f8;
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin: var(--space-lg) 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Email Login Form */
+.auth-form {
+  margin-bottom: var(--space-lg);
+}
+
+.auth-form .form-group {
+  margin-bottom: var(--space-md);
+}
+
+.auth-form .form-input {
+  background: var(--bg-tertiary);
+}
+
+.auth-form .btn-primary {
+  width: 100%;
+  margin-top: var(--space-sm);
+}
+
+/* Auth Footer Links */
+.auth-footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--text-tertiary);
+}
+
+.auth-footer a {
+  color: var(--accent-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.auth-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  font-size: 0.85rem;
+}
+
+.auth-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.auth-links a:hover {
+  color: var(--text-secondary);
+}
+
+/* User Menu (logged in state) */
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  position: relative;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gradient-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0a0a0f;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-glow);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + var(--space-sm));
+  right: 0;
+  min-width: 200px;
+  background: var(--bg-secondary);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all var(--transition-base);
+  z-index: 101;
+}
+
+.user-dropdown.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.user-dropdown-header {
+  padding: var(--space-md);
+  border-bottom: var(--border-subtle);
+}
+
+.user-dropdown-name {
+  font-weight: 600;
+  margin-bottom: var(--space-xs);
+}
+
+.user-dropdown-email {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.user-dropdown-menu {
+  padding: var(--space-sm);
+}
+
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.user-dropdown-item:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.user-dropdown-item.logout {
+  color: var(--error);
+}
+
+.user-dropdown-item.logout:hover {
+  background: rgba(248, 113, 113, 0.1);
+}
+
+/* Nav Auth Button */
+.nav-auth {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.btn-login {
+  padding: var(--space-sm) var(--space-lg);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-login:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Terms Checkbox */
+.auth-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+}
+
+.auth-terms input {
+  margin-top: 3px;
+  accent-color: var(--accent-primary);
+}
+
+.auth-terms a {
+  color: var(--accent-primary);
+  text-decoration: none;
+}
+
+.auth-terms a:hover {
+  text-decoration: underline;
+}
+
+/* Password Toggle */
+.password-wrapper {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: var(--space-md);
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-xs);
+  font-size: 1.1rem;
+}
+
+.password-toggle:hover {
+  color: var(--text-secondary);
+}
+

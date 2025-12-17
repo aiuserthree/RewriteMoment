@@ -23,10 +23,27 @@
         <li><a href="index.html#how" class="nav-link">이용방법</a></li>
         <li><a href="pricing.html" class="nav-link">가격</a></li>
       </ul>
-      <div class="nav-credits">
-        <span class="nav-credits-icon">💎</span>
-        <span class="nav-credits-value">0</span>
-        <span style="color: var(--text-muted)">크레딧</span>
+      <div class="nav-auth">
+        <div class="nav-credits">
+          <span class="nav-credits-icon">💎</span>
+          <span class="nav-credits-value" id="nav-credits">0</span>
+          <span style="color: var(--text-muted)">크레딧</span>
+        </div>
+        <button class="btn-login" id="btn-open-login" onclick="openAuthModal('login')">로그인</button>
+        <div class="user-menu hidden" id="user-menu">
+          <div class="user-avatar" id="user-avatar" onclick="toggleUserDropdown()">U</div>
+          <div class="user-dropdown" id="user-dropdown">
+            <div class="user-dropdown-header">
+              <div class="user-dropdown-name" id="user-name">사용자</div>
+              <div class="user-dropdown-email" id="user-email">user@email.com</div>
+            </div>
+            <div class="user-dropdown-menu">
+              <a href="pricing.html" class="user-dropdown-item">💎 크레딧 충전</a>
+              <a href="#" class="user-dropdown-item">📋 내 영상</a>
+              <div class="user-dropdown-item logout" onclick="logout()">🚪 로그아웃</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
