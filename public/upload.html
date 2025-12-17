@@ -374,10 +374,19 @@
     consent2.addEventListener('change', checkCanProceed);
 
     // Next button click
-    nextBtn.addEventListener('click', () => {
+    nextBtn.addEventListener('click', async () => {
       if (!nextBtn.disabled) {
-        // In a real app, you'd save the files to session/local storage or upload them
-        // For demo, we'll just navigate
+        // 이미지를 base64로 저장
+        const imagePromises = uploadedFiles.map(file => {
+          return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.readAsDataURL(file);
+          });
+        });
+        
+        const images = await Promise.all(imagePromises);
+        sessionStorage.setItem('uploadedImages', JSON.stringify(images));
         sessionStorage.setItem('uploadedCount', uploadedFiles.length);
         window.location.href = 'select.html';
       }

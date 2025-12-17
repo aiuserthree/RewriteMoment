@@ -638,8 +638,8 @@
       });
     });
 
-    // Generate function
-    function startGeneration() {
+    // Generate function - 실제 API 호출
+    async function startGeneration() {
       // Store rewrite data
       if (rewriteEnabled.checked) {
         sessionStorage.setItem('rewriteEnabled', 'true');
@@ -653,49 +653,112 @@
       // Show loading
       loadingOverlay.classList.add('show');
 
-      // Simulate generation progress
       const loadingText = document.getElementById('loadingText');
       const loadingBar = document.getElementById('loadingBar');
       const steps = document.querySelectorAll('.loading-step');
-      
-      const stages = [
-        { text: '스토리보드 생성 중...', progress: 25, step: 1 },
-        { text: '키프레임 이미지 생성 중...', progress: 50, step: 2 },
-        { text: '영상을 생성하고 있어요...', progress: 75, step: 3 },
-        { text: '마무리 중...', progress: 95, step: 4 }
-      ];
 
-      let currentStage = 0;
+      function updateStep(stepNum, text, progress) {
+        loadingText.textContent = text;
+        loadingBar.style.width = progress + '%';
+        steps.forEach((s, i) => {
+          if (i < stepNum - 1) {
+            s.classList.remove('active');
+            s.classList.add('completed');
+          } else if (i === stepNum - 1) {
+            s.classList.add('active');
+            s.classList.remove('completed');
+          } else {
+            s.classList.remove('active', 'completed');
+          }
+        });
+      }
 
-      const interval = setInterval(() => {
-        if (currentStage < stages.length) {
-          const stage = stages[currentStage];
-          loadingText.textContent = stage.text;
-          loadingBar.style.width = stage.progress + '%';
-          
-          steps.forEach((s, i) => {
-            if (i < stage.step - 1) {
-              s.classList.remove('active');
-              s.classList.add('completed');
-            } else if (i === stage.step - 1) {
-              s.classList.add('active');
-              s.classList.remove('completed');
-            } else {
-              s.classList.remove('active', 'completed');
-            }
-          });
-          
-          currentStage++;
-        } else {
-          clearInterval(interval);
-          loadingBar.style.width = '100%';
-          
-          // Navigate to result page
-          setTimeout(() => {
-            window.location.href = 'result.html';
-          }, 500);
+      try {
+        // 1. 이미지 가져오기
+        updateStep(1, '이미지 준비 중...', 10);
+        const uploadedImages = JSON.parse(sessionStorage.getItem('uploadedImages') || '[]');
+        const imageUrl = uploadedImages[0]; // 첫 번째 이미지 사용
+
+        if (!imageUrl) {
+          throw new Error('업로드된 이미지가 없습니다. 처음부터 다시 시작해주세요.');
         }
-      }, 1500);
+
+        // 선택된 설정 가져오기
+        const stage = sessionStorage.getItem('selectedStage') || 'teen';
+        const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
+        const mode = sessionStorage.getItem('selectedMode') || 'quick';
+
+        // 2. 영상 생성 API 호출
+        updateStep(2, '영상 생성 요청 중...', 25);
+        
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrl,
+            mode,
+            stage,
+            genre,
+            rewriteText: rewriteEnabled.checked ? eventText.value : null,
+          }),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || '영상 생성 요청 실패');
+        }
+
+        const { id: predictionId } = await response.json();
+        console.log('Prediction ID:', predictionId);
+
+        // 3. 상태 폴링
+        updateStep(3, '영상을 생성하고 있어요...', 40);
+        
+        let attempts = 0;
+        const maxAttempts = 120; // 10분
+        
+        while (attempts < maxAttempts) {
+          const statusResponse = await fetch(`/api/status/${predictionId}`);
+          const status = await statusResponse.json();
+          
+          console.log('Status:', status.status);
+          
+          if (status.status === 'succeeded') {
+            updateStep(4, '마무리 중...', 95);
+            
+            // 결과 저장
+            const videoUrl = Array.isArray(status.output) ? status.output[0] : status.output;
+            sessionStorage.setItem('generatedVideo', videoUrl);
+            sessionStorage.setItem('predictionId', predictionId);
+            sessionStorage.setItem('generationTime', status.metrics?.predict_time || 0);
+            
+            // 성공! 결과 페이지로 이동
+            updateStep(4, '완료!', 100);
+            setTimeout(() => {
+              window.location.href = 'result.html';
+            }, 500);
+            return;
+          }
+          
+          if (status.status === 'failed' || status.status === 'canceled') {
+            throw new Error(status.error || '영상 생성 실패');
+          }
+          
+          // 진행률 업데이트
+          const progress = Math.min(40 + (attempts * 0.5), 90);
+          loadingBar.style.width = progress + '%';
+          
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          attempts++;
+        }
+        
+        throw new Error('영상 생성 시간 초과');
+        
+      } catch (error) {
+        console.error('Generation error:', error);
+        loadingOverlay.classList.remove('show');
+        alert('영상 생성 중 오류가 발생했습니다:\n' + error.message);
+      }
     }
 
     // Event listeners

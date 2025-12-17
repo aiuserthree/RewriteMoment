@@ -109,13 +109,12 @@
           <!-- Video Player -->
           <div class="video-player-wrapper">
             <div class="video-container">
-              <div class="video-placeholder" id="videoPlaceholder">
+              <div class="video-placeholder" id="videoPlaceholder" style="display: none;">
                 <div class="video-placeholder-icon">🎬</div>
                 <p>영상 미리보기</p>
                 <span class="video-duration">8초</span>
               </div>
-              <!-- In production, this would be replaced with actual video -->
-              <!-- <video id="videoPlayer" controls></video> -->
+              <video id="videoPlayer" controls playsinline style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-xl);"></video>
             </div>
 
             <!-- Video Info -->
@@ -133,14 +132,14 @@
 
           <!-- Video Actions -->
           <div class="video-actions">
-            <button class="btn btn-secondary btn-icon" title="이전 클립">
+            <button class="btn btn-secondary btn-icon" title="이전 클립" onclick="skipTime(-2)">
               ◀
             </button>
-            <button class="btn btn-primary" id="playBtn">
-              <span>▶</span>
-              재생하기
+            <button class="btn btn-primary" id="playBtn" onclick="togglePlay()">
+              <span id="playIcon">▶</span>
+              <span id="playText">재생하기</span>
             </button>
-            <button class="btn btn-secondary btn-icon" title="다음 클립">
+            <button class="btn btn-secondary btn-icon" title="다음 클립" onclick="skipTime(2)">
               ▶
             </button>
           </div>
@@ -626,12 +625,46 @@
     const shareModal = document.getElementById('shareModal');
     const toast = document.getElementById('toast');
     const rewriteCard = document.getElementById('rewriteCard');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const videoPlaceholder = document.getElementById('videoPlaceholder');
+
+    // 생성된 영상 로드
+    const generatedVideo = sessionStorage.getItem('generatedVideo');
+    const generationTime = sessionStorage.getItem('generationTime');
+    const stage = sessionStorage.getItem('selectedStage') || 'teen';
+    const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
+
+    // 스테이지/장르 매핑
+    const stageMap = { 'teen': '청소년', 'young_adult': '청년', 'middle_adult': '중년', 'senior': '시니어' };
+    const genreMap = { 'comedy': '코미디', 'drama': '드라마', 'romance': '로맨스', 'thriller': '스릴러', 'fantasy': '판타지' };
+
+    // 페이지 서브타이틀 업데이트
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageSubtitle) {
+      pageSubtitle.textContent = `Quick Pack · ${stageMap[stage] || stage} · ${genreMap[genre] || genre}`;
+    }
+
+    // 영상 로드
+    if (generatedVideo) {
+      videoPlayer.src = generatedVideo;
+      videoPlayer.style.display = 'block';
+      videoPlaceholder.style.display = 'none';
+      
+      // 생성 시간 표시
+      if (generationTime) {
+        console.log(`영상 생성 시간: ${parseFloat(generationTime).toFixed(1)}초`);
+      }
+    } else {
+      // 영상이 없으면 플레이스홀더 표시
+      videoPlayer.style.display = 'none';
+      videoPlaceholder.style.display = 'flex';
+    }
 
     // Clip captions (sample data)
     const clipData = {
-      1: { caption: '"하필 오늘…"', duration: '8초', role: 'Hook' },
-      2: { caption: '"내가 왜 그랬지"', duration: '8초', role: 'Main' },
-      3: { caption: '"근데… 의외로"', duration: '8초', role: 'Ending' }
+      1: { caption: '"하필 오늘…"', duration: '4초', role: 'Hook' },
+      2: { caption: '"내가 왜 그랬지"', duration: '4초', role: 'Main' },
+      3: { caption: '"근데… 의외로"', duration: '4초', role: 'Ending' }
     };
 
     // Clip tab switching
@@ -709,9 +742,47 @@
       }, 3000);
     }
 
+    // Video control functions
+    function togglePlay() {
+      const playIcon = document.getElementById('playIcon');
+      const playText = document.getElementById('playText');
+      
+      if (videoPlayer.paused) {
+        videoPlayer.play();
+        playIcon.textContent = '⏸';
+        playText.textContent = '일시정지';
+      } else {
+        videoPlayer.pause();
+        playIcon.textContent = '▶';
+        playText.textContent = '재생하기';
+      }
+    }
+
+    function skipTime(seconds) {
+      videoPlayer.currentTime += seconds;
+    }
+
+    // Update play button when video ends
+    videoPlayer.addEventListener('ended', () => {
+      document.getElementById('playIcon').textContent = '▶';
+      document.getElementById('playText').textContent = '재생하기';
+    });
+
     // Download button
     document.getElementById('downloadBtn').addEventListener('click', () => {
-      showToast('다운로드가 시작됩니다...');
+      if (generatedVideo) {
+        // 영상 다운로드
+        const a = document.createElement('a');
+        a.href = generatedVideo;
+        a.download = `rewrite_moment_${Date.now()}.mp4`;
+        a.target = '_blank';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('다운로드가 시작됩니다...');
+      } else {
+        showToast('다운로드할 영상이 없습니다');
+      }
     });
 
     // Upgrade buttons
