@@ -1,7 +1,10 @@
 import Replicate from 'replicate';
 
+// Remove BOM and whitespace from token
+const apiToken = (process.env.REPLICATE_API_TOKEN || '').replace(/^\uFEFF/, '').trim();
+
 const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
+  auth: apiToken,
 });
 
 // Video generation models on Replicate
