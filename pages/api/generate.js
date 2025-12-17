@@ -46,17 +46,17 @@ export default async function handler(req, res) {
     // Use LTX Video for longer videos (10 seconds)
     // 시작 이미지로 업로드한 사진 사용, 긴 영상 생성
     const prediction = await replicate.predictions.create({
-      model: "lightricks/ltx-video",
+      version: "8c47da666861d081eeb4d1261853087de23923a268a69b63febdf5dc1dee08e4",  // lightricks/ltx-video
       input: {
         prompt: fullPrompt,
         image: imageUrl,              // 시작 프레임으로 사용
-        length: 241,                  // 10초 (24fps × 10 + 1)
+        length: 161,                  // ~6.5초 (24fps) - 너무 길면 에러날 수 있음
         aspect_ratio: "16:9",
-        target_size: 720,             // 720p
-        steps: 40,                    // 품질 (높을수록 좋음)
+        target_size: 640,             // 640p (안정성)
+        steps: 35,                    // 품질
         cfg: 4,                       // 프롬프트 따르는 강도
-        image_noise_scale: 0.1,       // 시작 이미지 유지 강도 (낮을수록 유지)
-        negative_prompt: "low quality, worst quality, deformed, distorted, ugly, blurry, western, caucasian, american",
+        image_noise_scale: 0.15,      // 시작 이미지 유지 강도
+        negative_prompt: "low quality, worst quality, deformed, distorted, ugly, blurry, western, caucasian, american, european",
       },
     });
 
