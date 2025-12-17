@@ -1,0 +1,11 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/upload", "destination": "/upload.html" },
+    { "source": "/select", "destination": "/select.html" },
+    { "source": "/rewrite", "destination": "/rewrite.html" },
+    { "source": "/result", "destination": "/result.html" },
+    { "source": "/pricing", "destination": "/pricing.html" }
+  ]
+}
+
