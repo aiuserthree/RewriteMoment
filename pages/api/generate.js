@@ -53,6 +53,7 @@ export default async function handler(req, res) {
       input: {
         prompt: fullPrompt,
         first_frame_image: imageUrl,
+        prompt_optimizer: true,  // 프롬프트 최적화
       },
     });
 

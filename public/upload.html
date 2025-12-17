@@ -373,17 +373,58 @@
     consent1.addEventListener('change', checkCanProceed);
     consent2.addEventListener('change', checkCanProceed);
 
+    // 이미지를 16:9 비율로 크롭하는 함수
+    function cropTo16x9(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            // 16:9 비율 계산
+            const targetRatio = 16 / 9;
+            const imgRatio = img.width / img.height;
+            
+            let cropWidth, cropHeight, cropX, cropY;
+            
+            if (imgRatio > targetRatio) {
+              // 이미지가 더 넓음 - 좌우 크롭
+              cropHeight = img.height;
+              cropWidth = img.height * targetRatio;
+              cropX = (img.width - cropWidth) / 2;
+              cropY = 0;
+            } else {
+              // 이미지가 더 높음 - 상하 크롭
+              cropWidth = img.width;
+              cropHeight = img.width / targetRatio;
+              cropX = 0;
+              cropY = (img.height - cropHeight) / 2;
+            }
+            
+            // 캔버스에 16:9로 크롭
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.min(1280, cropWidth);  // 최대 1280px
+            canvas.height = canvas.width / targetRatio;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(
+              img,
+              cropX, cropY, cropWidth, cropHeight,  // 소스 영역
+              0, 0, canvas.width, canvas.height      // 대상 영역
+            );
+            
+            resolve(canvas.toDataURL('image/jpeg', 0.9));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
     // Next button click
     nextBtn.addEventListener('click', async () => {
       if (!nextBtn.disabled) {
-        // 이미지를 base64로 저장
-        const imagePromises = uploadedFiles.map(file => {
-          return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.readAsDataURL(file);
-          });
-        });
+        // 이미지를 16:9로 크롭하고 base64로 저장
+        const imagePromises = uploadedFiles.map(file => cropTo16x9(file));
         
         const images = await Promise.all(imagePromises);
         sessionStorage.setItem('uploadedImages', JSON.stringify(images));
