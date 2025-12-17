@@ -1,33 +1,9 @@
-import crypto from 'crypto';
+import Replicate from 'replicate';
 
-// Kling AI API 키
-const accessKey = (process.env.KLING_ACCESS_KEY || '').replace(/^\uFEFF/, '').trim();
-const secretKey = (process.env.KLING_SECRET_KEY || '').replace(/^\uFEFF/, '').trim();
+// Replicate API 키
+const apiToken = (process.env.REPLICATE_API_TOKEN || '').replace(/^\uFEFF/, '').trim();
 
-// JWT 토큰 생성 함수 (Kling AI 인증용)
-function generateKlingToken() {
-  const header = {
-    alg: 'HS256',
-    typ: 'JWT'
-  };
-  
-  const now = Math.floor(Date.now() / 1000);
-  const payload = {
-    iss: accessKey,
-    exp: now + 1800, // 30분 유효
-    nbf: now - 5
-  };
-  
-  const base64Header = Buffer.from(JSON.stringify(header)).toString('base64url');
-  const base64Payload = Buffer.from(JSON.stringify(payload)).toString('base64url');
-  
-  const signature = crypto
-    .createHmac('sha256', secretKey)
-    .update(`${base64Header}.${base64Payload}`)
-    .digest('base64url');
-  
-  return `${base64Header}.${base64Payload}.${signature}`;
-}
+const replicate = new Replicate({ auth: apiToken });
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -61,54 +37,30 @@ export default async function handler(req, res) {
       sliders: sliders || { realism: 60, intensity: 40, pace: 70 }
     });
 
-    console.log('=== Kling AI Video Generation ===');
+    console.log('=== Minimax Video-01 Generation ===');
     console.log('Stage:', stage);
     console.log('Genre:', genre);
     console.log('Mode:', mode);
     console.log('Rewrite:', rewriteText ? 'Yes' : 'No');
     console.log('Prompt:', fullPrompt.substring(0, 200) + '...');
-    console.log('=================================');
+    console.log('===================================');
 
-    // JWT 토큰 생성
-    const token = generateKlingToken();
-
-    // Kling AI Image-to-Video API 호출
-    const klingResponse = await fetch('https://api.klingai.com/v1/videos/image2video', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        model_name: 'kling-v1',
-        image: imageUrl,
+    // Minimax Video-01 with subject_reference - 얼굴 보존!
+    const prediction = await replicate.predictions.create({
+      model: 'minimax/video-01',
+      input: {
         prompt: fullPrompt,
-        negative_prompt: 'blurry, distorted face, deformed, ugly, low quality, bad anatomy',
-        cfg_scale: 0.5,
-        mode: 'std',  // std 또는 pro
-        duration: '10',  // 10초 영상
-        aspect_ratio: '16:9'
-      })
+        subject_reference: imageUrl,  // 🔑 얼굴 참조 - 업로드한 얼굴이 영상에 나옴!
+        prompt_optimizer: true,
+      },
     });
 
-    const klingData = await klingResponse.json();
-
-    if (!klingResponse.ok) {
-      console.error('Kling API Error:', klingData);
-      return res.status(klingResponse.status).json({ 
-        error: 'Kling API error',
-        details: klingData.message || JSON.stringify(klingData)
-      });
-    }
-
-    console.log('Kling Response:', klingData);
-
-    // Return task ID for polling
+    // Return prediction ID for polling
     return res.status(200).json({
-      id: klingData.data?.task_id,
-      status: 'processing',
-      message: 'Video generation started with Kling AI',
-      provider: 'kling'
+      id: prediction.id,
+      status: prediction.status,
+      message: 'Video generation started with Minimax Video-01',
+      provider: 'replicate'
     });
 
   } catch (error) {
