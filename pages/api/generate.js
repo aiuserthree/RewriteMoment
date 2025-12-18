@@ -163,13 +163,13 @@ export default async function handler(req, res) {
 function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, sliders, clipType = 'main', clipIndex = 0, totalClips = 1 }) {
   
   // 라이프 스테이지별 상세 설정 (한국 배경)
-  // Note: Veo prohibits minors, so "teen" uses young adult students
+  // Note: All characters must be clearly adults (20+) to pass Google's safety filters
   const stageSettings = {
     teen: {
-      people: 'The person from the image as a young Korean university student in early 20s',
-      clothes: 'wearing a Korean school uniform blazer with white shirt, or casual campus fashion (hoodie, jeans)',
-      location: 'inside a bright Korean high school classroom with green chalkboard, wooden desks, or university campus corridor',
-      background: 'Korean educational posters on walls, window showing cherry blossom trees, fluorescent lights',
+      people: 'The person from the image as a Korean adult in their early 20s, clearly an adult',
+      clothes: 'wearing trendy casual fashion (oversized hoodie, jeans, sneakers, baseball cap)',
+      location: 'in a trendy Korean cafe or modern coworking space with large windows',
+      background: 'Coffee cups, laptops, modern interior design, indoor plants, warm ambient lighting',
     },
     twenties: {
       people: 'The person from the image as a trendy Korean young adult in their 20s',

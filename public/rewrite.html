@@ -845,9 +845,11 @@
             return;
           }
           
-          if (status.status === 'failed' || status.status === 'canceled') {
-            throw new Error(status.error || '영상 생성 실패');
-          }
+            if (status.status === 'failed' || status.status === 'canceled') {
+              const errorMsg = status.error || '영상 생성 실패';
+              const details = status.details ? `\n\n상세: ${status.details}` : '';
+              throw new Error(errorMsg + details);
+            }
           
           // 진행률 업데이트
           const progress = Math.min(40 + (attempts * 0.5), 90);

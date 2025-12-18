@@ -95,6 +95,21 @@ export default async function handler(req, res) {
     let videoUrl = null;
 
     if (statusData.done === true) {
+      // RAI 필터링 체크
+      if (statusData.response?.raiMediaFilteredCount > 0) {
+        status = 'failed';
+        const reasons = statusData.response?.raiMediaFilteredReasons || ['Content filtered by safety system'];
+        console.error('Video filtered by RAI:', reasons);
+        return res.status(200).json({
+          id: operationId,
+          status: 'failed',
+          output: null,
+          error: 'Google 안전 필터에 의해 영상이 차단되었습니다. 다른 사진이나 설정으로 다시 시도해주세요.',
+          details: reasons[0],
+          provider: 'google-veo'
+        });
+      }
+      
       if (statusData.error) {
         status = 'failed';
         console.error('Veo generation failed:', statusData.error);
