@@ -107,8 +107,6 @@ export default async function handler(req, res) {
           sampleCount: 1,
           durationSeconds: 8,  // 지원: 4, 6, 8초
           personGeneration: 'allow_adult',
-          enhancePrompt: false,  // 프롬프트 변경 방지 - 얼굴 보존 지시 유지
-          negativePrompt: 'different face, changed face, morphed face, distorted face, blurry face, face swap, different person, different identity',
         },
       }),
     });
