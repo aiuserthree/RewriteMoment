@@ -55,3 +55,4 @@ const result = await VideoGenerator.createVideo(
 console.log('Video URL:', result.videoUrl);
 ```
 
+

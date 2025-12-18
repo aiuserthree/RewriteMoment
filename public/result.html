@@ -628,8 +628,33 @@
     const videoPlayer = document.getElementById('videoPlayer');
     const videoPlaceholder = document.getElementById('videoPlaceholder');
 
+    // IndexedDB 헬퍼 함수
+    function openVideoDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('ClipLifeVideoDB', 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('videos')) {
+            db.createObjectStore('videos', { keyPath: 'id' });
+          }
+        };
+      });
+    }
+
+    async function getVideoFromIndexedDB() {
+      const db = await openVideoDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['videos'], 'readonly');
+        const store = transaction.objectStore('videos');
+        const request = store.get('generatedVideo');
+        request.onsuccess = () => resolve(request.result?.data || null);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
     // 생성된 영상 로드
-    const generatedVideo = sessionStorage.getItem('generatedVideo');
     const generationTime = sessionStorage.getItem('generationTime');
     const stage = sessionStorage.getItem('selectedStage') || 'teen';
     const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
@@ -644,21 +669,33 @@
       pageSubtitle.textContent = `Quick Pack · ${stageMap[stage] || stage} · ${genreMap[genre] || genre}`;
     }
 
-    // 영상 로드
-    if (generatedVideo) {
-      videoPlayer.src = generatedVideo;
-      videoPlayer.style.display = 'block';
-      videoPlaceholder.style.display = 'none';
-      
-      // 생성 시간 표시
-      if (generationTime) {
-        console.log(`영상 생성 시간: ${parseFloat(generationTime).toFixed(1)}초`);
+    // 영상 로드 (IndexedDB에서)
+    async function loadVideo() {
+      try {
+        const generatedVideo = await getVideoFromIndexedDB();
+        
+        if (generatedVideo) {
+          videoPlayer.src = generatedVideo;
+          videoPlayer.style.display = 'block';
+          videoPlaceholder.style.display = 'none';
+          
+          // 생성 시간 표시
+          if (generationTime) {
+            console.log(`영상 생성 시간: ${parseFloat(generationTime).toFixed(1)}초`);
+          }
+        } else {
+          // 영상이 없으면 플레이스홀더 표시
+          videoPlayer.style.display = 'none';
+          videoPlaceholder.style.display = 'flex';
+        }
+      } catch (error) {
+        console.error('영상 로드 오류:', error);
+        videoPlayer.style.display = 'none';
+        videoPlaceholder.style.display = 'flex';
       }
-    } else {
-      // 영상이 없으면 플레이스홀더 표시
-      videoPlayer.style.display = 'none';
-      videoPlaceholder.style.display = 'flex';
     }
+    
+    loadVideo();
 
     // Clip captions (sample data)
     const clipData = {

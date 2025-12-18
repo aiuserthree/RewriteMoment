@@ -638,6 +638,32 @@
       });
     });
 
+    // IndexedDB 헬퍼 함수
+    function openVideoDB() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open('ClipLifeVideoDB', 1);
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => resolve(request.result);
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          if (!db.objectStoreNames.contains('videos')) {
+            db.createObjectStore('videos', { keyPath: 'id' });
+          }
+        };
+      });
+    }
+
+    async function saveVideoToIndexedDB(videoData) {
+      const db = await openVideoDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['videos'], 'readwrite');
+        const store = transaction.objectStore('videos');
+        const request = store.put({ id: 'generatedVideo', data: videoData, timestamp: Date.now() });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
     // Generate function - 실제 API 호출
     async function startGeneration() {
       // Store rewrite data
@@ -738,7 +764,7 @@
         const maxAttempts = 120; // 10분
         
         while (attempts < maxAttempts) {
-          const statusResponse = await fetch(`/api/status/${predictionId}`);
+          const statusResponse = await fetch(`/api/status/${encodeURIComponent(predictionId)}`);
           const status = await statusResponse.json();
           
           console.log('Status:', status.status);
@@ -748,7 +774,9 @@
             
             // 결과 저장
             const videoUrl = Array.isArray(status.output) ? status.output[0] : status.output;
-            sessionStorage.setItem('generatedVideo', videoUrl);
+            
+            // Base64 영상을 IndexedDB에 저장 (sessionStorage 용량 초과 방지)
+            await saveVideoToIndexedDB(videoUrl);
             sessionStorage.setItem('predictionId', predictionId);
             sessionStorage.setItem('generationTime', status.metrics?.predict_time || 0);
             
