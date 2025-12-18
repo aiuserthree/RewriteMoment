@@ -17,6 +17,7 @@ export default async function handler(req, res) {
   try {
     const { 
       imageUrl,       // Base64 or URL of uploaded image
+      aspectRatio = '16:9', // 16:9 (가로) or 9:16 (세로)
       mode = 'quick', // quick, story, trailer
       rewriteText,    // Optional rewrite moment text
       stage,          // teen, twenties, newlywed, early_parenting
@@ -52,6 +53,7 @@ export default async function handler(req, res) {
     });
 
     console.log('=== Veo 3.1 Video Generation ===');
+    console.log('Aspect Ratio:', aspectRatio);
     console.log('Stage:', stage);
     console.log('Genre:', genre);
     console.log('Mode:', mode);
@@ -103,7 +105,7 @@ export default async function handler(req, res) {
           },
         }],
         parameters: {
-          aspectRatio: '16:9',
+          aspectRatio: aspectRatio, // 16:9 또는 9:16
           sampleCount: 1,
           durationSeconds: 8,  // 지원: 4, 6, 8초
           personGeneration: 'allow_adult',

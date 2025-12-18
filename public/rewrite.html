@@ -730,6 +730,7 @@
         }
 
         // 선택된 설정 가져오기
+        const aspectRatio = sessionStorage.getItem('selectedRatio') || '16:9';
         const stage = sessionStorage.getItem('selectedStage') || 'teen';
         const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
 
@@ -741,6 +742,7 @@
         const ending = rewriteEnabled.checked ? document.querySelector('[name="ending"]:checked')?.value : null;
 
         console.log('=== Sending to API ===');
+        console.log('Aspect Ratio:', aspectRatio);
         console.log('Stage:', stage);
         console.log('Genre:', genre);
         console.log('Sliders:', sliders);
@@ -757,6 +759,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             imageUrl,
+            aspectRatio,
             mode: 'quick',
             stage,
             genre,

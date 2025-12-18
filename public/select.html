@@ -87,6 +87,33 @@
         </p>
       </div>
 
+      <!-- Aspect Ratio Selection -->
+      <section class="select-section" data-animate style="animation-delay: 0.1s">
+        <h3 class="select-section-title">
+          <span class="select-section-icon">📐</span>
+          영상 비율
+        </h3>
+        <div class="ratio-cards">
+          <label class="ratio-card active">
+            <input type="radio" name="ratio" value="16:9" checked>
+            <div class="ratio-preview ratio-16-9">
+              <span>16:9</span>
+            </div>
+            <div class="ratio-label">가로형</div>
+            <div class="ratio-desc">YouTube, 데스크탑</div>
+          </label>
+
+          <label class="ratio-card">
+            <input type="radio" name="ratio" value="9:16">
+            <div class="ratio-preview ratio-9-16">
+              <span>9:16</span>
+            </div>
+            <div class="ratio-label">세로형</div>
+            <div class="ratio-desc">릴스, 쇼츠, TikTok</div>
+          </label>
+        </div>
+      </section>
+
       <!-- Stage Selection -->
       <section class="select-section" data-animate style="animation-delay: 0.2s">
         <h3 class="select-section-title">
@@ -218,6 +245,75 @@
       grid-template-columns: repeat(5, 1fr);
     }
 
+    /* Ratio Selection */
+    .ratio-cards {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .ratio-card {
+      flex: 1;
+      max-width: 200px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .ratio-card:hover {
+      border-color: var(--accent-secondary);
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    .ratio-card.active {
+      border-color: var(--accent-primary);
+      background: rgba(168, 85, 247, 0.1);
+    }
+
+    .ratio-card input {
+      display: none;
+    }
+
+    .ratio-preview {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .ratio-16-9 {
+      width: 100%;
+      aspect-ratio: 16/9;
+    }
+
+    .ratio-9-16 {
+      width: 56.25%;
+      aspect-ratio: 9/16;
+      margin: 0 auto;
+    }
+
+    .ratio-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+
+    .ratio-desc {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+    }
+
     /* Info Card */
     .info-card {
       background: rgba(168, 85, 247, 0.1);
@@ -286,12 +382,22 @@
       });
     });
 
+    // Ratio selection
+    document.querySelectorAll('.ratio-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.ratio-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+      });
+    });
+
     // Next button
     nextBtn.addEventListener('click', () => {
+      const selectedRatio = document.querySelector('[name="ratio"]:checked').value;
       const selectedStage = document.querySelector('[name="stage"]:checked').value;
       const selectedGenre = document.querySelector('[name="genre"]:checked').value;
 
-      // Store selections (모드는 항상 quick으로 고정 - 8초 단일 영상)
+      // Store selections
+      sessionStorage.setItem('selectedRatio', selectedRatio);
       sessionStorage.setItem('selectedMode', 'quick');
       sessionStorage.setItem('selectedStage', selectedStage);
       sessionStorage.setItem('selectedGenre', selectedGenre);
