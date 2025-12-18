@@ -90,39 +90,23 @@
         
         <!-- Video Section -->
         <div class="result-video-section" data-animate style="animation-delay: 0.1s">
-          <!-- Clip Tabs -->
-          <div class="clip-tabs">
-            <button class="clip-tab active" data-clip="1">
-              <span class="clip-tab-icon">🎬</span>
-              Clip 1<span class="clip-tab-role">Hook</span>
-            </button>
-            <button class="clip-tab" data-clip="2">
-              <span class="clip-tab-icon">🎬</span>
-              Clip 2<span class="clip-tab-role">Main</span>
-            </button>
-            <button class="clip-tab" data-clip="3">
-              <span class="clip-tab-icon">✨</span>
-              Clip 3<span class="clip-tab-role">Ending</span>
-            </button>
-          </div>
-
           <!-- Video Player -->
           <div class="video-player-wrapper">
-            <div class="video-container">
-              <div class="video-placeholder" id="videoPlaceholder" style="display: none;">
+            <div class="video-container" id="videoContainer">
+              <div class="video-placeholder" id="videoPlaceholder">
                 <div class="video-placeholder-icon">🎬</div>
-                <p>영상 미리보기</p>
+                <p>영상 로딩 중...</p>
                 <span class="video-duration">8초</span>
               </div>
-              <video id="videoPlayer" controls playsinline style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-xl);"></video>
+              <video id="videoPlayer" controls playsinline style="display: none; width: 100%; height: 100%; object-fit: contain; border-radius: var(--radius-xl);"></video>
             </div>
 
             <!-- Video Info -->
             <div class="video-info">
               <div class="video-caption" id="videoCaption">
-                "하필 오늘…"
+                "나의 순간"
               </div>
-              <div class="video-meta">
+              <div class="video-meta" id="videoMeta">
                 <span>🎭 청소년</span>
                 <span>😂 코미디</span>
                 <span>⏱️ 8초</span>
@@ -132,15 +116,9 @@
 
           <!-- Video Actions -->
           <div class="video-actions">
-            <button class="btn btn-secondary btn-icon" title="이전 클립" onclick="skipTime(-2)">
-              ◀
-            </button>
             <button class="btn btn-primary" id="playBtn" onclick="togglePlay()">
               <span id="playIcon">▶</span>
               <span id="playText">재생하기</span>
-            </button>
-            <button class="btn btn-secondary btn-icon" title="다음 클립" onclick="skipTime(2)">
-              ▶
             </button>
           </div>
         </div>
@@ -620,13 +598,14 @@
   </style>
   <script>
     // Result page functionality
-    const clipTabs = document.querySelectorAll('.clip-tab');
     const videoCaption = document.getElementById('videoCaption');
     const shareModal = document.getElementById('shareModal');
     const toast = document.getElementById('toast');
     const rewriteCard = document.getElementById('rewriteCard');
     const videoPlayer = document.getElementById('videoPlayer');
     const videoPlaceholder = document.getElementById('videoPlaceholder');
+    const videoContainer = document.getElementById('videoContainer');
+    const videoMeta = document.getElementById('videoMeta');
 
     // IndexedDB 헬퍼 함수
     function openVideoDB() {
@@ -649,163 +628,78 @@
         const transaction = db.transaction(['videos'], 'readonly');
         const store = transaction.objectStore('videos');
         const request = store.get('generatedVideo');
-        request.onsuccess = () => resolve(request.result?.data || null);
+        request.onsuccess = () => {
+          console.log('IndexedDB result:', request.result);
+          resolve(request.result?.data || null);
+        };
         request.onerror = () => reject(request.error);
       });
     }
 
-    // 여러 클립 가져오기
-    async function getVideosFromIndexedDB() {
-      const db = await openVideoDB();
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['videos'], 'readonly');
-        const store = transaction.objectStore('videos');
-        const request = store.get('generatedVideos');
-        request.onsuccess = () => resolve(request.result?.clips || null);
-        request.onerror = () => reject(request.error);
-      });
-    }
-
-    // 생성된 영상 로드
-    const generationTime = sessionStorage.getItem('generationTime');
+    // 저장된 설정 로드
+    const aspectRatio = sessionStorage.getItem('selectedRatio') || '16:9';
     const stage = sessionStorage.getItem('selectedStage') || 'teen';
     const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
-    const videoMode = sessionStorage.getItem('videoMode') || 'quick';
-    const totalClips = parseInt(sessionStorage.getItem('totalClips')) || 1;
 
     // 스테이지/장르 매핑
     const stageMap = { 'teen': '청소년', 'twenties': '20대', 'newlywed': '신혼', 'early_parenting': '초기 육아' };
     const genreMap = { 'docu': '다큐', 'comedy': '코미디', 'drama': '드라마', 'melo': '멜로', 'fantasy': '판타지' };
-    const modeMap = { 'quick': 'Quick Pack', 'story': 'Story Pack', 'trailer': 'Trailer' };
+    const genreIcons = { 'docu': '📹', 'comedy': '😂', 'drama': '🎭', 'melo': '💕', 'fantasy': '✨' };
+    const stageIcons = { 'teen': '🎒', 'twenties': '💼', 'newlywed': '💑', 'early_parenting': '👶' };
 
     // 페이지 서브타이틀 업데이트
     const pageSubtitle = document.querySelector('.page-subtitle');
     if (pageSubtitle) {
-      pageSubtitle.textContent = `${modeMap[videoMode] || 'Quick Pack'} · ${stageMap[stage] || stage} · ${genreMap[genre] || genre}`;
+      pageSubtitle.textContent = `${stageMap[stage] || stage} · ${genreMap[genre] || genre} · ${aspectRatio}`;
     }
 
-    // 클립 타입별 캡션
-    const clipCaptions = {
-      main: { caption: '"그 순간"', role: 'Main' },
-      opening: { caption: '"시작"', role: 'Opening' },
-      climax: { caption: '"절정"', role: 'Climax' },
-      hook: { caption: '"하필 오늘…"', role: 'Hook' },
-      rising: { caption: '"내가 왜 그랬지"', role: 'Rising' },
-      ending: { caption: '"근데… 의외로"', role: 'Ending' },
-    };
+    // 비디오 메타 업데이트
+    if (videoMeta) {
+      videoMeta.innerHTML = `
+        <span>${stageIcons[stage] || '🎭'} ${stageMap[stage] || stage}</span>
+        <span>${genreIcons[genre] || '🎬'} ${genreMap[genre] || genre}</span>
+        <span>⏱️ 8초</span>
+      `;
+    }
 
-    let allClips = [];
-    let currentClipIndex = 0;
+    // 비율에 따른 비디오 컨테이너 스타일 조정
+    if (aspectRatio === '9:16') {
+      videoContainer.style.aspectRatio = '9/16';
+      videoContainer.style.maxWidth = '350px';
+      videoContainer.style.margin = '0 auto';
+    } else {
+      videoContainer.style.aspectRatio = '16/9';
+      videoContainer.style.maxWidth = '100%';
+    }
 
     // 영상 로드 (IndexedDB에서)
     async function loadVideo() {
+      console.log('Loading video from IndexedDB...');
       try {
-        // 먼저 여러 클립 확인
-        const multipleClips = await getVideosFromIndexedDB();
+        const videoData = await getVideoFromIndexedDB();
+        console.log('Video data received:', videoData ? `${videoData.length} chars` : 'null');
         
-        if (multipleClips && multipleClips.length > 0) {
-          // 여러 클립이 있는 경우
-          allClips = multipleClips;
-          updateClipTabs();
-          playClip(0);
+        if (videoData) {
+          videoPlayer.src = videoData;
+          videoPlayer.style.display = 'block';
+          videoPlaceholder.style.display = 'none';
+          console.log('Video loaded successfully');
         } else {
-          // 단일 클립 (기존 방식)
-          const singleVideo = await getVideoFromIndexedDB();
-          if (singleVideo) {
-            videoPlayer.src = singleVideo;
-            videoPlayer.style.display = 'block';
-            videoPlaceholder.style.display = 'none';
-          } else {
-            videoPlayer.style.display = 'none';
-            videoPlaceholder.style.display = 'flex';
-          }
+          console.log('No video data found');
+          videoPlayer.style.display = 'none';
+          videoPlaceholder.style.display = 'flex';
+          videoPlaceholder.querySelector('p').textContent = '영상이 없습니다';
         }
       } catch (error) {
         console.error('영상 로드 오류:', error);
         videoPlayer.style.display = 'none';
         videoPlaceholder.style.display = 'flex';
+        videoPlaceholder.querySelector('p').textContent = '영상 로드 실패';
       }
     }
-
-    // 클립 탭 업데이트
-    function updateClipTabs() {
-      const clipTabsContainer = document.querySelector('.clip-tabs');
-      if (clipTabsContainer && allClips.length > 1) {
-        clipTabsContainer.innerHTML = allClips.map((clip, index) => {
-          const caption = clipCaptions[clip.clipType] || clipCaptions.main;
-          return `
-            <div class="clip-tab ${index === 0 ? 'active' : ''}" data-clip="${index}">
-              <span class="clip-num">${index + 1}</span>
-              <span class="clip-label">${caption.role}</span>
-            </div>
-          `;
-        }).join('');
-
-        // 탭 클릭 이벤트 재등록
-        document.querySelectorAll('.clip-tab').forEach(tab => {
-          tab.addEventListener('click', () => {
-            const clipIndex = parseInt(tab.dataset.clip);
-            playClip(clipIndex);
-          });
-        });
-      }
-    }
-
-    // 특정 클립 재생
-    function playClip(index) {
-      if (allClips[index]) {
-        currentClipIndex = index;
-        videoPlayer.src = allClips[index].videoUrl;
-        videoPlayer.style.display = 'block';
-        videoPlaceholder.style.display = 'none';
-        
-        // 탭 활성화 업데이트
-        document.querySelectorAll('.clip-tab').forEach((tab, i) => {
-          tab.classList.toggle('active', i === index);
-        });
-
-        // 캡션 업데이트
-        const caption = clipCaptions[allClips[index].clipType] || clipCaptions.main;
-        if (videoCaption) {
-          videoCaption.textContent = caption.caption;
-        }
-
-        videoPlayer.play();
-      }
-    }
-
-    // 클립 끝나면 다음 클립 자동 재생
-    videoPlayer.addEventListener('ended', () => {
-      if (allClips.length > 1 && currentClipIndex < allClips.length - 1) {
-        playClip(currentClipIndex + 1);
-      }
-    });
     
+    // 페이지 로드 시 영상 로드
     loadVideo();
-
-    // Clip captions (sample data - 기존 호환)
-    const clipData = {
-      1: { caption: '"하필 오늘…"', duration: '8초', role: 'Hook' },
-      2: { caption: '"내가 왜 그랬지"', duration: '8초', role: 'Main' },
-      3: { caption: '"근데… 의외로"', duration: '8초', role: 'Ending' }
-    };
-
-    // Clip tab switching (기존 호환)
-    clipTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        if (allClips.length === 0) {
-          // 기존 단일 영상 방식
-          clipTabs.forEach(t => t.classList.remove('active'));
-          tab.classList.add('active');
-          
-          const clipNo = tab.dataset.clip;
-          const data = clipData[clipNo];
-          if (data && videoCaption) {
-            videoCaption.textContent = data.caption;
-          }
-        }
-      });
-    });
 
     // Check if rewrite was enabled
     const rewriteEnabled = sessionStorage.getItem('rewriteEnabled') === 'true';
