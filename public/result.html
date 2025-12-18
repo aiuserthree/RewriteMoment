@@ -596,10 +596,10 @@
     const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
 
     // 스테이지/장르 매핑
-    const stageMap = { 'teen': '청소년', 'twenties': '20대', 'newlywed': '신혼', 'early_parenting': '초기 육아' };
+    const stageMap = { 'twenties': '20대', 'thirties': '30대', 'forties': '40대', 'newlywed': '신혼', 'early_parenting': '초기 육아' };
     const genreMap = { 'docu': '다큐', 'comedy': '코미디', 'drama': '드라마', 'melo': '멜로', 'fantasy': '판타지' };
     const genreIcons = { 'docu': '📹', 'comedy': '😂', 'drama': '🎭', 'melo': '💕', 'fantasy': '✨' };
-    const stageIcons = { 'teen': '🎒', 'twenties': '💼', 'newlywed': '💑', 'early_parenting': '👶' };
+    const stageIcons = { 'twenties': '✨', 'thirties': '💼', 'forties': '🏆', 'newlywed': '💑', 'early_parenting': '👶' };
 
     // 페이지 서브타이틀 업데이트
     const pageSubtitle = document.querySelector('.page-subtitle');

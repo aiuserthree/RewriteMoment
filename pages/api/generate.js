@@ -165,20 +165,26 @@ function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, slider
   // 라이프 스테이지별 상세 설정 (한국 배경)
   // Note: All characters must be clearly adults (20+) to pass Google's safety filters
   const stageSettings = {
-    teen: {
-      people: 'The person from the image as a Korean adult in their early 20s, clearly an adult',
-      clothes: 'wearing trendy casual fashion (oversized hoodie, jeans, sneakers, baseball cap)',
-      location: 'in a trendy Korean cafe or modern coworking space with large windows',
-      background: 'Coffee cups, laptops, modern interior design, indoor plants, warm ambient lighting',
-    },
     twenties: {
       people: 'The person from the image as a trendy Korean young adult in their 20s',
       clothes: 'wearing stylish K-fashion (oversized blazer, wide pants, minimal aesthetic Korean style)',
       location: 'at a modern Korean cafe with aesthetic interior, or busy Seoul street with neon signs',
       background: 'Iced Americano on table, MacBook, Korean signs in background, Hongdae or Gangnam atmosphere',
     },
+    thirties: {
+      people: 'The person from the image as a confident Korean professional in their 30s',
+      clothes: 'wearing smart casual business attire (fitted blazer, crisp shirt, dress pants)',
+      location: 'in a modern office space with city view, or upscale restaurant setting',
+      background: 'Floor-to-ceiling windows, Seoul skyline, elegant furniture, professional atmosphere',
+    },
+    forties: {
+      people: 'The person from the image as a mature Korean adult in their 40s with refined presence',
+      clothes: 'wearing elegant sophisticated attire (quality fabrics, classic designs, subtle luxury)',
+      location: 'in a luxurious home study or high-end lounge with warm ambiance',
+      background: 'Bookshelf with books, artwork on walls, premium furniture, warm mood lighting',
+    },
     newlywed: {
-      people: 'The person from the image as a young Korean adult in late 20s',
+      people: 'The person from the image as a Korean adult in their late 20s to early 30s',
       clothes: 'wearing comfortable home clothes (matching loungewear, cardigan)',
       location: 'in a cozy modern Korean apartment living room with warm lighting',
       background: 'Wedding photo frames on shelf, Korean home decor, TV, plants, warm wooden interior',

@@ -122,17 +122,24 @@
         </h3>
         <div class="selection-grid stage-grid">
           <label class="selection-card active">
-            <input type="radio" name="stage" value="teen" checked>
-            <div class="selection-card-icon">🎒</div>
-            <div class="selection-card-title">청소년</div>
-            <div class="selection-card-desc">학교, 친구, 성장</div>
+            <input type="radio" name="stage" value="twenties" checked>
+            <div class="selection-card-icon">✨</div>
+            <div class="selection-card-title">20대</div>
+            <div class="selection-card-desc">첫 시작, 도전</div>
           </label>
 
           <label class="selection-card">
-            <input type="radio" name="stage" value="twenties">
+            <input type="radio" name="stage" value="thirties">
             <div class="selection-card-icon">💼</div>
-            <div class="selection-card-title">20대</div>
-            <div class="selection-card-desc">첫 시작, 도전</div>
+            <div class="selection-card-title">30대</div>
+            <div class="selection-card-desc">커리어, 성장</div>
+          </label>
+
+          <label class="selection-card">
+            <input type="radio" name="stage" value="forties">
+            <div class="selection-card-icon">🏆</div>
+            <div class="selection-card-title">40대</div>
+            <div class="selection-card-desc">성숙, 여유</div>
           </label>
 
           <label class="selection-card">
@@ -238,7 +245,7 @@
     }
 
     .stage-grid {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
     }
 
     .genre-grid {
@@ -350,7 +357,7 @@
       }
 
       .stage-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
       }
 
       .genre-grid {
