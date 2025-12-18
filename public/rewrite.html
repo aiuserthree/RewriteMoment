@@ -653,6 +653,19 @@
       });
     }
 
+    // 이전 영상 삭제 (새 생성 전)
+    async function clearVideoFromIndexedDB() {
+      const db = await openVideoDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['videos'], 'readwrite');
+        const store = transaction.objectStore('videos');
+        store.delete('generatedVideo');
+        store.delete('generatedVideos');
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject(transaction.error);
+      });
+    }
+
     async function saveVideoToIndexedDB(videoData) {
       const db = await openVideoDB();
       return new Promise((resolve, reject) => {
@@ -720,6 +733,10 @@
       }
 
       try {
+        // 0. 이전 영상 삭제 (캐시 클리어)
+        await clearVideoFromIndexedDB();
+        console.log('Previous video cache cleared');
+
         // 1. 이미지 가져오기
         updateStep(1, '이미지 준비 중...', 10);
         const uploadedImages = JSON.parse(sessionStorage.getItem('uploadedImages') || '[]');
@@ -728,6 +745,9 @@
         if (!imageUrl) {
           throw new Error('업로드된 이미지가 없습니다. 처음부터 다시 시작해주세요.');
         }
+        
+        console.log('Image data length:', imageUrl.length);
+        console.log('Image data preview:', imageUrl.substring(0, 50));
 
         // 선택된 설정 가져오기
         const aspectRatio = sessionStorage.getItem('selectedRatio') || '16:9';
