@@ -139,118 +139,119 @@ export default async function handler(req, res) {
 // Build comprehensive prompt based on all user selections
 function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, sliders }) {
   
-  // 라이프 스테이지별 상세 설정 (한국 배경, 한국 사람)
-  // Note: Veo prohibits minors in generated content, so "teen" uses young adult students
+  // 라이프 스테이지별 상세 설정 (한국 배경)
+  // Note: Veo prohibits minors, so "teen" uses young adult students
   const stageSettings = {
     teen: {
-      people: 'A group of 3-4 young Korean university students in their early 20s (Asian Korean faces)',
-      clothes: 'wearing casual campus fashion (hoodies, jeans, sneakers, Korean street style)',
-      location: 'in a bright Korean university campus hallway with notice boards',
-      activity: 'walking together, laughing and chatting, carrying backpacks',
-      props: 'Korean textbooks, laptops, smartphones, coffee cups, Korean snacks',
+      people: 'The person from the image as a young Korean university student in early 20s',
+      clothes: 'wearing a Korean school uniform blazer with white shirt, or casual campus fashion (hoodie, jeans)',
+      location: 'inside a bright Korean high school classroom with green chalkboard, wooden desks, or university campus corridor',
+      background: 'Korean educational posters on walls, window showing cherry blossom trees, fluorescent lights',
     },
     twenties: {
-      people: 'A group of Korean young adults in their 20s (Asian Korean faces)',
-      clothes: 'wearing trendy Korean fashion (청청패션, oversized sweaters, wide pants, minimal Korean style)',
-      location: 'at a stylish Korean cafe (한국 카페) with aesthetic interior, neon signs',
-      activity: 'having Americano coffee, chatting, taking photos for Instagram',
-      props: 'iced Americano, Korean desserts, MacBooks, AirPods',
+      people: 'The person from the image as a trendy Korean young adult in their 20s',
+      clothes: 'wearing stylish K-fashion (oversized blazer, wide pants, minimal aesthetic Korean style)',
+      location: 'at a modern Korean cafe with aesthetic interior, or busy Seoul street with neon signs',
+      background: 'Iced Americano on table, MacBook, Korean signs in background, Hongdae or Gangnam atmosphere',
     },
     newlywed: {
-      people: 'A young Korean married couple in their late 20s (Asian Korean faces)',
-      clothes: 'wearing comfortable Korean home clothes (편한 옷, matching loungewear)',
-      location: 'in a modern Korean apartment (아파트) living room with warm lighting',
-      activity: 'cooking Korean food together, watching TV on sofa, cozy moments',
-      props: 'Korean wedding photos, rice cooker, soju glasses, Korean home decor',
+      people: 'The person from the image as a young Korean adult in late 20s',
+      clothes: 'wearing comfortable home clothes (matching loungewear, cardigan)',
+      location: 'in a cozy modern Korean apartment living room with warm lighting',
+      background: 'Wedding photo frames on shelf, Korean home decor, TV, plants, warm wooden interior',
     },
     early_parenting: {
-      people: 'Korean parents with a toddler (age 2-3, Asian Korean family)',
-      clothes: 'wearing casual Korean style clothes (편한 옷, 카디건)',
-      location: 'in a warm Korean family apartment living room with play mat',
-      activity: 'playing with the child, reading Korean picture books, tender family moments',
-      props: 'Korean toys, baby items, family photos, Korean childrens books',
+      people: 'The person from the image as a Korean parent in their 30s',
+      clothes: 'wearing casual comfortable clothes (soft cardigan, cotton pants)',
+      location: 'in a warm Korean family apartment with colorful play mat on floor',
+      background: 'Baby toys scattered around, family photos on wall, soft cushions, warm atmosphere',
     },
   };
 
-  // 장르별 영화 스타일
-  const genreStyles = {
+  // 장르별 구체적 행동과 스타일
+  const genreActions = {
     docu: {
-      lighting: 'natural documentary lighting, handheld camera feel',
-      colors: 'muted realistic colors, desaturated tones',
-      mood: 'authentic, intimate, slice-of-life',
-      camera: 'close-up candid shots, observational style',
+      action: 'Looking directly at camera with sincere expression, then turning to look out the window thoughtfully, natural candid movements',
+      movement: 'subtle head turns, natural eye blinks, slight smile forming',
+      style: 'documentary realism, natural lighting from window, handheld camera subtle shake',
+      emotion: 'authentic, reflective, contemplative, real-life moment',
     },
     comedy: {
-      lighting: 'bright even lighting, well-lit cheerful scenes',
-      colors: 'vibrant saturated colors, warm cheerful palette',
-      mood: 'lighthearted, playful, feel-good, funny',
-      camera: 'wide shots showing reactions, comedic timing',
+      action: 'Making a surprised funny face, then bursting into laughter, playful gestures, animated expressions',
+      movement: 'exaggerated reactions, throwing head back laughing, clapping hands, covering mouth while giggling',
+      style: 'bright colorful lighting, wide angle to capture full reactions, vibrant saturation',
+      emotion: 'joyful, playful, silly, lighthearted fun',
     },
     drama: {
-      lighting: 'cinematic dramatic lighting with shadows',
-      colors: 'rich deep colors, moody color grading',
-      mood: 'emotional, intense, thought-provoking',
-      camera: 'slow meaningful shots, dramatic angles',
+      action: 'Deep in thought with furrowed brow, then looking up with determined eyes, emotional intensity building',
+      movement: 'slow deliberate movements, meaningful pauses, clenching fist or touching heart',
+      style: 'cinematic dramatic lighting with strong shadows, shallow depth of field, rich contrast',
+      emotion: 'intense, emotional, conflicted, dramatic tension',
     },
     melo: {
-      lighting: 'soft golden hour lighting, romantic glow',
-      colors: 'warm pastel tones, soft pink and orange hues',
-      mood: 'tender, emotional, bittersweet, touching',
-      camera: 'slow motion, intimate close-ups, lingering gazes',
+      action: 'Gazing softly into distance with gentle smile, touching face tenderly, looking down shyly then up again',
+      movement: 'slow graceful movements, hair gently moving, soft gestures, tender expressions',
+      style: 'soft golden hour glow, warm pink and orange tones, dreamy bokeh background',
+      emotion: 'romantic, tender, bittersweet, heartfelt longing',
     },
     fantasy: {
-      lighting: 'magical ethereal lighting with lens flares',
-      colors: 'vibrant otherworldly colors, magical glows',
-      mood: 'dreamlike, enchanting, whimsical, wonder',
-      camera: 'sweeping movements, fantastical angles',
+      action: 'Eyes widening in wonder, reaching out hand toward magical light, spinning around in amazement',
+      movement: 'flowing ethereal movements, looking around in awe, magical gestures',
+      style: 'magical lighting with lens flares, sparkles and glowing particles, otherworldly colors',
+      emotion: 'wonder, enchantment, magical surprise, dreamlike',
     },
   };
 
-  // 슬라이더 값
+  // 슬라이더 값으로 세부 조정
   const realismLevel = parseInt(sliders?.realism) || 60;
   const intensityLevel = parseInt(sliders?.intensity) || 40;
   const paceLevel = parseInt(sliders?.pace) || 70;
 
-  // 분위기 설명
-  const realismDesc = realismLevel < 40 
-    ? 'highly stylized movie aesthetic' 
+  // 리얼리즘 수준
+  const realismStyle = realismLevel < 40 
+    ? 'highly stylized cinematic look, movie-like color grading' 
     : realismLevel > 70 
-    ? 'ultra realistic, like real footage' 
-    : 'cinematic but natural';
+    ? 'ultra realistic footage, like iPhone video, natural imperfections' 
+    : 'balanced cinematic realism, professional but natural';
     
-  const intensityDesc = intensityLevel < 40 
-    ? 'subtle gentle emotions' 
+  // 감정 강도
+  const emotionIntensity = intensityLevel < 40 
+    ? 'subtle understated emotions, minimal expression changes' 
     : intensityLevel > 70 
-    ? 'intense dramatic emotions' 
-    : 'balanced emotional moments';
+    ? 'intense dramatic emotions, visible tears or strong reactions' 
+    : 'moderate emotional expression, relatable reactions';
     
-  const paceDesc = paceLevel < 40 
-    ? 'slow contemplative pacing' 
+  // 페이스/속도
+  const motionPace = paceLevel < 40 
+    ? 'slow motion 0.5x speed, lingering contemplative shots' 
     : paceLevel > 70 
-    ? 'dynamic energetic movement' 
-    : 'natural comfortable rhythm';
+    ? 'energetic quick movements, dynamic action' 
+    : 'natural comfortable rhythm, real-time pacing';
 
   // 스테이지 및 장르 정보 가져오기
   const stageInfo = stageSettings[stage] || stageSettings.teen;
-  const genreInfo = genreStyles[genre] || genreStyles.drama;
+  const genreInfo = genreActions[genre] || genreActions.drama;
 
-  // 상세 프롬프트 구성
-  let prompt = `${stageInfo.people}, ${stageInfo.clothes}, ${stageInfo.location}. They are ${stageInfo.activity}. Props include ${stageInfo.props}. `;
-  prompt += `${genreInfo.lighting}, ${genreInfo.colors}, ${genreInfo.mood} atmosphere. `;
-  prompt += `${realismDesc}, ${intensityDesc}, ${paceDesc}. `;
-  prompt += `Wide shot showing full scene with multiple people visible. High quality cinematic video, smooth natural motion, 16:9 aspect ratio.`;
+  // 메인 프롬프트 구성 - 얼굴 보존 강조
+  let prompt = `IMPORTANT: Keep the exact face from the input image throughout the video. `;
+  prompt += `${stageInfo.people}, ${stageInfo.clothes}. `;
+  prompt += `Setting: ${stageInfo.location}. ${stageInfo.background}. `;
+  prompt += `Action: ${genreInfo.action}. Movement: ${genreInfo.movement}. `;
+  prompt += `Visual style: ${genreInfo.style}. Emotional tone: ${genreInfo.emotion}. `;
+  prompt += `${realismStyle}. ${emotionIntensity}. ${motionPace}. `;
+  prompt += `Medium shot framing showing face and upper body clearly. Korean setting, Korean aesthetic. High quality 4K cinematic video.`;
 
-  // Rewrite Moment 추가
+  // Rewrite Moment (결말 재구성) 추가
   if (rewriteText) {
-    const endingTypes = {
-      recovery: 'The scene transitions to show healing, inner peace, and emotional recovery',
-      growth: 'The scene shows personal growth, learning from experience, becoming stronger',
-      reconcile: 'The scene depicts forgiveness, reconciliation, rebuilding relationships',
-      self_protect: 'The scene shows setting healthy boundaries, self-care, protecting oneself',
-      new_start: 'The scene transitions to a fresh beginning, new chapter, hopeful future',
-      comedy: 'The mood shifts to finding humor in the situation, laughing it off, lightness',
+    const endingTransitions = {
+      recovery: 'Scene transitions: initial sadness slowly transforms to peaceful acceptance, tears turning to gentle smile, shoulders relaxing, deep breath of relief',
+      growth: 'Scene transitions: uncertainty transforms to confidence, standing taller, eyes brightening with determination, small victorious smile',
+      reconcile: 'Scene transitions: hurt expression softens to understanding, extending hand in forgiveness, warm reconnecting smile',
+      self_protect: 'Scene transitions: vulnerability transforms to quiet strength, setting boundaries with calm confidence, self-assured nod',
+      new_start: 'Scene transitions: looking back briefly then turning forward with hope, stepping toward bright light, optimistic smile',
+      comedy: 'Scene transitions: tense moment breaks into unexpected laughter, seeing humor in situation, relieved giggles',
     };
-    const endingDesc = endingTypes[ending] || endingTypes.growth;
+    const endingDesc = endingTransitions[ending] || endingTransitions.growth;
     prompt += ` ${endingDesc}.`;
   }
 
