@@ -82,7 +82,10 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log('Veo Status Response:', JSON.stringify(statusData, null, 2).substring(0, 500));
+    // 전체 응답 로그
+    console.log('=== Full Veo Status Response ===');
+    console.log(JSON.stringify(statusData, null, 2));
+    console.log('================================');
 
     // 상태 변환
     let status = 'processing';
@@ -95,30 +98,46 @@ export default async function handler(req, res) {
       } else {
         status = 'succeeded';
         
-        // 비디오 데이터 추출 - 여러 형식 지원
-        // 1. response.videos 형식 (Veo 3.0)
-        let videos = statusData.response?.videos;
+        // 비디오 데이터 추출 - 모든 가능한 경로 탐색
+        let videos = null;
         
-        // 2. response.predictions 형식 (Veo 2.0)
-        if (!videos && statusData.response?.predictions) {
-          videos = statusData.response.predictions;
-        }
-        
-        // 3. result 형식
-        if (!videos && statusData.result?.videos) {
-          videos = statusData.result.videos;
-        }
+        // 여러 경로 시도
+        const possiblePaths = [
+          statusData.response?.videos,
+          statusData.response?.predictions,
+          statusData.response?.generatedSamples,
+          statusData.result?.videos,
+          statusData.result?.predictions,
+          statusData.result?.generatedSamples,
+          statusData.videos,
+          statusData.predictions,
+          statusData.generatedSamples,
+        ];
 
-        console.log('Found videos:', videos ? videos.length : 0);
+        for (const path of possiblePaths) {
+          if (path && Array.isArray(path) && path.length > 0) {
+            videos = path;
+            console.log('Found videos at path, count:', videos.length);
+            break;
+          }
+        }
 
         if (videos && videos.length > 0) {
           const video = videos[0];
+          console.log('Video object keys:', Object.keys(video));
           
           // Base64 인코딩된 비디오
           if (video.bytesBase64Encoded) {
             const mimeType = video.mimeType || 'video/mp4';
             videoUrl = `data:${mimeType};base64,${video.bytesBase64Encoded}`;
             console.log('Video URL created (Base64), length:', videoUrl.length);
+          }
+          
+          // video 속성
+          if (video.video?.bytesBase64Encoded && !videoUrl) {
+            const mimeType = video.video.mimeType || 'video/mp4';
+            videoUrl = `data:${mimeType};base64,${video.video.bytesBase64Encoded}`;
+            console.log('Video URL created (video.bytesBase64Encoded), length:', videoUrl.length);
           }
           
           // GCS URI
@@ -135,10 +154,17 @@ export default async function handler(req, res) {
             videoUrl = video.uri;
             console.log('Video URL (direct):', videoUrl);
           }
+          
+          // video.uri
+          if (video.video?.uri && !videoUrl) {
+            videoUrl = video.video.uri;
+            console.log('Video URL (video.uri):', videoUrl);
+          }
         }
 
         if (!videoUrl) {
-          console.error('No video URL found in response:', JSON.stringify(statusData.response || statusData.result, null, 2).substring(0, 500));
+          console.error('No video URL found. Response keys:', Object.keys(statusData));
+          if (statusData.response) console.error('Response keys:', Object.keys(statusData.response));
         }
       }
     }
