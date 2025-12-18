@@ -821,7 +821,16 @@
             console.log('Video URL received:', videoUrl ? `${videoUrl.substring(0, 50)}... (length: ${videoUrl.length})` : 'null');
             
             if (!videoUrl) {
-              throw new Error('영상 URL이 없습니다. API 응답을 확인하세요.');
+              // 디버그 정보 출력
+              if (status.debug) {
+                console.error('=== DEBUG INFO ===');
+                console.error('Root keys:', status.debug.rootKeys);
+                console.error('Response keys:', status.debug.responseKeys);
+                console.error('Result keys:', status.debug.resultKeys);
+                console.error('Raw response:', status.debug.rawResponse);
+                console.error('==================');
+              }
+              throw new Error('영상 URL이 없습니다. 콘솔에서 DEBUG INFO를 확인하세요.');
             }
             
             // 영상을 IndexedDB에 저장

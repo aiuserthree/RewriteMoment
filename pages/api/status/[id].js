@@ -85,6 +85,9 @@ export default async function handler(req, res) {
     // 전체 응답 로그
     console.log('=== Full Veo Status Response ===');
     console.log(JSON.stringify(statusData, null, 2));
+    console.log('Root keys:', Object.keys(statusData));
+    if (statusData.response) console.log('Response keys:', Object.keys(statusData.response));
+    if (statusData.result) console.log('Result keys:', Object.keys(statusData.result));
     console.log('================================');
 
     // 상태 변환
@@ -101,70 +104,124 @@ export default async function handler(req, res) {
         // 비디오 데이터 추출 - 모든 가능한 경로 탐색
         let videos = null;
         
-        // 여러 경로 시도
+        // 여러 경로 시도 (Veo 2.0 응답 구조 포함)
         const possiblePaths = [
-          statusData.response?.videos,
+          // Veo 2.0 표준 경로
           statusData.response?.predictions,
+          statusData.response?.videos,
           statusData.response?.generatedSamples,
-          statusData.result?.videos,
+          statusData.response?.generateVideoResponse?.generatedSamples,
+          // result 경로
           statusData.result?.predictions,
+          statusData.result?.videos,
           statusData.result?.generatedSamples,
-          statusData.videos,
+          // 직접 경로
           statusData.predictions,
+          statusData.videos,
           statusData.generatedSamples,
+          // metadata 경로
+          statusData.metadata?.output?.videos,
         ];
 
-        for (const path of possiblePaths) {
+        for (let i = 0; i < possiblePaths.length; i++) {
+          const path = possiblePaths[i];
           if (path && Array.isArray(path) && path.length > 0) {
             videos = path;
-            console.log('Found videos at path, count:', videos.length);
+            console.log(`Found videos at path index ${i}, count:`, videos.length);
             break;
           }
+        }
+
+        // 비디오를 찾지 못한 경우 재귀적으로 탐색
+        if (!videos) {
+          const findVideos = (obj, depth = 0) => {
+            if (depth > 5 || !obj || typeof obj !== 'object') return null;
+            
+            // 직접 비디오 배열인지 확인
+            if (Array.isArray(obj) && obj.length > 0 && (obj[0].bytesBase64Encoded || obj[0].video || obj[0].gcsUri || obj[0].uri)) {
+              return obj;
+            }
+            
+            // 객체의 각 키를 탐색
+            for (const key of Object.keys(obj)) {
+              if (key === '@type') continue;
+              const result = findVideos(obj[key], depth + 1);
+              if (result) {
+                console.log(`Found videos via recursive search at key: ${key}`);
+                return result;
+              }
+            }
+            return null;
+          };
+          videos = findVideos(statusData);
         }
 
         if (videos && videos.length > 0) {
           const video = videos[0];
           console.log('Video object keys:', Object.keys(video));
+          console.log('Video object:', JSON.stringify(video).substring(0, 500));
           
-          // Base64 인코딩된 비디오
+          // Base64 인코딩된 비디오 (직접)
           if (video.bytesBase64Encoded) {
             const mimeType = video.mimeType || 'video/mp4';
             videoUrl = `data:${mimeType};base64,${video.bytesBase64Encoded}`;
             console.log('Video URL created (Base64), length:', videoUrl.length);
           }
           
-          // video 속성
-          if (video.video?.bytesBase64Encoded && !videoUrl) {
+          // video 객체 내부
+          if (!videoUrl && video.video?.bytesBase64Encoded) {
             const mimeType = video.video.mimeType || 'video/mp4';
             videoUrl = `data:${mimeType};base64,${video.video.bytesBase64Encoded}`;
             console.log('Video URL created (video.bytesBase64Encoded), length:', videoUrl.length);
           }
           
-          // GCS URI
-          if (video.gcsUri && !videoUrl) {
+          // GCS URI (직접)
+          if (!videoUrl && video.gcsUri) {
             const gcsUri = video.gcsUri;
             const bucket = gcsUri.replace('gs://', '').split('/')[0];
             const path = gcsUri.replace(`gs://${bucket}/`, '');
             videoUrl = `https://storage.googleapis.com/${bucket}/${path}`;
             console.log('Video URL (GCS):', videoUrl);
           }
+          
+          // GCS URI (video 객체 내부)
+          if (!videoUrl && video.video?.gcsUri) {
+            const gcsUri = video.video.gcsUri;
+            const bucket = gcsUri.replace('gs://', '').split('/')[0];
+            const path = gcsUri.replace(`gs://${bucket}/`, '');
+            videoUrl = `https://storage.googleapis.com/${bucket}/${path}`;
+            console.log('Video URL (video.gcsUri):', videoUrl);
+          }
 
           // 직접 URL
-          if (video.uri && !videoUrl) {
+          if (!videoUrl && video.uri) {
             videoUrl = video.uri;
-            console.log('Video URL (direct):', videoUrl);
+            console.log('Video URL (direct uri):', videoUrl);
           }
           
           // video.uri
-          if (video.video?.uri && !videoUrl) {
+          if (!videoUrl && video.video?.uri) {
             videoUrl = video.video.uri;
             console.log('Video URL (video.uri):', videoUrl);
           }
         }
 
         if (!videoUrl) {
-          console.error('No video URL found. Response keys:', Object.keys(statusData));
-          if (statusData.response) console.error('Response keys:', Object.keys(statusData.response));
+          console.error('No video URL found after all attempts');
+          // 디버깅용: 응답 구조 반환
+          return res.status(200).json({
+            id: operationId,
+            status: 'succeeded',
+            output: null,
+            error: 'Video URL not found in response',
+            debug: {
+              rootKeys: Object.keys(statusData),
+              responseKeys: statusData.response ? Object.keys(statusData.response) : null,
+              resultKeys: statusData.result ? Object.keys(statusData.result) : null,
+              rawResponse: JSON.stringify(statusData).substring(0, 2000),
+            },
+            provider: 'google-veo'
+          });
         }
       }
     }
