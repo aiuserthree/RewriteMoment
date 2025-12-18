@@ -732,7 +732,6 @@
         // 선택된 설정 가져오기
         const stage = sessionStorage.getItem('selectedStage') || 'teen';
         const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
-        const mode = sessionStorage.getItem('selectedMode') || 'quick';
 
         // 슬라이더 설정 가져오기
         const sliders = JSON.parse(sessionStorage.getItem('sliders') || '{}');
@@ -741,119 +740,85 @@
         const distance = rewriteEnabled.checked ? document.querySelector('[name="distance"]:checked')?.value : null;
         const ending = rewriteEnabled.checked ? document.querySelector('[name="ending"]:checked')?.value : null;
 
-        // 모드별 클립 수 결정
-        const clipCounts = { quick: 1, story: 2, trailer: 4 };
-        const totalClips = clipCounts[mode] || 1;
-        
-        // 클립별 프롬프트 타입 (스토리 진행)
-        const clipTypes = {
-          quick: ['main'],
-          story: ['opening', 'climax'],
-          trailer: ['hook', 'rising', 'climax', 'ending']
-        };
-        const clipTypeList = clipTypes[mode] || ['main'];
-
         console.log('=== Sending to API ===');
         console.log('Stage:', stage);
         console.log('Genre:', genre);
-        console.log('Mode:', mode);
-        console.log('Total Clips:', totalClips);
         console.log('Sliders:', sliders);
         console.log('Rewrite:', rewriteEnabled.checked);
         console.log('Distance:', distance);
         console.log('Ending:', ending);
         console.log('======================');
 
-        const generatedVideos = [];
+        // 2. 영상 생성 API 호출
+        updateStep(2, '영상 생성 요청 중...', 20);
         
-        // 각 클립 생성
-        for (let clipIndex = 0; clipIndex < totalClips; clipIndex++) {
-          const clipType = clipTypeList[clipIndex];
-          
-          // 2. 영상 생성 API 호출
-          updateStep(2, `클립 ${clipIndex + 1}/${totalClips} 생성 요청 중...`, 15 + (clipIndex * 5));
-          
-          const response = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              imageUrl,
-              mode,
-              stage,
-              genre,
-              sliders,
-              clipType, // 클립 타입 전달
-              clipIndex,
-              totalClips,
-              rewriteText: rewriteEnabled.checked ? eventText.value : null,
-              distance,
-              ending,
-            }),
-          });
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            imageUrl,
+            mode: 'quick',
+            stage,
+            genre,
+            sliders,
+            clipType: 'main',
+            clipIndex: 0,
+            totalClips: 1,
+            rewriteText: rewriteEnabled.checked ? eventText.value : null,
+            distance,
+            ending,
+          }),
+        });
 
-          if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.error || `클립 ${clipIndex + 1} 생성 요청 실패`);
-          }
-
-          const { id: predictionId } = await response.json();
-          console.log(`Clip ${clipIndex + 1} Prediction ID:`, predictionId);
-
-          // 3. 상태 폴링
-          updateStep(3, `클립 ${clipIndex + 1}/${totalClips} 생성 중...`, 25 + (clipIndex * 20));
-          
-          let attempts = 0;
-          const maxAttempts = 120; // 10분
-          
-          while (attempts < maxAttempts) {
-            const statusResponse = await fetch(`/api/status/${encodeURIComponent(predictionId)}`);
-            const status = await statusResponse.json();
-            
-            console.log(`Clip ${clipIndex + 1} Status:`, status.status);
-            
-            if (status.status === 'succeeded') {
-              const videoUrl = Array.isArray(status.output) ? status.output[0] : status.output;
-              generatedVideos.push({
-                clipType,
-                clipIndex,
-                videoUrl,
-                generationTime: status.metrics?.predict_time || 0
-              });
-              break;
-            }
-            
-            if (status.status === 'failed' || status.status === 'canceled') {
-              throw new Error(status.error || `클립 ${clipIndex + 1} 생성 실패`);
-            }
-            
-            // 진행률 업데이트
-            const baseProgress = 25 + (clipIndex * 20);
-            const clipProgress = Math.min(attempts * 0.8, 18);
-            loadingBar.style.width = (baseProgress + clipProgress) + '%';
-            
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            attempts++;
-          }
-          
-          if (attempts >= maxAttempts) {
-            throw new Error(`클립 ${clipIndex + 1} 생성 시간 초과`);
-          }
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || '영상 생성 요청 실패');
         }
 
-        // 4. 모든 클립 저장
-        updateStep(4, '마무리 중...', 95);
+        const { id: predictionId } = await response.json();
+        console.log('Prediction ID:', predictionId);
+
+        // 3. 상태 폴링
+        updateStep(3, '영상을 생성하고 있어요...', 40);
         
-        // 모든 영상을 IndexedDB에 저장
-        await saveVideosToIndexedDB(generatedVideos);
-        sessionStorage.setItem('videoMode', mode);
-        sessionStorage.setItem('totalClips', totalClips);
+        let attempts = 0;
+        const maxAttempts = 120; // 10분
         
-        // 성공! 결과 페이지로 이동
-        updateStep(4, '완료!', 100);
-        setTimeout(() => {
-          window.location.href = 'result.html';
-        }, 500);
-        return;
+        while (attempts < maxAttempts) {
+          const statusResponse = await fetch(`/api/status/${encodeURIComponent(predictionId)}`);
+          const status = await statusResponse.json();
+          
+          console.log('Status:', status.status);
+          
+          if (status.status === 'succeeded') {
+            updateStep(4, '마무리 중...', 95);
+            
+            const videoUrl = Array.isArray(status.output) ? status.output[0] : status.output;
+            
+            // 영상을 IndexedDB에 저장
+            await saveVideoToIndexedDB(videoUrl);
+            
+            // 성공! 결과 페이지로 이동
+            updateStep(4, '완료!', 100);
+            setTimeout(() => {
+              window.location.href = 'result.html';
+            }, 500);
+            return;
+          }
+          
+          if (status.status === 'failed' || status.status === 'canceled') {
+            throw new Error(status.error || '영상 생성 실패');
+          }
+          
+          // 진행률 업데이트
+          const progress = Math.min(40 + (attempts * 0.5), 90);
+          loadingBar.style.width = progress + '%';
+          
+          await new Promise(resolve => setTimeout(resolve, 5000));
+          attempts++;
+        }
+        
+        throw new Error('영상 생성 시간 초과');
         
       } catch (error) {
         console.error('Generation error:', error);

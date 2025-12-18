@@ -87,51 +87,6 @@
         </p>
       </div>
 
-      <!-- Mode Selection -->
-      <section class="select-section" data-animate style="animation-delay: 0.1s">
-        <h3 class="select-section-title">
-          <span class="select-section-icon">📦</span>
-          길이 선택
-        </h3>
-        <div class="mode-cards">
-          <label class="mode-card active">
-            <input type="radio" name="mode" value="quick" checked>
-            <div class="mode-badge free">무료</div>
-            <h4 class="mode-title">Quick Pack</h4>
-            <div class="mode-duration">8초 × 3개 클립</div>
-            <ul class="mode-features">
-              <li>Hook + Main + Ending</li>
-              <li>하루 1팩 무료</li>
-              <li>720p + 워터마크</li>
-            </ul>
-          </label>
-
-          <label class="mode-card">
-            <input type="radio" name="mode" value="story">
-            <div class="mode-badge paid">2 크레딧</div>
-            <h4 class="mode-title">Story Pack</h4>
-            <div class="mode-duration">15초 × 3개 클립</div>
-            <ul class="mode-features">
-              <li>상황→감정→전환 비트</li>
-              <li>클립별 재생성</li>
-              <li>1080p + 워터마크 옵션</li>
-            </ul>
-          </label>
-
-          <label class="mode-card">
-            <input type="radio" name="mode" value="trailer">
-            <div class="mode-badge premium">5 크레딧</div>
-            <h4 class="mode-title">Trailer</h4>
-            <div class="mode-duration">45~60초 × 1개</div>
-            <ul class="mode-features">
-              <li>6~10장면 예고편</li>
-              <li>타이틀/내레이션</li>
-              <li>1080p + 워터마크 옵션</li>
-            </ul>
-          </label>
-        </div>
-      </section>
-
       <!-- Stage Selection -->
       <section class="select-section" data-animate style="animation-delay: 0.2s">
         <h3 class="select-section-title">
@@ -213,20 +168,11 @@
         </div>
       </section>
 
-      <!-- Cost Summary -->
-      <div class="cost-summary mt-xl" data-animate style="animation-delay: 0.5s">
-        <div class="cost-summary-inner">
-          <div class="cost-item">
-            <span class="cost-label">선택한 팩</span>
-            <span class="cost-value" id="selectedPack">Quick Pack (무료)</span>
-          </div>
-          <div class="cost-item cost-total">
-            <span class="cost-label">필요 크레딧</span>
-            <span class="cost-value" id="totalCost">0</span>
-          </div>
-        </div>
-        <div class="cost-note" id="costNote">
-          <span>✓</span> 무료 Quick Pack은 하루 1팩 제한이 있어요
+      <!-- Info -->
+      <div class="info-card mt-xl" data-animate style="animation-delay: 0.4s">
+        <div class="info-content">
+          <span class="info-icon">🎬</span>
+          <span class="info-text">8초 고품질 AI 영상이 생성됩니다</span>
         </div>
       </div>
 
@@ -272,62 +218,28 @@
       grid-template-columns: repeat(5, 1fr);
     }
 
-    /* Cost Summary */
-    .cost-summary {
-      background: var(--bg-secondary);
-      border: var(--border-subtle);
+    /* Info Card */
+    .info-card {
+      background: rgba(168, 85, 247, 0.1);
+      border: 1px solid rgba(168, 85, 247, 0.3);
       border-radius: var(--radius-lg);
-      padding: 20px;
+      padding: 16px 20px;
     }
 
-    .cost-summary-inner {
+    .info-content {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding-bottom: 16px;
-      border-bottom: var(--border-subtle);
-      margin-bottom: 16px;
+      gap: 12px;
+      justify-content: center;
     }
 
-    .cost-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .cost-label {
-      font-size: 0.85rem;
-      color: var(--text-tertiary);
-    }
-
-    .cost-value {
-      font-size: 1.125rem;
-      font-weight: 600;
-    }
-
-    .cost-total .cost-value {
+    .info-icon {
       font-size: 1.5rem;
-      color: var(--accent-primary);
     }
 
-    .cost-note {
-      font-size: 0.85rem;
-      color: var(--text-tertiary);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .cost-note span {
-      color: var(--success);
-    }
-
-    .cost-note.warning {
-      color: var(--warning);
-    }
-
-    .cost-note.warning span {
-      color: var(--warning);
+    .info-text {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
     }
 
     .actions-row {
@@ -349,12 +261,6 @@
         grid-template-columns: repeat(2, 1fr);
       }
 
-      .cost-summary-inner {
-        flex-direction: column;
-        gap: 16px;
-        text-align: center;
-      }
-
       .actions-row {
         flex-direction: column;
         gap: 16px;
@@ -367,24 +273,9 @@
   </style>
   <script>
     // Selection functionality
-    const modeCards = document.querySelectorAll('.mode-card');
-    const stageCards = document.querySelectorAll('[name="stage"]');
-    const genreCards = document.querySelectorAll('[name="genre"]');
     const nextBtn = document.getElementById('nextBtn');
 
-    // Credit balance (simulated)
-    let creditBalance = 0;
-
-    // Mode selection
-    modeCards.forEach(card => {
-      card.addEventListener('click', () => {
-        modeCards.forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        updateCostSummary();
-      });
-    });
-
-    // Stage selection
+    // Stage/Genre selection
     document.querySelectorAll('.selection-card').forEach(card => {
       card.addEventListener('click', () => {
         const name = card.querySelector('input').name;
@@ -395,63 +286,15 @@
       });
     });
 
-    function updateCostSummary() {
-      const selectedMode = document.querySelector('[name="mode"]:checked').value;
-      const packElement = document.getElementById('selectedPack');
-      const costElement = document.getElementById('totalCost');
-      const noteElement = document.getElementById('costNote');
-
-      let packName, cost;
-
-      switch(selectedMode) {
-        case 'quick':
-          packName = 'Quick Pack (무료)';
-          cost = 0;
-          noteElement.innerHTML = '<span>✓</span> 무료 Quick Pack은 하루 1팩 제한이 있어요';
-          noteElement.className = 'cost-note';
-          break;
-        case 'story':
-          packName = 'Story Pack';
-          cost = 2;
-          if (creditBalance < cost) {
-            noteElement.innerHTML = '<span>!</span> 크레딧이 부족해요. 충전이 필요합니다.';
-            noteElement.className = 'cost-note warning';
-          } else {
-            noteElement.innerHTML = '<span>✓</span> 크레딧에서 차감됩니다';
-            noteElement.className = 'cost-note';
-          }
-          break;
-        case 'trailer':
-          packName = 'Trailer';
-          cost = 5;
-          if (creditBalance < cost) {
-            noteElement.innerHTML = '<span>!</span> 크레딧이 부족해요. 충전이 필요합니다.';
-            noteElement.className = 'cost-note warning';
-          } else {
-            noteElement.innerHTML = '<span>✓</span> 크레딧에서 차감됩니다';
-            noteElement.className = 'cost-note';
-          }
-          break;
-      }
-
-      packElement.textContent = packName;
-      costElement.textContent = cost;
-    }
-
-    // Initialize
-    updateCostSummary();
-
     // Next button
     nextBtn.addEventListener('click', () => {
-      const selectedMode = document.querySelector('[name="mode"]:checked').value;
       const selectedStage = document.querySelector('[name="stage"]:checked').value;
       const selectedGenre = document.querySelector('[name="genre"]:checked').value;
 
-      // Store selections
-      sessionStorage.setItem('selectedMode', selectedMode);
+      // Store selections (모드는 항상 quick으로 고정 - 8초 단일 영상)
+      sessionStorage.setItem('selectedMode', 'quick');
       sessionStorage.setItem('selectedStage', selectedStage);
       sessionStorage.setItem('selectedGenre', selectedGenre);
-      // 슬라이더 제거됨 - 기본값 사용
       sessionStorage.setItem('sliders', JSON.stringify({
         realism: 60,
         intensity: 50,
