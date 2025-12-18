@@ -89,7 +89,7 @@ export default async function handler(req, res) {
         parameters: {
           aspectRatio: '16:9',
           sampleCount: 1,
-          durationSeconds: 8,
+          durationSeconds: 8,  // 지원: 4, 6, 8초
           personGeneration: 'allow_adult',
           enhancePrompt: true,
         },
@@ -131,13 +131,14 @@ export default async function handler(req, res) {
 function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, sliders }) {
   
   // 라이프 스테이지별 상세 설정 (한국 배경, 한국 사람)
+  // Note: Veo prohibits minors in generated content, so "teen" uses young adult students
   const stageSettings = {
     teen: {
-      people: 'A group of 3-4 Korean teenage students (ages 16-18, Asian Korean faces)',
-      clothes: 'wearing Korean high school uniforms (white dress shirts, navy blue blazers, plaid skirts for girls or navy slacks for boys)',
-      location: 'in a bright Korean high school hallway (복도) with shoe lockers and bulletin boards',
-      activity: 'walking together, laughing and chatting in Korean style, carrying backpacks',
-      props: 'Korean textbooks, smartphones, school bags, Korean snacks',
+      people: 'A group of 3-4 young Korean university students in their early 20s (Asian Korean faces)',
+      clothes: 'wearing casual campus fashion (hoodies, jeans, sneakers, Korean street style)',
+      location: 'in a bright Korean university campus hallway with notice boards',
+      activity: 'walking together, laughing and chatting, carrying backpacks',
+      props: 'Korean textbooks, laptops, smartphones, coffee cups, Korean snacks',
     },
     twenties: {
       people: 'A group of Korean young adults in their 20s (Asian Korean faces)',

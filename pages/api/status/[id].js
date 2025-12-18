@@ -37,15 +37,18 @@ export default async function handler(req, res) {
     // Operation ID를 URL-safe하게 처리
     const operationId = decodeURIComponent(id);
     
-    // Long Running Operation 상태 확인
+    // fetchPredictOperation API 사용
     const statusResponse = await fetch(
-      `https://${LOCATION}-aiplatform.googleapis.com/v1/${operationId}`,
+      `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-3.0-generate-preview:fetchPredictOperation`,
       {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken.token}`,
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          operationName: operationId
+        }),
       }
     );
 
@@ -64,21 +67,30 @@ export default async function handler(req, res) {
     // 상태 변환
     let status = 'processing';
     let videoUrl = null;
+    let videoBase64 = null;
+    let mimeType = null;
 
     if (statusData.done === true) {
       if (statusData.error) {
         status = 'failed';
       } else {
         status = 'succeeded';
-        // 비디오 URL 추출
-        const videos = statusData.response?.generatedSamples;
+        // 비디오 데이터 추출 - Veo는 Base64로 반환
+        const videos = statusData.response?.videos;
         if (videos && videos.length > 0) {
-          videoUrl = videos[0].video?.uri;
-          // GCS URI를 다운로드 가능한 URL로 변환 필요할 수 있음
-          if (videoUrl && videoUrl.startsWith('gs://')) {
-            // GCS URI를 공개 URL로 변환
-            const bucket = videoUrl.replace('gs://', '').split('/')[0];
-            const path = videoUrl.replace(`gs://${bucket}/`, '');
+          videoBase64 = videos[0].bytesBase64Encoded;
+          mimeType = videos[0].mimeType || 'video/mp4';
+          
+          // Base64를 Data URL로 변환
+          if (videoBase64) {
+            videoUrl = `data:${mimeType};base64,${videoBase64}`;
+          }
+          
+          // GCS URI 방식도 지원
+          if (videos[0].gcsUri) {
+            const gcsUri = videos[0].gcsUri;
+            const bucket = gcsUri.replace('gs://', '').split('/')[0];
+            const path = gcsUri.replace(`gs://${bucket}/`, '');
             videoUrl = `https://storage.googleapis.com/${bucket}/${path}`;
           }
         }
