@@ -818,8 +818,15 @@
             
             const videoUrl = Array.isArray(status.output) ? status.output[0] : status.output;
             
+            console.log('Video URL received:', videoUrl ? `${videoUrl.substring(0, 50)}... (length: ${videoUrl.length})` : 'null');
+            
+            if (!videoUrl) {
+              throw new Error('영상 URL이 없습니다. API 응답을 확인하세요.');
+            }
+            
             // 영상을 IndexedDB에 저장
             await saveVideoToIndexedDB(videoUrl);
+            console.log('Video saved to IndexedDB');
             
             // 성공! 결과 페이지로 이동
             updateStep(4, '완료!', 100);

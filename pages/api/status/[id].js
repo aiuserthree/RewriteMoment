@@ -37,18 +37,15 @@ export default async function handler(req, res) {
     // Operation ID를 URL-safe하게 처리
     const operationId = decodeURIComponent(id);
     
-    // fetchPredictOperation API 사용
+    // Operation 상태 직접 조회 (Long Running Operation)
     const statusResponse = await fetch(
-      `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-3.0-generate-preview:fetchPredictOperation`,
+      `https://${LOCATION}-aiplatform.googleapis.com/v1/${operationId}`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${accessToken.token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          operationName: operationId
-        }),
       }
     );
 
@@ -62,37 +59,63 @@ export default async function handler(req, res) {
       });
     }
 
-    console.log('Veo Status:', JSON.stringify(statusData, null, 2));
+    console.log('Veo Status Response:', JSON.stringify(statusData, null, 2).substring(0, 500));
 
     // 상태 변환
     let status = 'processing';
     let videoUrl = null;
-    let videoBase64 = null;
-    let mimeType = null;
 
     if (statusData.done === true) {
       if (statusData.error) {
         status = 'failed';
+        console.error('Veo generation failed:', statusData.error);
       } else {
         status = 'succeeded';
-        // 비디오 데이터 추출 - Veo는 Base64로 반환
-        const videos = statusData.response?.videos;
+        
+        // 비디오 데이터 추출 - 여러 형식 지원
+        // 1. response.videos 형식 (Veo 3.0)
+        let videos = statusData.response?.videos;
+        
+        // 2. response.predictions 형식 (Veo 2.0)
+        if (!videos && statusData.response?.predictions) {
+          videos = statusData.response.predictions;
+        }
+        
+        // 3. result 형식
+        if (!videos && statusData.result?.videos) {
+          videos = statusData.result.videos;
+        }
+
+        console.log('Found videos:', videos ? videos.length : 0);
+
         if (videos && videos.length > 0) {
-          videoBase64 = videos[0].bytesBase64Encoded;
-          mimeType = videos[0].mimeType || 'video/mp4';
+          const video = videos[0];
           
-          // Base64를 Data URL로 변환
-          if (videoBase64) {
-            videoUrl = `data:${mimeType};base64,${videoBase64}`;
+          // Base64 인코딩된 비디오
+          if (video.bytesBase64Encoded) {
+            const mimeType = video.mimeType || 'video/mp4';
+            videoUrl = `data:${mimeType};base64,${video.bytesBase64Encoded}`;
+            console.log('Video URL created (Base64), length:', videoUrl.length);
           }
           
-          // GCS URI 방식도 지원
-          if (videos[0].gcsUri) {
-            const gcsUri = videos[0].gcsUri;
+          // GCS URI
+          if (video.gcsUri && !videoUrl) {
+            const gcsUri = video.gcsUri;
             const bucket = gcsUri.replace('gs://', '').split('/')[0];
             const path = gcsUri.replace(`gs://${bucket}/`, '');
             videoUrl = `https://storage.googleapis.com/${bucket}/${path}`;
+            console.log('Video URL (GCS):', videoUrl);
           }
+
+          // 직접 URL
+          if (video.uri && !videoUrl) {
+            videoUrl = video.uri;
+            console.log('Video URL (direct):', videoUrl);
+          }
+        }
+
+        if (!videoUrl) {
+          console.error('No video URL found in response:', JSON.stringify(statusData.response || statusData.result, null, 2).substring(0, 500));
         }
       }
     }
