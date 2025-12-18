@@ -86,31 +86,46 @@ export default async function handler(req, res) {
       }
     }
 
-    // Veo API 엔드포인트
-    const endpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-3.0-generate-preview:predictLongRunning`;
+    // 이미지 데이터 확인 로그
+    console.log('Image MIME type:', mimeType);
+    console.log('Image Base64 length:', imageBase64?.length || 0);
+    console.log('Image Base64 preview:', imageBase64?.substring(0, 50) + '...');
 
-    // Veo API 호출 - Image-to-Video with Start Frame
+    // Veo API 엔드포인트 - veo-2.0-generate-001 (Image-to-Video 지원)
+    const endpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
+
+    // Veo 2.0 API 호출 - Image-to-Video
+    const requestBody = {
+      instances: [{
+        prompt: fullPrompt,
+        image: {
+          bytesBase64Encoded: imageBase64,
+          mimeType: mimeType,
+        },
+      }],
+      parameters: {
+        aspectRatio: aspectRatio,
+        sampleCount: 1,
+        durationSeconds: 8,
+        personGeneration: 'allow_adult',
+      },
+    };
+
+    console.log('Request body (without image data):', JSON.stringify({
+      ...requestBody,
+      instances: [{
+        ...requestBody.instances[0],
+        image: { mimeType, bytesBase64Length: imageBase64?.length }
+      }]
+    }, null, 2));
+
     const veoResponse = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken.token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        instances: [{
-          prompt: fullPrompt,
-          image: {
-            bytesBase64Encoded: imageBase64,
-            mimeType: mimeType,
-          },
-        }],
-        parameters: {
-          aspectRatio: aspectRatio, // 16:9 또는 9:16
-          sampleCount: 1,
-          durationSeconds: 8,  // 지원: 4, 6, 8초
-          personGeneration: 'allow_adult',
-        },
-      }),
+      body: JSON.stringify(requestBody),
     });
 
     const veoData = await veoResponse.json();
