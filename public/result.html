@@ -654,39 +654,71 @@
       });
     }
 
+    // 여러 클립 가져오기
+    async function getVideosFromIndexedDB() {
+      const db = await openVideoDB();
+      return new Promise((resolve, reject) => {
+        const transaction = db.transaction(['videos'], 'readonly');
+        const store = transaction.objectStore('videos');
+        const request = store.get('generatedVideos');
+        request.onsuccess = () => resolve(request.result?.clips || null);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
     // 생성된 영상 로드
     const generationTime = sessionStorage.getItem('generationTime');
     const stage = sessionStorage.getItem('selectedStage') || 'teen';
     const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
+    const videoMode = sessionStorage.getItem('videoMode') || 'quick';
+    const totalClips = parseInt(sessionStorage.getItem('totalClips')) || 1;
 
     // 스테이지/장르 매핑
     const stageMap = { 'teen': '청소년', 'twenties': '20대', 'newlywed': '신혼', 'early_parenting': '초기 육아' };
     const genreMap = { 'docu': '다큐', 'comedy': '코미디', 'drama': '드라마', 'melo': '멜로', 'fantasy': '판타지' };
+    const modeMap = { 'quick': 'Quick Pack', 'story': 'Story Pack', 'trailer': 'Trailer' };
 
     // 페이지 서브타이틀 업데이트
     const pageSubtitle = document.querySelector('.page-subtitle');
     if (pageSubtitle) {
-      pageSubtitle.textContent = `Quick Pack · ${stageMap[stage] || stage} · ${genreMap[genre] || genre}`;
+      pageSubtitle.textContent = `${modeMap[videoMode] || 'Quick Pack'} · ${stageMap[stage] || stage} · ${genreMap[genre] || genre}`;
     }
+
+    // 클립 타입별 캡션
+    const clipCaptions = {
+      main: { caption: '"그 순간"', role: 'Main' },
+      opening: { caption: '"시작"', role: 'Opening' },
+      climax: { caption: '"절정"', role: 'Climax' },
+      hook: { caption: '"하필 오늘…"', role: 'Hook' },
+      rising: { caption: '"내가 왜 그랬지"', role: 'Rising' },
+      ending: { caption: '"근데… 의외로"', role: 'Ending' },
+    };
+
+    let allClips = [];
+    let currentClipIndex = 0;
 
     // 영상 로드 (IndexedDB에서)
     async function loadVideo() {
       try {
-        const generatedVideo = await getVideoFromIndexedDB();
+        // 먼저 여러 클립 확인
+        const multipleClips = await getVideosFromIndexedDB();
         
-        if (generatedVideo) {
-          videoPlayer.src = generatedVideo;
-          videoPlayer.style.display = 'block';
-          videoPlaceholder.style.display = 'none';
-          
-          // 생성 시간 표시
-          if (generationTime) {
-            console.log(`영상 생성 시간: ${parseFloat(generationTime).toFixed(1)}초`);
-          }
+        if (multipleClips && multipleClips.length > 0) {
+          // 여러 클립이 있는 경우
+          allClips = multipleClips;
+          updateClipTabs();
+          playClip(0);
         } else {
-          // 영상이 없으면 플레이스홀더 표시
-          videoPlayer.style.display = 'none';
-          videoPlaceholder.style.display = 'flex';
+          // 단일 클립 (기존 방식)
+          const singleVideo = await getVideoFromIndexedDB();
+          if (singleVideo) {
+            videoPlayer.src = singleVideo;
+            videoPlayer.style.display = 'block';
+            videoPlaceholder.style.display = 'none';
+          } else {
+            videoPlayer.style.display = 'none';
+            videoPlaceholder.style.display = 'flex';
+          }
         }
       } catch (error) {
         console.error('영상 로드 오류:', error);
@@ -694,25 +726,84 @@
         videoPlaceholder.style.display = 'flex';
       }
     }
+
+    // 클립 탭 업데이트
+    function updateClipTabs() {
+      const clipTabsContainer = document.querySelector('.clip-tabs');
+      if (clipTabsContainer && allClips.length > 1) {
+        clipTabsContainer.innerHTML = allClips.map((clip, index) => {
+          const caption = clipCaptions[clip.clipType] || clipCaptions.main;
+          return `
+            <div class="clip-tab ${index === 0 ? 'active' : ''}" data-clip="${index}">
+              <span class="clip-num">${index + 1}</span>
+              <span class="clip-label">${caption.role}</span>
+            </div>
+          `;
+        }).join('');
+
+        // 탭 클릭 이벤트 재등록
+        document.querySelectorAll('.clip-tab').forEach(tab => {
+          tab.addEventListener('click', () => {
+            const clipIndex = parseInt(tab.dataset.clip);
+            playClip(clipIndex);
+          });
+        });
+      }
+    }
+
+    // 특정 클립 재생
+    function playClip(index) {
+      if (allClips[index]) {
+        currentClipIndex = index;
+        videoPlayer.src = allClips[index].videoUrl;
+        videoPlayer.style.display = 'block';
+        videoPlaceholder.style.display = 'none';
+        
+        // 탭 활성화 업데이트
+        document.querySelectorAll('.clip-tab').forEach((tab, i) => {
+          tab.classList.toggle('active', i === index);
+        });
+
+        // 캡션 업데이트
+        const caption = clipCaptions[allClips[index].clipType] || clipCaptions.main;
+        if (videoCaption) {
+          videoCaption.textContent = caption.caption;
+        }
+
+        videoPlayer.play();
+      }
+    }
+
+    // 클립 끝나면 다음 클립 자동 재생
+    videoPlayer.addEventListener('ended', () => {
+      if (allClips.length > 1 && currentClipIndex < allClips.length - 1) {
+        playClip(currentClipIndex + 1);
+      }
+    });
     
     loadVideo();
 
-    // Clip captions (sample data)
+    // Clip captions (sample data - 기존 호환)
     const clipData = {
-      1: { caption: '"하필 오늘…"', duration: '4초', role: 'Hook' },
-      2: { caption: '"내가 왜 그랬지"', duration: '4초', role: 'Main' },
-      3: { caption: '"근데… 의외로"', duration: '4초', role: 'Ending' }
+      1: { caption: '"하필 오늘…"', duration: '8초', role: 'Hook' },
+      2: { caption: '"내가 왜 그랬지"', duration: '8초', role: 'Main' },
+      3: { caption: '"근데… 의외로"', duration: '8초', role: 'Ending' }
     };
 
-    // Clip tab switching
+    // Clip tab switching (기존 호환)
     clipTabs.forEach(tab => {
       tab.addEventListener('click', () => {
-        clipTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        
-        const clipNo = tab.dataset.clip;
-        const data = clipData[clipNo];
-        videoCaption.textContent = data.caption;
+        if (allClips.length === 0) {
+          // 기존 단일 영상 방식
+          clipTabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          const clipNo = tab.dataset.clip;
+          const data = clipData[clipNo];
+          if (data && videoCaption) {
+            videoCaption.textContent = data.caption;
+          }
+        }
       });
     });
 

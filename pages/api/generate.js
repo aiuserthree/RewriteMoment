@@ -24,6 +24,9 @@ export default async function handler(req, res) {
       distance,       // symbolic, similar, quite_similar
       ending,         // recovery, growth, reconcile, self_protect, new_start, comedy
       sliders,        // { realism, intensity, pace }
+      clipType = 'main',  // 클립 타입: main, opening, climax, hook, rising, ending
+      clipIndex = 0,      // 현재 클립 인덱스
+      totalClips = 1,     // 총 클립 수
     } = req.body;
 
     if (!imageUrl) {
@@ -42,13 +45,17 @@ export default async function handler(req, res) {
       mode,
       distance,
       ending,
-      sliders: sliders || { realism: 60, intensity: 40, pace: 70 }
+      sliders: sliders || { realism: 60, intensity: 40, pace: 70 },
+      clipType,
+      clipIndex,
+      totalClips,
     });
 
     console.log('=== Veo 3.1 Video Generation ===');
     console.log('Stage:', stage);
     console.log('Genre:', genre);
     console.log('Mode:', mode);
+    console.log('Clip:', `${clipIndex + 1}/${totalClips} (${clipType})`);
     console.log('Rewrite:', rewriteText ? 'Yes' : 'No');
     console.log('Prompt:', fullPrompt.substring(0, 200) + '...');
     console.log('================================');
@@ -137,7 +144,7 @@ export default async function handler(req, res) {
 }
 
 // Build comprehensive prompt based on all user selections
-function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, sliders }) {
+function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, sliders, clipType = 'main', clipIndex = 0, totalClips = 1 }) {
   
   // 라이프 스테이지별 상세 설정 (한국 배경)
   // Note: Veo prohibits minors, so "teen" uses young adult students
@@ -232,17 +239,66 @@ function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, slider
   const stageInfo = stageSettings[stage] || stageSettings.teen;
   const genreInfo = genreActions[genre] || genreActions.drama;
 
+  // 클립 타입별 장면 설정 (스토리 진행에 따라 다른 장면)
+  const clipScenes = {
+    // 단일 클립 (Quick Pack)
+    main: {
+      scene: 'Main scene',
+      action: genreInfo.action,
+      movement: genreInfo.movement,
+      narrative: 'A complete moment captured in one continuous shot',
+    },
+    // Story Pack (2클립) - 도입과 클라이맥스
+    opening: {
+      scene: 'Opening scene - establishing shot',
+      action: 'Starting the day, looking around the space, settling into the environment, initial calm before events unfold',
+      movement: 'slow entrance, looking around, taking in surroundings, relaxed posture',
+      narrative: 'The beginning of the story, introducing the character in their environment',
+    },
+    climax: {
+      scene: 'Climax scene - emotional peak',
+      action: genreInfo.action,
+      movement: genreInfo.movement,
+      narrative: 'The emotional high point of the story, peak dramatic moment',
+    },
+    // Trailer (4클립) - Hook, Rising, Climax, Ending
+    hook: {
+      scene: 'Hook scene - attention grabber',
+      action: 'Turning toward camera with intriguing expression, mysterious or inviting look, creating curiosity',
+      movement: 'sudden turn, direct eye contact, enigmatic half-smile, leaning in',
+      narrative: 'The hook that captures attention immediately',
+    },
+    rising: {
+      scene: 'Rising action scene - building tension',
+      action: 'Something unexpected happens, reacting to news or event, tension building in body language',
+      movement: 'surprised reaction, hand to chest, stepping back, eyes widening',
+      narrative: 'Events begin to unfold, tension rises',
+    },
+    ending: {
+      scene: 'Ending scene - resolution',
+      action: 'Finding peace, acceptance, or new determination, final emotional resolution',
+      movement: 'deep breath, shoulders dropping in relief, peaceful smile, looking toward future',
+      narrative: 'The resolution and conclusion of the story',
+    },
+  };
+
+  const clipScene = clipScenes[clipType] || clipScenes.main;
+
   // 메인 프롬프트 구성 - 얼굴 보존 강조
   let prompt = `IMPORTANT: Keep the exact face from the input image throughout the video. `;
   prompt += `${stageInfo.people}, ${stageInfo.clothes}. `;
   prompt += `Setting: ${stageInfo.location}. ${stageInfo.background}. `;
-  prompt += `Action: ${genreInfo.action}. Movement: ${genreInfo.movement}. `;
+  
+  // 클립 타입에 따른 액션 적용
+  prompt += `${clipScene.scene}. Action: ${clipScene.action}. Movement: ${clipScene.movement}. `;
+  prompt += `Narrative: ${clipScene.narrative}. `;
+  
   prompt += `Visual style: ${genreInfo.style}. Emotional tone: ${genreInfo.emotion}. `;
   prompt += `${realismStyle}. ${emotionIntensity}. ${motionPace}. `;
   prompt += `Medium shot framing showing face and upper body clearly. Korean setting, Korean aesthetic. High quality 4K cinematic video.`;
 
-  // Rewrite Moment (결말 재구성) 추가
-  if (rewriteText) {
+  // Rewrite Moment (결말 재구성) - 마지막 클립에만 적용
+  if (rewriteText && (clipType === 'ending' || clipType === 'climax' || clipType === 'main')) {
     const endingTransitions = {
       recovery: 'Scene transitions: initial sadness slowly transforms to peaceful acceptance, tears turning to gentle smile, shoulders relaxing, deep breath of relief',
       growth: 'Scene transitions: uncertainty transforms to confidence, standing taller, eyes brightening with determination, small victorious smile',
