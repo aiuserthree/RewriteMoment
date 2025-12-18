@@ -213,54 +213,6 @@
         </div>
       </section>
 
-      <!-- Sliders -->
-      <section class="select-section" data-animate style="animation-delay: 0.4s">
-        <h3 class="select-section-title">
-          <span class="select-section-icon">🎚️</span>
-          분위기 조절
-        </h3>
-        <div class="card">
-          <!-- Realism Slider -->
-          <div class="range-slider">
-            <div class="range-slider-header">
-              <span class="range-slider-label">현실감</span>
-              <span class="range-slider-value" id="realismValue">60%</span>
-            </div>
-            <input type="range" id="realism" min="0" max="100" value="60">
-            <div class="range-slider-labels">
-              <span>영화처럼</span>
-              <span>현실적으로</span>
-            </div>
-          </div>
-
-          <!-- Intensity Slider -->
-          <div class="range-slider mt-lg">
-            <div class="range-slider-header">
-              <span class="range-slider-label">강도</span>
-              <span class="range-slider-value" id="intensityValue">40%</span>
-            </div>
-            <input type="range" id="intensity" min="0" max="100" value="40">
-            <div class="range-slider-labels">
-              <span>순한맛</span>
-              <span>진한맛</span>
-            </div>
-          </div>
-
-          <!-- Pace Slider -->
-          <div class="range-slider mt-lg">
-            <div class="range-slider-header">
-              <span class="range-slider-label">속도</span>
-              <span class="range-slider-value" id="paceValue">70%</span>
-            </div>
-            <input type="range" id="pace" min="0" max="100" value="70">
-            <div class="range-slider-labels">
-              <span>느리게</span>
-              <span>빠르게</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <!-- Cost Summary -->
       <div class="cost-summary mt-xl" data-animate style="animation-delay: 0.5s">
         <div class="cost-summary-inner">
@@ -423,26 +375,6 @@
     // Credit balance (simulated)
     let creditBalance = 0;
 
-    // Slider values
-    const sliders = {
-      realism: document.getElementById('realism'),
-      intensity: document.getElementById('intensity'),
-      pace: document.getElementById('pace')
-    };
-
-    const sliderValues = {
-      realism: document.getElementById('realismValue'),
-      intensity: document.getElementById('intensityValue'),
-      pace: document.getElementById('paceValue')
-    };
-
-    // Update slider displays
-    Object.keys(sliders).forEach(key => {
-      sliders[key].addEventListener('input', (e) => {
-        sliderValues[key].textContent = e.target.value + '%';
-      });
-    });
-
     // Mode selection
     modeCards.forEach(card => {
       card.addEventListener('click', () => {
@@ -519,10 +451,11 @@
       sessionStorage.setItem('selectedMode', selectedMode);
       sessionStorage.setItem('selectedStage', selectedStage);
       sessionStorage.setItem('selectedGenre', selectedGenre);
+      // 슬라이더 제거됨 - 기본값 사용
       sessionStorage.setItem('sliders', JSON.stringify({
-        realism: sliders.realism.value,
-        intensity: sliders.intensity.value,
-        pace: sliders.pace.value
+        realism: 60,
+        intensity: 50,
+        pace: 60
       }));
 
       // Navigate to rewrite page
