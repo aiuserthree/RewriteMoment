@@ -37,17 +37,40 @@ export default async function handler(req, res) {
     // Operation ID를 URL-safe하게 처리
     const operationId = decodeURIComponent(id);
     
-    // Operation 상태 직접 조회 (Long Running Operation)
+    // Operation 상태 조회 - fetchPredictOperation API 사용
+    // operationId에서 모델 이름 추출
+    console.log('Checking operation:', operationId);
+    
+    // operationId 형식: projects/xxx/locations/xxx/publishers/google/models/MODEL_NAME/operations/xxx
+    const modelMatch = operationId.match(/models\/([^\/]+)\/operations/);
+    const modelName = modelMatch ? modelMatch[1] : 'veo-2.0-generate-001';
+    
+    console.log('Model name:', modelName);
+    
     const statusResponse = await fetch(
-      `https://${LOCATION}-aiplatform.googleapis.com/v1/${operationId}`,
+      `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/${modelName}:fetchPredictOperation`,
       {
-        method: 'GET',
+        method: 'POST',
         headers: {
           'Authorization': `Bearer ${accessToken.token}`,
           'Content-Type': 'application/json',
         },
+        body: JSON.stringify({
+          operationName: operationId
+        }),
       }
     );
+    
+    // 응답이 JSON인지 확인
+    const contentType = statusResponse.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      const text = await statusResponse.text();
+      console.error('Non-JSON response:', text.substring(0, 200));
+      return res.status(500).json({ 
+        error: 'Invalid API response',
+        details: 'Google API returned non-JSON response'
+      });
+    }
 
     const statusData = await statusResponse.json();
 
