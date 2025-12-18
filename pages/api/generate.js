@@ -62,11 +62,19 @@ export default async function handler(req, res) {
     const client = await auth.getClient();
     const accessToken = await client.getAccessToken();
 
-    // 이미지 Base64 처리
+    // 이미지 Base64 처리 및 MIME 타입 추출
     let imageBase64 = imageUrl;
+    let mimeType = 'image/jpeg';  // 기본값
+    
     if (imageUrl.startsWith('data:')) {
-      // data:image/jpeg;base64,XXXX 형식에서 base64 부분만 추출
-      imageBase64 = imageUrl.split(',')[1];
+      // data:image/jpeg;base64,XXXX 형식에서 분리
+      const matches = imageUrl.match(/^data:([^;]+);base64,(.+)$/);
+      if (matches) {
+        mimeType = matches[1];
+        imageBase64 = matches[2];
+      } else {
+        imageBase64 = imageUrl.split(',')[1];
+      }
     }
 
     // Veo API 엔드포인트
@@ -84,6 +92,7 @@ export default async function handler(req, res) {
           prompt: fullPrompt,
           image: {
             bytesBase64Encoded: imageBase64,
+            mimeType: mimeType,
           },
         }],
         parameters: {
