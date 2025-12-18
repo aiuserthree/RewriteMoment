@@ -130,75 +130,32 @@
           <div class="card result-card" data-animate style="animation-delay: 0.2s">
             <h3 class="result-card-title">다운로드 & 공유</h3>
             <div class="result-card-actions">
-              <button class="btn btn-primary w-full" id="downloadBtn">
+              <button class="btn btn-primary w-full" id="downloadBtn" onclick="downloadVideo()">
                 <span>⬇️</span>
-                전체 다운로드
+                영상 다운로드
               </button>
               <button class="btn btn-secondary w-full" id="shareBtn">
                 <span>🔗</span>
-                공유 링크 만들기
+                공유하기
               </button>
-            </div>
-            <div class="download-options mt-md">
-              <button class="btn btn-ghost btn-sm">Clip 1만 다운로드</button>
-              <button class="btn btn-ghost btn-sm">Clip 2만 다운로드</button>
-              <button class="btn btn-ghost btn-sm">Clip 3만 다운로드</button>
             </div>
           </div>
 
           <!-- Regenerate -->
-          <div class="card result-card" data-animate style="animation-delay: 0.3s" id="regenCard">
-            <h3 class="result-card-title">재생성</h3>
-            <p class="result-card-desc">마음에 들지 않는 클립만 다시 만들 수 있어요</p>
-            <div class="regen-options">
-              <button class="btn btn-secondary btn-sm regen-btn" data-clip="1">
-                <span>🔄</span> Clip 1 다시
-              </button>
-              <button class="btn btn-secondary btn-sm regen-btn" data-clip="2">
-                <span>🔄</span> Clip 2 다시
-              </button>
-              <button class="btn btn-secondary btn-sm regen-btn" data-clip="3">
-                <span>🔄</span> Clip 3 다시
-              </button>
-            </div>
-            <div class="regen-note">
-              <span>💎</span> 재생성은 클립당 1 크레딧이 필요해요
-            </div>
-          </div>
-
-          <!-- Upgrade Card -->
-          <div class="upgrade-card" data-animate style="animation-delay: 0.4s" id="upgradeCard">
-            <div class="upgrade-header">
-              <span class="upgrade-badge">🚀 업그레이드</span>
-              <h3 class="upgrade-card-title">더 길게 만들기</h3>
-            </div>
-            <p class="upgrade-card-desc">
-              Story Pack(15초×3)은 <strong>상황→감정→전환</strong>이 들어가고,<br>
-              Trailer는 예고편처럼 이어집니다.
-            </p>
-            <div class="upgrade-options">
-              <button class="btn btn-outline upgrade-btn" data-mode="story">
-                <span>📦</span>
-                Story Pack으로
-                <span class="upgrade-cost">2 크레딧</span>
-              </button>
-              <button class="btn btn-outline upgrade-btn" data-mode="trailer">
-                <span>🎬</span>
-                Trailer로
-                <span class="upgrade-cost">5 크레딧</span>
-              </button>
-            </div>
+          <div class="card result-card" data-animate style="animation-delay: 0.3s">
+            <h3 class="result-card-title">다시 만들기</h3>
+            <p class="result-card-desc">다른 스타일로 새로 만들어보세요</p>
+            <a href="select.html" class="btn btn-secondary w-full">
+              <span>🔄</span> 설정 변경 후 재생성
+            </a>
           </div>
 
           <!-- Rewrite Info (if enabled) -->
-          <div class="card result-card rewrite-result-card hidden" data-animate style="animation-delay: 0.5s" id="rewriteCard">
+          <div class="card result-card rewrite-result-card hidden" data-animate style="animation-delay: 0.4s" id="rewriteCard">
             <div class="rewrite-result-header">
               <span>✨</span>
               <h3>Rewrite Moment 적용됨</h3>
             </div>
-            <p class="rewrite-result-desc">
-              Clip 3(엔딩)에 다른 결말이 적용되었어요
-            </p>
             <div class="rewrite-result-meta">
               <span class="rewrite-meta-item">
                 <span class="meta-label">거리두기:</span>
@@ -209,9 +166,6 @@
                 <span class="meta-value" id="rewriteEnding">성장</span>
               </span>
             </div>
-            <button class="btn btn-secondary btn-sm mt-md" id="rewriteAgainBtn">
-              <span>🔄</span> 엔딩만 다시 만들기
-            </button>
           </div>
 
         </div>
@@ -698,8 +652,74 @@
       }
     }
     
+    // 영상 다운로드 함수
+    async function downloadVideo() {
+      try {
+        const videoData = await getVideoFromIndexedDB();
+        if (!videoData) {
+          alert('다운로드할 영상이 없습니다.');
+          return;
+        }
+
+        // Base64를 Blob으로 변환
+        const response = await fetch(videoData);
+        const blob = await response.blob();
+        
+        // 다운로드 링크 생성
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `rewrite_moment_${Date.now()}.mp4`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showToast('영상이 다운로드되었습니다!');
+      } catch (error) {
+        console.error('다운로드 오류:', error);
+        alert('다운로드 중 오류가 발생했습니다.');
+      }
+    }
+
+    // 재생/정지 토글
+    function togglePlay() {
+      const playIcon = document.getElementById('playIcon');
+      const playText = document.getElementById('playText');
+      
+      if (videoPlayer.paused) {
+        videoPlayer.play();
+        playIcon.textContent = '⏸';
+        playText.textContent = '일시정지';
+      } else {
+        videoPlayer.pause();
+        playIcon.textContent = '▶';
+        playText.textContent = '재생하기';
+      }
+    }
+
+    // 토스트 표시
+    function showToast(message) {
+      const toastEl = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      toastMsg.textContent = message;
+      toastEl.classList.add('show');
+      setTimeout(() => toastEl.classList.remove('show'), 3000);
+    }
+    
     // 페이지 로드 시 영상 로드
     loadVideo();
+
+    // 비디오 이벤트 리스너
+    videoPlayer.addEventListener('play', () => {
+      document.getElementById('playIcon').textContent = '⏸';
+      document.getElementById('playText').textContent = '일시정지';
+    });
+    
+    videoPlayer.addEventListener('pause', () => {
+      document.getElementById('playIcon').textContent = '▶';
+      document.getElementById('playText').textContent = '재생하기';
+    });
 
     // Check if rewrite was enabled
     const rewriteEnabled = sessionStorage.getItem('rewriteEnabled') === 'true';
