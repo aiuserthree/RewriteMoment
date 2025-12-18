@@ -107,7 +107,8 @@ export default async function handler(req, res) {
           sampleCount: 1,
           durationSeconds: 8,  // 지원: 4, 6, 8초
           personGeneration: 'allow_adult',
-          enhancePrompt: true,
+          enhancePrompt: false,  // 프롬프트 변경 방지 - 얼굴 보존 지시 유지
+          negativePrompt: 'different face, changed face, morphed face, distorted face, blurry face, face swap, different person, different identity',
         },
       }),
     });
@@ -284,18 +285,27 @@ function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, slider
 
   const clipScene = clipScenes[clipType] || clipScenes.main;
 
-  // 메인 프롬프트 구성 - 얼굴 보존 강조
-  let prompt = `IMPORTANT: Keep the exact face from the input image throughout the video. `;
-  prompt += `${stageInfo.people}, ${stageInfo.clothes}. `;
-  prompt += `Setting: ${stageInfo.location}. ${stageInfo.background}. `;
+  // 메인 프롬프트 구성 - 얼굴 보존 최우선
+  let prompt = `[CRITICAL IDENTITY PRESERVATION] `;
+  prompt += `The person in this video MUST have the EXACT SAME face as the input image. `;
+  prompt += `Preserve identical: face shape, eyes, eyebrows, nose, lips, skin tone, facial proportions. `;
+  prompt += `The face must be recognizable as the same person from start to end. `;
+  prompt += `DO NOT morph, change, or alter any facial features. `;
+  
+  prompt += `\n\n[CHARACTER] ${stageInfo.people}, ${stageInfo.clothes}. `;
+  prompt += `\n[SETTING] ${stageInfo.location}. ${stageInfo.background}. `;
   
   // 클립 타입에 따른 액션 적용
-  prompt += `${clipScene.scene}. Action: ${clipScene.action}. Movement: ${clipScene.movement}. `;
-  prompt += `Narrative: ${clipScene.narrative}. `;
+  prompt += `\n[SCENE] ${clipScene.scene}. `;
+  prompt += `\n[ACTION] ${clipScene.action}. `;
+  prompt += `\n[MOVEMENT] ${clipScene.movement}. `;
+  prompt += `\n[NARRATIVE] ${clipScene.narrative}. `;
   
-  prompt += `Visual style: ${genreInfo.style}. Emotional tone: ${genreInfo.emotion}. `;
+  prompt += `\n[STYLE] ${genreInfo.style}. ${genreInfo.emotion} mood. `;
   prompt += `${realismStyle}. ${emotionIntensity}. ${motionPace}. `;
-  prompt += `Medium shot framing showing face and upper body clearly. Korean setting, Korean aesthetic. High quality 4K cinematic video.`;
+  prompt += `\n[FRAMING] Close-up to medium shot, face always clearly visible and in focus. `;
+  prompt += `Korean setting, Korean aesthetic. Photorealistic quality, 4K cinematic video. `;
+  prompt += `Consistent lighting on face throughout.`;
 
   // Rewrite Moment (결말 재구성) - 마지막 클립에만 적용
   if (rewriteText && (clipType === 'ending' || clipType === 'climax' || clipType === 'main')) {
