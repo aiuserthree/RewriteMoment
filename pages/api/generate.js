@@ -199,11 +199,11 @@ function buildPrompt({ rewriteText, stage, genre, mode, distance, ending, slider
 
   // 장르별 구체적 행동과 스타일
   const genreActions = {
-    docu: {
-      action: 'Looking directly at camera with sincere expression, then turning to look out the window thoughtfully, natural candid movements',
-      movement: 'subtle head turns, natural eye blinks, slight smile forming',
-      style: 'documentary realism, natural lighting from window, handheld camera subtle shake',
-      emotion: 'authentic, reflective, contemplative, real-life moment',
+    action: {
+      action: 'Intense focused expression, sudden quick movement, dodging or blocking motion, powerful stance with clenched fists',
+      movement: 'fast dynamic movements, sharp turns, quick reflexes, athletic poses, powerful gestures',
+      style: 'high contrast cinematic lighting, dynamic camera angles, motion blur effects, intense color grading',
+      emotion: 'determined, fierce, powerful, adrenaline-pumping intensity',
     },
     comedy: {
       action: 'Making a surprised funny face, then bursting into laughter, playful gestures, animated expressions',
