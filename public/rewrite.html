@@ -86,16 +86,16 @@
         <div class="loading-container">
           <div class="spinner-large"></div>
           <h3 class="loading-title">영상을 생성하고 있어요</h3>
-          <p class="loading-text" id="loadingText">촬영장 준비 중...</p>
+          <p class="loading-text" id="loadingText">AI가 작업 중...</p>
           <div class="loading-progress">
             <div class="loading-progress-bar" id="loadingBar"></div>
           </div>
           <div class="loading-steps">
-            <div class="loading-step active" data-step="1">촬영장 준비</div>
-            <div class="loading-step" data-step="2">배우 등장</div>
-            <div class="loading-step" data-step="3">셀카 촬영</div>
-            <div class="loading-step" data-step="4">편집 완료</div>
+            <div class="loading-step active" data-step="1">📸 셀카 이미지 생성</div>
+            <div class="loading-step" data-step="2">🎬 영상으로 변환</div>
+            <div class="loading-step" data-step="3">✨ 마무리</div>
           </div>
+          <p class="pipeline-info">나노바나나(Gemini) → Veo 2단계 파이프라인</p>
         </div>
 
         <div class="tips-card">
@@ -229,6 +229,16 @@
     @keyframes pulse {
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
+    }
+
+    .pipeline-info {
+      margin-top: 24px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(168, 85, 247, 0.1);
+      padding: 8px 16px;
+      border-radius: var(--radius-full);
+      display: inline-block;
     }
 
     .tips-card {
@@ -392,8 +402,8 @@
         console.log('Movie:', selectedMovie);
         console.log('======================');
 
-        // 2. 영상 생성 API 호출
-        updateStep(2, '배우들 등장 준비 중...', 25);
+        // 2. 영상 생성 API 호출 (Gemini 이미지 생성 → Veo 영상 생성)
+        updateStep(1, '배우들과 셀카 이미지 생성 중...', 20);
 
         const response = await fetch('/api/generate', {
           method: 'POST',
@@ -414,7 +424,7 @@
         console.log('Prediction ID:', predictionId);
 
         // 3. 상태 폴링
-        updateStep(3, '셀카 촬영 중...', 50);
+        updateStep(2, '영상으로 변환 중...', 50);
 
         let attempts = 0;
         const maxAttempts = 120; // 10분
@@ -426,7 +436,7 @@
           console.log('Status:', status.status);
 
           if (status.status === 'succeeded') {
-            updateStep(4, '편집 마무리 중...', 95);
+            updateStep(3, '마무리 중...', 95);
 
             const videoUrl = Array.isArray(status.output) ? status.output[0] : status.output;
 
@@ -446,7 +456,7 @@
             console.log('Video saved to IndexedDB');
 
             // 성공! 결과 페이지로 이동
-            updateStep(4, '완료!', 100);
+            updateStep(3, '완료!', 100);
             setTimeout(() => {
               window.location.href = 'result.html';
             }, 500);
