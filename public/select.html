@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>스테이지 & 장르 선택 - Rewrite Moment</title>
+  <title>영화 선택 - Rewrite Moment</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
 </head>
@@ -66,7 +66,7 @@
         <div class="step-line"></div>
         <div class="step">
           <div class="step-number">3</div>
-          <span class="step-text">Rewrite</span>
+          <span class="step-text">생성</span>
         </div>
         <div class="step-line"></div>
         <div class="step">
@@ -78,12 +78,12 @@
       <!-- Page Header -->
       <div class="page-header" data-animate>
         <h1 class="page-title">
-          어떤 <span class="text-gradient">이야기</span>를<br>
-          만들까요?
+          어떤 <span class="text-gradient">영화</span>에서<br>
+          셀카를 찍을까요?
         </h1>
         <p class="page-subtitle">
-          라이프 스테이지와 장르를 선택하고,<br>
-          원하는 분위기로 조절해보세요.
+          좋아하는 영화를 선택하면,<br>
+          그 영화 배우들과 함께 셀카를 찍는 영상이 만들어져요! 📸
         </p>
       </div>
 
@@ -114,110 +114,109 @@
         </div>
       </section>
 
-      <!-- Stage Selection -->
+      <!-- Movie Selection -->
       <section class="select-section" data-animate style="animation-delay: 0.2s">
         <h3 class="select-section-title">
-          <span class="select-section-icon">🎭</span>
-          라이프 스테이지
-        </h3>
-        <div class="selection-grid stage-grid">
-          <label class="selection-card active">
-            <input type="radio" name="stage" value="twenties" checked>
-            <div class="selection-card-icon">✨</div>
-            <div class="selection-card-title">20대</div>
-            <div class="selection-card-desc">첫 시작, 도전</div>
-          </label>
-
-          <label class="selection-card">
-            <input type="radio" name="stage" value="thirties">
-            <div class="selection-card-icon">💼</div>
-            <div class="selection-card-title">30대</div>
-            <div class="selection-card-desc">커리어, 성장</div>
-          </label>
-
-          <label class="selection-card">
-            <input type="radio" name="stage" value="forties">
-            <div class="selection-card-icon">🏆</div>
-            <div class="selection-card-title">40대</div>
-            <div class="selection-card-desc">성숙, 여유</div>
-          </label>
-
-          <label class="selection-card">
-            <input type="radio" name="stage" value="newlywed">
-            <div class="selection-card-icon">💑</div>
-            <div class="selection-card-title">신혼</div>
-            <div class="selection-card-desc">새 출발, 함께</div>
-          </label>
-
-          <label class="selection-card">
-            <input type="radio" name="stage" value="early_parenting">
-            <div class="selection-card-icon">👶</div>
-            <div class="selection-card-title">초기 육아</div>
-            <div class="selection-card-desc">아이와 함께</div>
-          </label>
-        </div>
-      </section>
-
-      <!-- Genre Selection -->
-      <section class="select-section" data-animate style="animation-delay: 0.3s">
-        <h3 class="select-section-title">
           <span class="select-section-icon">🎬</span>
-          장르
+          영화 선택
         </h3>
-        <div class="selection-grid genre-grid">
-          <label class="selection-card">
-            <input type="radio" name="genre" value="action">
-            <div class="selection-card-icon">💥</div>
-            <div class="selection-card-title">액션</div>
-            <div class="selection-card-desc">역동적 액션</div>
+        <div class="movie-grid">
+          <label class="movie-card active">
+            <input type="radio" name="movie" value="avengers" checked>
+            <div class="movie-poster avengers">
+              <div class="movie-overlay">
+                <span class="movie-icon">🦸</span>
+              </div>
+            </div>
+            <div class="movie-info">
+              <div class="movie-title">어벤저스</div>
+              <div class="movie-actors">아이언맨, 캡틴, 토르, 블랙위도우</div>
+            </div>
           </label>
 
-          <label class="selection-card active">
-            <input type="radio" name="genre" value="comedy" checked>
-            <div class="selection-card-icon">😂</div>
-            <div class="selection-card-title">코미디</div>
-            <div class="selection-card-desc">유쾌한 해프닝</div>
+          <label class="movie-card">
+            <input type="radio" name="movie" value="spiderman">
+            <div class="movie-poster spiderman">
+              <div class="movie-overlay">
+                <span class="movie-icon">🕷️</span>
+              </div>
+            </div>
+            <div class="movie-info">
+              <div class="movie-title">스파이더맨</div>
+              <div class="movie-actors">피터파커, MJ, 네드</div>
+            </div>
           </label>
 
-          <label class="selection-card">
-            <input type="radio" name="genre" value="drama">
-            <div class="selection-card-icon">🎭</div>
-            <div class="selection-card-title">드라마</div>
-            <div class="selection-card-desc">감정의 서사</div>
+          <label class="movie-card">
+            <input type="radio" name="movie" value="harrypotter">
+            <div class="movie-poster harrypotter">
+              <div class="movie-overlay">
+                <span class="movie-icon">⚡</span>
+              </div>
+            </div>
+            <div class="movie-info">
+              <div class="movie-title">해리포터</div>
+              <div class="movie-actors">해리, 헤르미온느, 론</div>
+            </div>
           </label>
 
-          <label class="selection-card">
-            <input type="radio" name="genre" value="melo">
-            <div class="selection-card-icon">💕</div>
-            <div class="selection-card-title">멜로</div>
-            <div class="selection-card-desc">로맨틱 감성</div>
+          <label class="movie-card">
+            <input type="radio" name="movie" value="lotr">
+            <div class="movie-poster lotr">
+              <div class="movie-overlay">
+                <span class="movie-icon">💍</span>
+              </div>
+            </div>
+            <div class="movie-info">
+              <div class="movie-title">반지의 제왕</div>
+              <div class="movie-actors">프로도, 간달프, 아라곤, 레골라스</div>
+            </div>
           </label>
 
-          <label class="selection-card">
-            <input type="radio" name="genre" value="fantasy">
-            <div class="selection-card-icon">✨</div>
-            <div class="selection-card-title">판타지</div>
-            <div class="selection-card-desc">상상의 세계</div>
+          <label class="movie-card">
+            <input type="radio" name="movie" value="starwars">
+            <div class="movie-poster starwars">
+              <div class="movie-overlay">
+                <span class="movie-icon">⚔️</span>
+              </div>
+            </div>
+            <div class="movie-info">
+              <div class="movie-title">스타워즈</div>
+              <div class="movie-actors">루크, 레아, 한솔로, 다스베이더</div>
+            </div>
+          </label>
+
+          <label class="movie-card">
+            <input type="radio" name="movie" value="jurassic">
+            <div class="movie-poster jurassic">
+              <div class="movie-overlay">
+                <span class="movie-icon">🦖</span>
+              </div>
+            </div>
+            <div class="movie-info">
+              <div class="movie-title">쥬라기 공원</div>
+              <div class="movie-actors">그랜트 박사, 엘리, 말콤 박사</div>
+            </div>
           </label>
         </div>
       </section>
 
       <!-- Info -->
-      <div class="info-card mt-xl" data-animate style="animation-delay: 0.4s">
+      <div class="info-card mt-xl" data-animate style="animation-delay: 0.3s">
         <div class="info-content">
-          <span class="info-icon">🎬</span>
-          <span class="info-text">8초 고품질 AI 영상이 생성됩니다</span>
+          <span class="info-icon">📸</span>
+          <span class="info-text">영화 촬영장에서 배우들과 셀카를 찍는 8초 영상이 생성됩니다</span>
         </div>
       </div>
 
       <!-- Actions -->
-      <div class="actions-row mt-xl" data-animate style="animation-delay: 0.6s">
+      <div class="actions-row mt-xl" data-animate style="animation-delay: 0.4s">
         <a href="upload.html" class="btn btn-ghost">
           ← 이전
         </a>
         <button class="btn btn-primary btn-lg" id="nextBtn">
-          다음 단계로
-          <span>→</span>
+          영상 만들기
+          <span>🎬</span>
         </button>
       </div>
 
@@ -225,7 +224,6 @@
   </main>
 
   <script src="/js/app.js"></script>
-  <script src="/js/videoGenerator.js"></script>
   <style>
     /* Select Page Specific Styles */
     .select-section {
@@ -244,12 +242,99 @@
       font-size: 1.25rem;
     }
 
-    .stage-grid {
-      grid-template-columns: repeat(5, 1fr);
+    /* Movie Grid */
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
     }
 
-    .genre-grid {
-      grid-template-columns: repeat(5, 1fr);
+    .movie-card {
+      background: var(--bg-secondary);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+
+    .movie-card:hover {
+      border-color: var(--accent-secondary);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2);
+    }
+
+    .movie-card.active {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3);
+    }
+
+    .movie-card input {
+      display: none;
+    }
+
+    .movie-poster {
+      height: 140px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .movie-poster.avengers {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    }
+
+    .movie-poster.spiderman {
+      background: linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #FF4500 100%);
+    }
+
+    .movie-poster.harrypotter {
+      background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #4a1a6b 100%);
+    }
+
+    .movie-poster.lotr {
+      background: linear-gradient(135deg, #2d4a22 0%, #3d5a2e 50%, #556b2f 100%);
+    }
+
+    .movie-poster.starwars {
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
+    }
+
+    .movie-poster.jurassic {
+      background: linear-gradient(135deg, #1a3a1a 0%, #2d5a2d 50%, #228b22 100%);
+    }
+
+    .movie-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .movie-icon {
+      font-size: 3.5rem;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
+    }
+
+    .movie-info {
+      padding: 16px;
+      text-align: center;
+    }
+
+    .movie-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .movie-actors {
+      font-size: 0.8rem;
+      color: var(--text-tertiary);
+      line-height: 1.4;
     }
 
     /* Ratio Selection */
@@ -352,16 +437,29 @@
     }
 
     @media (max-width: 768px) {
-      .mode-cards {
-        grid-template-columns: 1fr !important;
-      }
-
-      .stage-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-
-      .genre-grid {
+      .movie-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+
+      .movie-poster {
+        height: 100px;
+      }
+
+      .movie-icon {
+        font-size: 2.5rem;
+      }
+
+      .movie-info {
+        padding: 12px;
+      }
+
+      .movie-title {
+        font-size: 0.95rem;
+      }
+
+      .movie-actors {
+        font-size: 0.7rem;
       }
 
       .actions-row {
@@ -378,13 +476,10 @@
     // Selection functionality
     const nextBtn = document.getElementById('nextBtn');
 
-    // Stage/Genre selection
-    document.querySelectorAll('.selection-card').forEach(card => {
+    // Movie selection
+    document.querySelectorAll('.movie-card').forEach(card => {
       card.addEventListener('click', () => {
-        const name = card.querySelector('input').name;
-        document.querySelectorAll(`[name="${name}"]`).forEach(input => {
-          input.closest('.selection-card').classList.remove('active');
-        });
+        document.querySelectorAll('.movie-card').forEach(c => c.classList.remove('active'));
         card.classList.add('active');
       });
     });
@@ -400,24 +495,15 @@
     // Next button
     nextBtn.addEventListener('click', () => {
       const selectedRatio = document.querySelector('[name="ratio"]:checked').value;
-      const selectedStage = document.querySelector('[name="stage"]:checked').value;
-      const selectedGenre = document.querySelector('[name="genre"]:checked').value;
+      const selectedMovie = document.querySelector('[name="movie"]:checked').value;
 
       // Store selections
       sessionStorage.setItem('selectedRatio', selectedRatio);
-      sessionStorage.setItem('selectedMode', 'quick');
-      sessionStorage.setItem('selectedStage', selectedStage);
-      sessionStorage.setItem('selectedGenre', selectedGenre);
-      sessionStorage.setItem('sliders', JSON.stringify({
-        realism: 60,
-        intensity: 50,
-        pace: 60
-      }));
+      sessionStorage.setItem('selectedMovie', selectedMovie);
 
-      // Navigate to rewrite page
+      // Navigate to rewrite page (which will handle generation)
       window.location.href = 'rewrite.html';
     });
   </script>
 </body>
 </html>
-

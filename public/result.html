@@ -66,7 +66,7 @@
         <div class="step-line completed"></div>
         <div class="step completed">
           <div class="step-number">✓</div>
-          <span class="step-text">Rewrite</span>
+          <span class="step-text">생성</span>
         </div>
         <div class="step-line completed"></div>
         <div class="step active">
@@ -80,8 +80,8 @@
         <h1 class="page-title">
           🎉 <span class="text-gradient">영상이 완성</span>되었어요!
         </h1>
-        <p class="page-subtitle">
-          Quick Pack · 청소년 · 코미디
+        <p class="page-subtitle" id="pageSubtitle">
+          어벤저스 촬영장에서의 셀카
         </p>
       </div>
 
@@ -104,11 +104,11 @@
             <!-- Video Info -->
             <div class="video-info">
               <div class="video-caption" id="videoCaption">
-                "나의 순간"
+                "나의 특별한 순간"
               </div>
               <div class="video-meta" id="videoMeta">
-                <span>🎭 청소년</span>
-                <span>😂 코미디</span>
+                <span>🦸 어벤저스</span>
+                <span>📸 셀카</span>
                 <span>⏱️ 8초</span>
               </div>
             </div>
@@ -143,28 +143,21 @@
 
           <!-- Regenerate -->
           <div class="card result-card" data-animate style="animation-delay: 0.3s">
-            <h3 class="result-card-title">다시 만들기</h3>
-            <p class="result-card-desc">다른 스타일로 새로 만들어보세요</p>
+            <h3 class="result-card-title">다른 영화로 다시 만들기</h3>
+            <p class="result-card-desc">다른 영화 촬영장에서 셀카를 찍어보세요!</p>
             <a href="select.html" class="btn btn-secondary w-full">
-              <span>🔄</span> 설정 변경 후 재생성
+              <span>🎬</span> 다른 영화 선택하기
             </a>
           </div>
 
-          <!-- Rewrite Info (if enabled) -->
-          <div class="card result-card rewrite-result-card hidden" data-animate style="animation-delay: 0.4s" id="rewriteCard">
-            <div class="rewrite-result-header">
-              <span>✨</span>
-              <h3>Rewrite Moment 적용됨</h3>
-            </div>
-            <div class="rewrite-result-meta">
-              <span class="rewrite-meta-item">
-                <span class="meta-label">거리두기:</span>
-                <span class="meta-value" id="rewriteDistance">유사 상황</span>
-              </span>
-              <span class="rewrite-meta-item">
-                <span class="meta-label">결말:</span>
-                <span class="meta-value" id="rewriteEnding">성장</span>
-              </span>
+          <!-- Movie Info Card -->
+          <div class="card result-card movie-info-result" data-animate style="animation-delay: 0.4s" id="movieInfoCard">
+            <div class="movie-result-header">
+              <span class="movie-result-icon" id="movieResultIcon">🦸</span>
+              <div>
+                <h3 class="movie-result-title" id="movieResultTitle">어벤저스</h3>
+                <p class="movie-result-actors" id="movieResultActors">아이언맨, 캡틴, 토르, 블랙위도우</p>
+              </div>
             </div>
           </div>
 
@@ -172,7 +165,7 @@
       </div>
 
       <!-- New Creation CTA -->
-      <div class="new-creation-cta mt-2xl" data-animate style="animation-delay: 0.6s">
+      <div class="new-creation-cta mt-2xl" data-animate style="animation-delay: 0.5s">
         <a href="upload.html" class="btn btn-secondary btn-lg">
           <span>✨</span>
           새로운 영상 만들기
@@ -180,8 +173,8 @@
       </div>
 
       <!-- Disclaimer -->
-      <div class="disclaimer mt-xl" data-animate style="animation-delay: 0.7s">
-        <strong>Fiction / Simulation</strong> - 이 결과물은 가상의 창작물이며 예측이나 사실이 아닙니다.
+      <div class="disclaimer mt-xl" data-animate style="animation-delay: 0.6s">
+        <strong>Fiction / Simulation</strong> - 이 결과물은 AI가 생성한 가상의 창작물이며, 실제 영화나 배우와는 관련이 없습니다.
       </div>
 
     </div>
@@ -224,7 +217,6 @@
   </div>
 
   <script src="/js/app.js"></script>
-  <script src="/js/videoGenerator.js"></script>
   <style>
     /* Result Page Specific Styles */
     .result-layout {
@@ -237,48 +229,6 @@
     .result-video-section {
       position: sticky;
       top: 100px;
-    }
-
-    .clip-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-
-    .clip-tab {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 20px;
-      background: var(--bg-secondary);
-      border: 2px solid transparent;
-      border-radius: var(--radius-full);
-      color: var(--text-secondary);
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all var(--transition-fast);
-    }
-
-    .clip-tab:hover {
-      background: var(--bg-tertiary);
-    }
-
-    .clip-tab.active {
-      background: var(--accent-primary);
-      color: #0a0a0f;
-      border-color: var(--accent-primary);
-    }
-
-    .clip-tab-icon {
-      font-size: 1rem;
-    }
-
-    .clip-tab-role {
-      font-size: 0.75rem;
-      opacity: 0.8;
-      margin-left: 4px;
     }
 
     .video-player-wrapper {
@@ -373,129 +323,31 @@
       gap: 12px;
     }
 
-    .download-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
+    /* Movie Info Result Card */
+    .movie-info-result {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.2);
     }
 
-    .regen-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .regen-note {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .movie-result-header {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 16px;
     }
 
-    /* Upgrade Card */
-    .upgrade-card {
-      background: linear-gradient(135deg, rgba(240, 180, 41, 0.1) 0%, rgba(240, 180, 41, 0.03) 100%);
-      border: 1px solid rgba(240, 180, 41, 0.2);
-      padding: 24px;
-      border-radius: var(--radius-xl);
-      margin-bottom: 20px;
+    .movie-result-icon {
+      font-size: 2.5rem;
     }
 
-    .upgrade-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-
-    .upgrade-badge {
-      padding: 4px 10px;
-      background: var(--gradient-gold);
-      border-radius: var(--radius-full);
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #0a0a0f;
-    }
-
-    .upgrade-card-title {
+    .movie-result-title {
       font-size: 1.25rem;
-      margin: 0;
+      margin: 0 0 4px 0;
     }
 
-    .upgrade-card-desc {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-bottom: 20px;
-      line-height: 1.6;
-    }
-
-    .upgrade-card-desc strong {
-      color: var(--accent-primary);
-    }
-
-    .upgrade-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .upgrade-btn {
-      justify-content: space-between;
-      padding: 16px 20px;
-    }
-
-    .upgrade-cost {
-      font-size: 0.8rem;
-      opacity: 0.8;
-    }
-
-    /* Rewrite Result Card */
-    .rewrite-result-card {
-      background: rgba(240, 180, 41, 0.05);
-      border-color: rgba(240, 180, 41, 0.2);
-    }
-
-    .rewrite-result-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .rewrite-result-header span {
-      font-size: 1.25rem;
-    }
-
-    .rewrite-result-header h3 {
-      font-size: 1rem;
-      margin: 0;
-    }
-
-    .rewrite-result-desc {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-    }
-
-    .rewrite-result-meta {
-      display: flex;
-      gap: 24px;
-    }
-
-    .rewrite-meta-item {
+    .movie-result-actors {
       font-size: 0.85rem;
-    }
-
-    .meta-label {
       color: var(--text-tertiary);
-    }
-
-    .meta-value {
-      color: var(--accent-primary);
-      font-weight: 600;
-      margin-left: 4px;
+      margin: 0;
     }
 
     /* Share Modal */
@@ -530,17 +382,9 @@
       .result-video-section {
         position: static;
       }
-
-      .result-info-section {
-        order: 1;
-      }
     }
 
     @media (max-width: 768px) {
-      .clip-tabs {
-        justify-content: center;
-      }
-
       .video-container {
         max-width: 280px;
       }
@@ -551,11 +395,20 @@
     }
   </style>
   <script>
+    // 영화 정보 매핑
+    const movieInfo = {
+      avengers: { icon: '🦸', title: '어벤저스', actors: '아이언맨, 캡틴 아메리카, 토르, 블랙위도우' },
+      spiderman: { icon: '🕷️', title: '스파이더맨', actors: '피터 파커, MJ, 네드' },
+      harrypotter: { icon: '⚡', title: '해리포터', actors: '해리, 헤르미온느, 론' },
+      lotr: { icon: '💍', title: '반지의 제왕', actors: '프로도, 간달프, 아라곤, 레골라스' },
+      starwars: { icon: '⚔️', title: '스타워즈', actors: '루크, 레아, 한 솔로' },
+      jurassic: { icon: '🦖', title: '쥬라기 공원', actors: '그랜트 박사, 엘리, 말콤 박사' },
+    };
+
     // Result page functionality
     const videoCaption = document.getElementById('videoCaption');
     const shareModal = document.getElementById('shareModal');
     const toast = document.getElementById('toast');
-    const rewriteCard = document.getElementById('rewriteCard');
     const videoPlayer = document.getElementById('videoPlayer');
     const videoPlaceholder = document.getElementById('videoPlaceholder');
     const videoContainer = document.getElementById('videoContainer');
@@ -592,26 +445,21 @@
 
     // 저장된 설정 로드
     const aspectRatio = sessionStorage.getItem('selectedRatio') || '16:9';
-    const stage = sessionStorage.getItem('selectedStage') || 'teen';
-    const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
+    const selectedMovie = sessionStorage.getItem('selectedMovie') || 'avengers';
+    const movie = movieInfo[selectedMovie] || movieInfo.avengers;
 
-    // 스테이지/장르 매핑
-    const stageMap = { 'twenties': '20대', 'thirties': '30대', 'forties': '40대', 'newlywed': '신혼', 'early_parenting': '초기 육아' };
-    const genreMap = { 'action': '액션', 'comedy': '코미디', 'drama': '드라마', 'melo': '멜로', 'fantasy': '판타지' };
-    const genreIcons = { 'action': '💥', 'comedy': '😂', 'drama': '🎭', 'melo': '💕', 'fantasy': '✨' };
-    const stageIcons = { 'twenties': '✨', 'thirties': '💼', 'forties': '🏆', 'newlywed': '💑', 'early_parenting': '👶' };
-
-    // 페이지 서브타이틀 업데이트
-    const pageSubtitle = document.querySelector('.page-subtitle');
-    if (pageSubtitle) {
-      pageSubtitle.textContent = `${stageMap[stage] || stage} · ${genreMap[genre] || genre} · ${aspectRatio}`;
-    }
+    // 페이지 정보 업데이트
+    document.getElementById('pageSubtitle').textContent = `${movie.title} 촬영장에서의 셀카 · ${aspectRatio}`;
+    document.getElementById('videoCaption').textContent = `"${movie.title} 촬영장에서"`;
+    document.getElementById('movieResultIcon').textContent = movie.icon;
+    document.getElementById('movieResultTitle').textContent = movie.title;
+    document.getElementById('movieResultActors').textContent = movie.actors;
 
     // 비디오 메타 업데이트
     if (videoMeta) {
       videoMeta.innerHTML = `
-        <span>${stageIcons[stage] || '🎭'} ${stageMap[stage] || stage}</span>
-        <span>${genreIcons[genre] || '🎬'} ${genreMap[genre] || genre}</span>
+        <span>${movie.icon} ${movie.title}</span>
+        <span>📸 셀카</span>
         <span>⏱️ 8초</span>
       `;
     }
@@ -669,7 +517,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `rewrite_moment_${Date.now()}.mp4`;
+        a.download = `${movie.title}_셀카_${Date.now()}.mp4`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -721,33 +569,10 @@
       document.getElementById('playText').textContent = '재생하기';
     });
 
-    // Check if rewrite was enabled
-    const rewriteEnabled = sessionStorage.getItem('rewriteEnabled') === 'true';
-    if (rewriteEnabled) {
-      rewriteCard.classList.remove('hidden');
-      
-      // Update rewrite meta
-      const distance = sessionStorage.getItem('distance');
-      const ending = sessionStorage.getItem('ending');
-      
-      const distanceMap = {
-        'symbolic': '상징적으로',
-        'similar': '유사 상황',
-        'quite_similar': '꽤 비슷하게'
-      };
-      
-      const endingMap = {
-        'recovery': '회복',
-        'growth': '성장',
-        'reconcile': '화해',
-        'self_protect': '자기보호',
-        'new_start': '새출발',
-        'comedy': '코미디 승화'
-      };
-      
-      document.getElementById('rewriteDistance').textContent = distanceMap[distance] || '유사 상황';
-      document.getElementById('rewriteEnding').textContent = endingMap[ending] || '성장';
-    }
+    videoPlayer.addEventListener('ended', () => {
+      document.getElementById('playIcon').textContent = '▶';
+      document.getElementById('playText').textContent = '재생하기';
+    });
 
     // Share modal
     document.getElementById('shareBtn').addEventListener('click', () => {
@@ -769,93 +594,8 @@
       const input = document.getElementById('shareLink');
       input.select();
       document.execCommand('copy');
-      
       showToast('링크가 복사되었어요!');
     });
-
-    // Toast notification
-    function showToast(message) {
-      const toastMessage = document.getElementById('toastMessage');
-      toastMessage.textContent = message;
-      toast.classList.add('show');
-      
-      setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
-    }
-
-    // Video control functions
-    function togglePlay() {
-      const playIcon = document.getElementById('playIcon');
-      const playText = document.getElementById('playText');
-      
-      if (videoPlayer.paused) {
-        videoPlayer.play();
-        playIcon.textContent = '⏸';
-        playText.textContent = '일시정지';
-      } else {
-        videoPlayer.pause();
-        playIcon.textContent = '▶';
-        playText.textContent = '재생하기';
-      }
-    }
-
-    function skipTime(seconds) {
-      videoPlayer.currentTime += seconds;
-    }
-
-    // Update play button when video ends
-    videoPlayer.addEventListener('ended', () => {
-      document.getElementById('playIcon').textContent = '▶';
-      document.getElementById('playText').textContent = '재생하기';
-    });
-
-    // Download button
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-      if (generatedVideo) {
-        // 영상 다운로드
-        const a = document.createElement('a');
-        a.href = generatedVideo;
-        a.download = `rewrite_moment_${Date.now()}.mp4`;
-        a.target = '_blank';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        showToast('다운로드가 시작됩니다...');
-      } else {
-        showToast('다운로드할 영상이 없습니다');
-      }
-    });
-
-    // Upgrade buttons
-    document.querySelectorAll('.upgrade-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mode = btn.dataset.mode;
-        const cost = mode === 'story' ? 2 : 5;
-        
-        // In production, this would check credits and process the upgrade
-        alert(`${mode === 'story' ? 'Story Pack' : 'Trailer'}으로 업그레이드하려면 ${cost} 크레딧이 필요해요.\n\n크레딧 충전 페이지로 이동합니다.`);
-        window.location.href = 'pricing.html';
-      });
-    });
-
-    // Regenerate buttons
-    document.querySelectorAll('.regen-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const clipNo = btn.dataset.clip;
-        
-        // In production, this would check credits and process regeneration
-        alert(`Clip ${clipNo} 재생성에 1 크레딧이 필요해요.\n\n크레딧을 충전하시겠습니까?`);
-      });
-    });
-
-    // Rewrite again button
-    if (document.getElementById('rewriteAgainBtn')) {
-      document.getElementById('rewriteAgainBtn').addEventListener('click', () => {
-        alert('엔딩 재생성에 1 크레딧이 필요해요.\n\n크레딧을 충전하시겠습니까?');
-      });
-    }
   </script>
 </body>
 </html>
-

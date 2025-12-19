@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rewrite Moment - 나만의 영화 만들기</title>
+  <title>영상 생성 중 - Rewrite Moment</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
 </head>
@@ -66,7 +66,7 @@
         <div class="step-line completed"></div>
         <div class="step active">
           <div class="step-number">3</div>
-          <span class="step-text">Rewrite</span>
+          <span class="step-text">생성</span>
         </div>
         <div class="step-line"></div>
         <div class="step">
@@ -75,464 +75,94 @@
         </div>
       </div>
 
-      <!-- Page Header -->
-      <div class="page-header" data-animate>
-        <h1 class="page-title">
-          <span class="text-gradient">Rewrite</span> Moment
-        </h1>
-        <p class="page-subtitle">
-          잊지 못하는 순간을 다른 결말로 재구성해보세요.<br>
-          <span style="color: var(--text-muted);">(선택 사항 - 건너뛰어도 됩니다)</span>
-        </p>
-      </div>
+      <!-- Generation Status -->
+      <div class="generation-status" data-animate>
+        <div class="movie-info-card">
+          <div class="movie-icon-large" id="movieIcon">🎬</div>
+          <h2 class="movie-title-large" id="movieTitle">영화 촬영장</h2>
+          <p class="movie-actors-large" id="movieActors">배우들과 함께하는 셀카</p>
+        </div>
 
-      <!-- Rewrite Toggle -->
-      <div class="rewrite-toggle card" data-animate style="animation-delay: 0.1s">
-        <label class="toggle-switch">
-          <input type="checkbox" id="rewriteEnabled">
-          <span class="toggle-slider"></span>
-          <span class="toggle-label">
-            <span class="toggle-title">Rewrite Moment 사용하기</span>
-            <span class="toggle-desc">바꾸고 싶은 기억을 입력하면 다른 결말로 재구성됩니다 (+1 크레딧)</span>
-          </span>
-        </label>
-      </div>
-
-      <!-- Rewrite Content (Initially Hidden) -->
-      <div class="rewrite-content" id="rewriteContent">
-        
-        <!-- Safety Notice -->
-        <div class="safety-notice" data-animate style="animation-delay: 0.2s">
-          <div class="safety-icon">🔒</div>
-          <div class="safety-text">
-            <strong>안전 가이드</strong>
-            <p>실명, 학교, 회사, 주소는 적지 말아주세요.<br>입력한 내용은 유사 상황으로 상징화되어 재구성됩니다.</p>
+        <div class="loading-container">
+          <div class="spinner-large"></div>
+          <h3 class="loading-title">영상을 생성하고 있어요</h3>
+          <p class="loading-text" id="loadingText">촬영장 준비 중...</p>
+          <div class="loading-progress">
+            <div class="loading-progress-bar" id="loadingBar"></div>
+          </div>
+          <div class="loading-steps">
+            <div class="loading-step active" data-step="1">촬영장 준비</div>
+            <div class="loading-step" data-step="2">배우 등장</div>
+            <div class="loading-step" data-step="3">셀카 촬영</div>
+            <div class="loading-step" data-step="4">편집 완료</div>
           </div>
         </div>
 
-        <!-- Event Input -->
-        <section class="rewrite-section" data-animate style="animation-delay: 0.3s">
-          <h3 class="rewrite-section-title">바꾸고 싶은 순간</h3>
-          <div class="form-group">
-            <textarea 
-              class="form-textarea" 
-              id="eventText"
-              placeholder="예: 그날 발표에서 너무 창피했어… 준비를 열심히 했는데 머리가 새하얘졌어."
-              rows="4"
-              maxlength="300"
-            ></textarea>
-            <div class="form-hint">
-              <span id="charCount">0</span>/300자 · 구체적인 감정과 상황을 적어주세요
-            </div>
-          </div>
-        </section>
-
-        <!-- Distance Mode -->
-        <section class="rewrite-section" data-animate style="animation-delay: 0.4s">
-          <h3 class="rewrite-section-title">거리두기</h3>
-          <p class="rewrite-section-desc">원본 사건과 얼마나 비슷하게 재구성할까요?</p>
-          <div class="distance-options">
-            <label class="distance-card">
-              <input type="radio" name="distance" value="symbolic">
-              <div class="distance-card-inner">
-                <div class="distance-icon">🌫️</div>
-                <div class="distance-title">상징적으로</div>
-                <div class="distance-desc">가장 안전한 방식<br>메타포로 표현</div>
-              </div>
-            </label>
-
-            <label class="distance-card active">
-              <input type="radio" name="distance" value="similar" checked>
-              <div class="distance-card-inner">
-                <div class="distance-icon">🔄</div>
-                <div class="distance-title">유사 상황</div>
-                <div class="distance-desc">비슷하지만 다른<br>상황으로 재구성</div>
-              </div>
-            </label>
-
-            <label class="distance-card">
-              <input type="radio" name="distance" value="quite_similar">
-              <div class="distance-card-inner">
-                <div class="distance-icon">🎯</div>
-                <div class="distance-title">꽤 비슷하게</div>
-                <div class="distance-desc">더 몰입되지만<br>직접 재현은 금지</div>
-              </div>
-            </label>
-          </div>
-        </section>
-
-        <!-- Desired Ending -->
-        <section class="rewrite-section" data-animate style="animation-delay: 0.5s">
-          <h3 class="rewrite-section-title">바꿀 결말</h3>
-          <p class="rewrite-section-desc">어떤 방향의 엔딩을 원하시나요?</p>
-          <div class="ending-options">
-            <label class="ending-card">
-              <input type="radio" name="ending" value="recovery">
-              <span class="ending-emoji">💚</span>
-              <span class="ending-text">회복</span>
-            </label>
-
-            <label class="ending-card active">
-              <input type="radio" name="ending" value="growth" checked>
-              <span class="ending-emoji">🌱</span>
-              <span class="ending-text">성장</span>
-            </label>
-
-            <label class="ending-card">
-              <input type="radio" name="ending" value="reconcile">
-              <span class="ending-emoji">🤝</span>
-              <span class="ending-text">화해</span>
-            </label>
-
-            <label class="ending-card">
-              <input type="radio" name="ending" value="self_protect">
-              <span class="ending-emoji">🛡️</span>
-              <span class="ending-text">자기보호</span>
-            </label>
-
-            <label class="ending-card">
-              <input type="radio" name="ending" value="new_start">
-              <span class="ending-emoji">🚀</span>
-              <span class="ending-text">새출발</span>
-            </label>
-
-            <label class="ending-card">
-              <input type="radio" name="ending" value="comedy">
-              <span class="ending-emoji">😄</span>
-              <span class="ending-text">코미디 승화</span>
-            </label>
-          </div>
-        </section>
-
-        <!-- What Happens -->
-        <div class="what-happens card" data-animate style="animation-delay: 0.6s">
-          <h4>🎬 이렇게 재구성됩니다</h4>
-          <ul>
-            <li>입력한 사건은 <strong>유사한 가상 상황</strong>으로 변환됩니다</li>
-            <li>실명, 학교, 회사 등 식별 가능한 정보는 <strong>자동으로 제거</strong>됩니다</li>
-            <li>선택한 결말 방향으로 <strong>엔딩 클립(Clip 3)</strong>이 재구성됩니다</li>
-            <li>Trailer 모드에서는 중간 장면에도 Rewrite가 반영됩니다</li>
-          </ul>
+        <div class="tips-card">
+          <h4>💡 잠깐! 알고 계셨나요?</h4>
+          <p id="tipText">AI가 영화 촬영장의 분위기를 재현하고 있어요. 조금만 기다려주세요!</p>
         </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="actions-row mt-xl" data-animate style="animation-delay: 0.7s">
-        <a href="select.html" class="btn btn-ghost">
-          ← 이전
-        </a>
-        <div class="actions-right">
-          <button class="btn btn-secondary" id="skipBtn">
-            건너뛰기
-          </button>
-          <button class="btn btn-primary btn-lg" id="generateBtn">
-            영상 생성하기
-            <span>🎬</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Disclaimer -->
-      <div class="disclaimer mt-xl" data-animate style="animation-delay: 0.8s">
-        <strong>안내:</strong> Rewrite Moment의 모든 결과물은 가상의 재구성입니다. 
-        실제 사건의 재현이 아니며, 치료적 목적으로 사용되지 않습니다. 
-        도움이 필요하시면 전문 상담을 받아주세요.
       </div>
 
     </div>
   </main>
 
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="loading-content">
-      <div class="spinner"></div>
-      <h3 class="loading-title">영상을 생성하고 있어요</h3>
-      <p class="loading-text" id="loadingText">스토리보드 생성 중...</p>
-      <div class="loading-progress">
-        <div class="loading-progress-bar" id="loadingBar"></div>
-      </div>
-      <div class="loading-steps">
-        <div class="loading-step active" data-step="1">스토리보드</div>
-        <div class="loading-step" data-step="2">키프레임</div>
-        <div class="loading-step" data-step="3">영상 생성</div>
-        <div class="loading-step" data-step="4">후처리</div>
-      </div>
-    </div>
-  </div>
-
   <script src="/js/app.js"></script>
-  <script src="/js/videoGenerator.js"></script>
   <style>
-    /* Rewrite Page Specific Styles */
-    .rewrite-toggle {
-      margin-bottom: 24px;
+    .generation-status {
+      text-align: center;
+      padding: 40px 0;
     }
 
-    .toggle-switch {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      cursor: pointer;
+    .movie-info-card {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      border-radius: var(--radius-xl);
+      padding: 40px;
+      margin-bottom: 40px;
     }
 
-    .toggle-switch input {
-      display: none;
+    .movie-icon-large {
+      font-size: 4rem;
+      margin-bottom: 16px;
     }
 
-    .toggle-slider {
-      width: 52px;
-      height: 28px;
-      background: var(--bg-tertiary);
-      border-radius: 14px;
-      position: relative;
-      transition: background var(--transition-fast);
-      flex-shrink: 0;
+    .movie-title-large {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .toggle-slider::after {
-      content: '';
-      position: absolute;
-      top: 3px;
-      left: 3px;
-      width: 22px;
-      height: 22px;
-      background: white;
-      border-radius: 50%;
-      transition: transform var(--transition-fast);
-    }
-
-    .toggle-switch input:checked + .toggle-slider {
-      background: var(--accent-primary);
-    }
-
-    .toggle-switch input:checked + .toggle-slider::after {
-      transform: translateX(24px);
-    }
-
-    .toggle-label {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .toggle-title {
-      font-weight: 600;
+    .movie-actors-large {
+      color: var(--text-secondary);
       font-size: 1.1rem;
     }
 
-    .toggle-desc {
-      font-size: 0.9rem;
-      color: var(--text-tertiary);
+    .loading-container {
+      margin-bottom: 40px;
     }
 
-    .rewrite-content {
-      display: none;
+    .spinner-large {
+      width: 80px;
+      height: 80px;
+      border: 4px solid rgba(168, 85, 247, 0.2);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 24px;
     }
 
-    .rewrite-content.show {
-      display: block;
-    }
-
-    .safety-notice {
-      display: flex;
-      gap: 16px;
-      padding: 20px;
-      background: rgba(240, 180, 41, 0.08);
-      border: 1px solid rgba(240, 180, 41, 0.2);
-      border-radius: var(--radius-lg);
-      margin-bottom: 32px;
-    }
-
-    .safety-icon {
-      font-size: 1.5rem;
-      flex-shrink: 0;
-    }
-
-    .safety-text strong {
-      display: block;
-      margin-bottom: 4px;
-      color: var(--accent-primary);
-    }
-
-    .safety-text p {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin: 0;
-    }
-
-    .rewrite-section {
-      margin-bottom: 32px;
-    }
-
-    .rewrite-section-title {
-      font-size: 1.125rem;
-      margin-bottom: 8px;
-    }
-
-    .rewrite-section-desc {
-      color: var(--text-tertiary);
-      font-size: 0.9rem;
-      margin-bottom: 16px;
-    }
-
-    /* Distance Cards */
-    .distance-options {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .distance-card {
-      cursor: pointer;
-    }
-
-    .distance-card input {
-      display: none;
-    }
-
-    .distance-card-inner {
-      padding: 24px 16px;
-      background: var(--bg-secondary);
-      border: 2px solid transparent;
-      border-radius: var(--radius-lg);
-      text-align: center;
-      transition: all var(--transition-base);
-    }
-
-    .distance-card:hover .distance-card-inner {
-      background: var(--bg-tertiary);
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .distance-card.active .distance-card-inner,
-    .distance-card input:checked + .distance-card-inner {
-      border-color: var(--accent-primary);
-      background: rgba(240, 180, 41, 0.08);
-    }
-
-    .distance-icon {
-      font-size: 2rem;
-      margin-bottom: 12px;
-    }
-
-    .distance-title {
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-
-    .distance-desc {
-      font-size: 0.8rem;
-      color: var(--text-tertiary);
-      line-height: 1.4;
-    }
-
-    /* Ending Options */
-    .ending-options {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .ending-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 16px;
-      background: var(--bg-secondary);
-      border: 2px solid transparent;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      transition: all var(--transition-base);
-    }
-
-    .ending-card input {
-      display: none;
-    }
-
-    .ending-card:hover {
-      background: var(--bg-tertiary);
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .ending-card.active,
-    .ending-card:has(input:checked) {
-      border-color: var(--accent-primary);
-      background: rgba(240, 180, 41, 0.08);
-    }
-
-    .ending-emoji {
-      font-size: 1.25rem;
-    }
-
-    .ending-text {
-      font-weight: 500;
-      font-size: 0.95rem;
-    }
-
-    /* What Happens */
-    .what-happens {
-      background: var(--bg-secondary);
-    }
-
-    .what-happens h4 {
-      margin-bottom: 16px;
-    }
-
-    .what-happens ul {
-      list-style: none;
-    }
-
-    .what-happens li {
-      position: relative;
-      padding-left: 24px;
-      padding-bottom: 12px;
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-    }
-
-    .what-happens li::before {
-      content: '→';
-      position: absolute;
-      left: 0;
-      color: var(--accent-primary);
-    }
-
-    .what-happens li:last-child {
-      padding-bottom: 0;
-    }
-
-    .what-happens strong {
-      color: var(--text-primary);
-    }
-
-    .actions-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .actions-right {
-      display: flex;
-      gap: 12px;
-    }
-
-    /* Loading Overlay */
-    .loading-overlay {
-      display: none;
-    }
-
-    .loading-overlay.show {
-      display: flex;
-    }
-
-    .loading-content {
-      text-align: center;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     .loading-title {
-      margin-top: 24px;
-      margin-bottom: 8px;
       font-size: 1.5rem;
+      margin-bottom: 8px;
     }
 
     .loading-text {
@@ -541,24 +171,51 @@
     }
 
     .loading-progress {
-      width: 300px;
+      width: 100%;
+      max-width: 400px;
+      height: 8px;
+      background: var(--bg-tertiary);
+      border-radius: 4px;
+      overflow: hidden;
       margin: 0 auto 24px;
+    }
+
+    .loading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 4px;
+      transition: width 0.5s ease;
+      width: 0%;
     }
 
     .loading-steps {
       display: flex;
       justify-content: center;
-      gap: 24px;
+      gap: 32px;
+      flex-wrap: wrap;
     }
 
     .loading-step {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
       position: relative;
+      padding-left: 24px;
+    }
+
+    .loading-step::before {
+      content: '○';
+      position: absolute;
+      left: 0;
+      font-size: 1rem;
     }
 
     .loading-step.active {
       color: var(--accent-primary);
+    }
+
+    .loading-step.active::before {
+      content: '◉';
+      animation: pulse 1s ease-in-out infinite;
     }
 
     .loading-step.completed {
@@ -566,77 +223,90 @@
     }
 
     .loading-step.completed::before {
-      content: '✓ ';
+      content: '✓';
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .tips-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .tips-card h4 {
+      margin-bottom: 12px;
+      font-size: 1rem;
+    }
+
+    .tips-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
     }
 
     @media (max-width: 768px) {
-      .distance-options {
-        grid-template-columns: 1fr;
+      .movie-info-card {
+        padding: 24px;
       }
 
-      .ending-options {
-        grid-template-columns: repeat(2, 1fr);
+      .movie-icon-large {
+        font-size: 3rem;
       }
 
-      .actions-row {
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .actions-right {
-        width: 100%;
-        flex-direction: column;
-      }
-
-      .actions-right .btn {
-        width: 100%;
+      .movie-title-large {
+        font-size: 1.5rem;
       }
 
       .loading-steps {
-        flex-wrap: wrap;
-        gap: 12px;
+        gap: 16px;
+      }
+
+      .loading-step {
+        font-size: 0.8rem;
       }
     }
   </style>
   <script>
-    // Rewrite functionality
-    const rewriteEnabled = document.getElementById('rewriteEnabled');
-    const rewriteContent = document.getElementById('rewriteContent');
-    const eventText = document.getElementById('eventText');
-    const charCount = document.getElementById('charCount');
-    const generateBtn = document.getElementById('generateBtn');
-    const skipBtn = document.getElementById('skipBtn');
-    const loadingOverlay = document.getElementById('loadingOverlay');
+    // 영화 정보 매핑
+    const movieInfo = {
+      avengers: { icon: '🦸', title: '어벤저스', actors: '아이언맨, 캡틴 아메리카, 토르, 블랙위도우' },
+      spiderman: { icon: '🕷️', title: '스파이더맨', actors: '피터 파커, MJ, 네드' },
+      harrypotter: { icon: '⚡', title: '해리포터', actors: '해리, 헤르미온느, 론' },
+      lotr: { icon: '💍', title: '반지의 제왕', actors: '프로도, 간달프, 아라곤, 레골라스' },
+      starwars: { icon: '⚔️', title: '스타워즈', actors: '루크, 레아, 한 솔로' },
+      jurassic: { icon: '🦖', title: '쥬라기 공원', actors: '그랜트 박사, 엘리, 말콤 박사' },
+    };
 
-    // Toggle rewrite content
-    rewriteEnabled.addEventListener('change', () => {
-      if (rewriteEnabled.checked) {
-        rewriteContent.classList.add('show');
-      } else {
-        rewriteContent.classList.remove('show');
-      }
-    });
+    // 팁 목록
+    const tips = [
+      'AI가 영화 촬영장의 분위기를 재현하고 있어요. 조금만 기다려주세요!',
+      '배우들의 의상과 표정까지 정교하게 생성됩니다.',
+      '촬영장 소품과 배경도 영화와 유사하게 만들어져요.',
+      '셀카를 찍는 자연스러운 동작이 담깁니다.',
+      '약 1-2분 정도 소요됩니다. 잠시만 기다려주세요!',
+    ];
 
-    // Character count
-    eventText.addEventListener('input', () => {
-      charCount.textContent = eventText.value.length;
-    });
+    // 선택된 영화 정보 표시
+    const selectedMovie = sessionStorage.getItem('selectedMovie') || 'avengers';
+    const movie = movieInfo[selectedMovie] || movieInfo.avengers;
+    
+    document.getElementById('movieIcon').textContent = movie.icon;
+    document.getElementById('movieTitle').textContent = movie.title + ' 촬영장';
+    document.getElementById('movieActors').textContent = movie.actors + '와 함께하는 셀카';
 
-    // Distance selection
-    document.querySelectorAll('.distance-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.distance-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-      });
-    });
-
-    // Ending selection
-    document.querySelectorAll('.ending-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.ending-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-      });
-    });
+    // 팁 랜덤 표시
+    let tipIndex = 0;
+    setInterval(() => {
+      tipIndex = (tipIndex + 1) % tips.length;
+      document.getElementById('tipText').textContent = tips[tipIndex];
+    }, 5000);
 
     // IndexedDB 헬퍼 함수
     function openVideoDB() {
@@ -653,14 +323,12 @@
       });
     }
 
-    // 이전 영상 삭제 (새 생성 전)
     async function clearVideoFromIndexedDB() {
       const db = await openVideoDB();
       return new Promise((resolve, reject) => {
         const transaction = db.transaction(['videos'], 'readwrite');
         const store = transaction.objectStore('videos');
         store.delete('generatedVideo');
-        store.delete('generatedVideos');
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject(transaction.error);
       });
@@ -677,119 +345,63 @@
       });
     }
 
-    // 여러 클립 저장 (Story Pack, Trailer용)
-    async function saveVideosToIndexedDB(videosArray) {
-      const db = await openVideoDB();
-      return new Promise((resolve, reject) => {
-        const transaction = db.transaction(['videos'], 'readwrite');
-        const store = transaction.objectStore('videos');
-        
-        // 모든 클립 정보 저장
-        const allVideos = {
-          id: 'generatedVideos',
-          clips: videosArray,
-          timestamp: Date.now()
-        };
-        
-        const request = store.put(allVideos);
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject(request.error);
+    // 로딩 상태 업데이트
+    const loadingText = document.getElementById('loadingText');
+    const loadingBar = document.getElementById('loadingBar');
+    const steps = document.querySelectorAll('.loading-step');
+
+    function updateStep(stepNum, text, progress) {
+      loadingText.textContent = text;
+      loadingBar.style.width = progress + '%';
+      steps.forEach((s, i) => {
+        if (i < stepNum - 1) {
+          s.classList.remove('active');
+          s.classList.add('completed');
+        } else if (i === stepNum - 1) {
+          s.classList.add('active');
+          s.classList.remove('completed');
+        } else {
+          s.classList.remove('active', 'completed');
+        }
       });
     }
 
-    // Generate function - 실제 API 호출
+    // 영상 생성 시작
     async function startGeneration() {
-      // Store rewrite data
-      if (rewriteEnabled.checked) {
-        sessionStorage.setItem('rewriteEnabled', 'true');
-        sessionStorage.setItem('rewriteText', eventText.value);
-        sessionStorage.setItem('distance', document.querySelector('[name="distance"]:checked').value);
-        sessionStorage.setItem('ending', document.querySelector('[name="ending"]:checked').value);
-      } else {
-        sessionStorage.setItem('rewriteEnabled', 'false');
-      }
-
-      // Show loading
-      loadingOverlay.classList.add('show');
-
-      const loadingText = document.getElementById('loadingText');
-      const loadingBar = document.getElementById('loadingBar');
-      const steps = document.querySelectorAll('.loading-step');
-
-      function updateStep(stepNum, text, progress) {
-        loadingText.textContent = text;
-        loadingBar.style.width = progress + '%';
-        steps.forEach((s, i) => {
-          if (i < stepNum - 1) {
-            s.classList.remove('active');
-            s.classList.add('completed');
-          } else if (i === stepNum - 1) {
-            s.classList.add('active');
-            s.classList.remove('completed');
-          } else {
-            s.classList.remove('active', 'completed');
-          }
-        });
-      }
-
       try {
-        // 0. 이전 영상 삭제 (캐시 클리어)
+        // 0. 이전 영상 삭제
         await clearVideoFromIndexedDB();
         console.log('Previous video cache cleared');
 
         // 1. 이미지 가져오기
-        updateStep(1, '이미지 준비 중...', 10);
+        updateStep(1, '촬영장 준비 중...', 10);
         const uploadedImages = JSON.parse(sessionStorage.getItem('uploadedImages') || '[]');
-        const imageUrl = uploadedImages[0]; // 첫 번째 이미지 사용
+        const imageUrl = uploadedImages[0];
 
         if (!imageUrl) {
           throw new Error('업로드된 이미지가 없습니다. 처음부터 다시 시작해주세요.');
         }
-        
+
         console.log('Image data length:', imageUrl.length);
-        console.log('Image data preview:', imageUrl.substring(0, 50));
 
         // 선택된 설정 가져오기
         const aspectRatio = sessionStorage.getItem('selectedRatio') || '16:9';
-        const stage = sessionStorage.getItem('selectedStage') || 'teen';
-        const genre = sessionStorage.getItem('selectedGenre') || 'comedy';
-
-        // 슬라이더 설정 가져오기
-        const sliders = JSON.parse(sessionStorage.getItem('sliders') || '{}');
-        
-        // Rewrite 설정
-        const distance = rewriteEnabled.checked ? document.querySelector('[name="distance"]:checked')?.value : null;
-        const ending = rewriteEnabled.checked ? document.querySelector('[name="ending"]:checked')?.value : null;
 
         console.log('=== Sending to API ===');
         console.log('Aspect Ratio:', aspectRatio);
-        console.log('Stage:', stage);
-        console.log('Genre:', genre);
-        console.log('Sliders:', sliders);
-        console.log('Rewrite:', rewriteEnabled.checked);
-        console.log('Distance:', distance);
-        console.log('Ending:', ending);
+        console.log('Movie:', selectedMovie);
         console.log('======================');
 
         // 2. 영상 생성 API 호출
-        updateStep(2, '영상 생성 요청 중...', 20);
-        
+        updateStep(2, '배우들 등장 준비 중...', 25);
+
         const response = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             imageUrl,
             aspectRatio,
-            mode: 'quick',
-            stage,
-            genre,
-            sliders,
-            clipType: 'main',
-            clipIndex: 0,
-            totalClips: 1,
-            rewriteText: rewriteEnabled.checked ? eventText.value : null,
-            distance,
-            ending,
+            movie: selectedMovie,
           }),
         });
 
@@ -802,41 +414,37 @@
         console.log('Prediction ID:', predictionId);
 
         // 3. 상태 폴링
-        updateStep(3, '영상을 생성하고 있어요...', 40);
-        
+        updateStep(3, '셀카 촬영 중...', 50);
+
         let attempts = 0;
         const maxAttempts = 120; // 10분
-        
+
         while (attempts < maxAttempts) {
           const statusResponse = await fetch(`/api/status/${encodeURIComponent(predictionId)}`);
           const status = await statusResponse.json();
-          
+
           console.log('Status:', status.status);
-          
+
           if (status.status === 'succeeded') {
-            updateStep(4, '마무리 중...', 95);
-            
+            updateStep(4, '편집 마무리 중...', 95);
+
             const videoUrl = Array.isArray(status.output) ? status.output[0] : status.output;
-            
-            console.log('Video URL received:', videoUrl ? `${videoUrl.substring(0, 50)}... (length: ${videoUrl.length})` : 'null');
-            
+
+            console.log('Video URL received:', videoUrl ? `length: ${videoUrl.length}` : 'null');
+
             if (!videoUrl) {
-              // 디버그 정보 출력
               if (status.debug) {
                 console.error('=== DEBUG INFO ===');
-                console.error('Root keys:', status.debug.rootKeys);
-                console.error('Response keys:', status.debug.responseKeys);
-                console.error('Result keys:', status.debug.resultKeys);
-                console.error('Raw response:', status.debug.rawResponse);
+                console.error(JSON.stringify(status.debug, null, 2));
                 console.error('==================');
               }
-              throw new Error('영상 URL이 없습니다. 콘솔에서 DEBUG INFO를 확인하세요.');
+              throw new Error('영상 URL이 없습니다. 다시 시도해주세요.');
             }
-            
+
             // 영상을 IndexedDB에 저장
             await saveVideoToIndexedDB(videoUrl);
             console.log('Video saved to IndexedDB');
-            
+
             // 성공! 결과 페이지로 이동
             updateStep(4, '완료!', 100);
             setTimeout(() => {
@@ -844,37 +452,34 @@
             }, 500);
             return;
           }
-          
-            if (status.status === 'failed' || status.status === 'canceled') {
-              const errorMsg = status.error || '영상 생성 실패';
-              const details = status.details ? `\n\n상세: ${status.details}` : '';
-              throw new Error(errorMsg + details);
-            }
-          
+
+          if (status.status === 'failed' || status.status === 'canceled') {
+            const errorMsg = status.error || '영상 생성 실패';
+            const details = status.details ? `\n\n상세: ${status.details}` : '';
+            throw new Error(errorMsg + details);
+          }
+
           // 진행률 업데이트
-          const progress = Math.min(40 + (attempts * 0.5), 90);
+          const progress = Math.min(50 + (attempts * 0.4), 90);
           loadingBar.style.width = progress + '%';
-          
+
           await new Promise(resolve => setTimeout(resolve, 5000));
           attempts++;
         }
-        
+
         throw new Error('영상 생성 시간 초과');
-        
+
       } catch (error) {
         console.error('Generation error:', error);
-        loadingOverlay.classList.remove('show');
         alert('영상 생성 중 오류가 발생했습니다:\n' + error.message);
+        window.location.href = 'select.html';
       }
     }
 
-    // Event listeners
-    generateBtn.addEventListener('click', startGeneration);
-    skipBtn.addEventListener('click', () => {
-      sessionStorage.setItem('rewriteEnabled', 'false');
-      startGeneration();
+    // 페이지 로드 시 자동으로 생성 시작
+    window.addEventListener('load', () => {
+      setTimeout(startGeneration, 500);
     });
   </script>
 </body>
 </html>
-
