@@ -1,5 +1,4 @@
 import { GoogleAuth } from 'google-auth-library';
-import Replicate from 'replicate';
 
 // Google Cloud 설정
 const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || 'rewritemoment';
@@ -8,11 +7,6 @@ const LOCATION = 'us-central1';
 const credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON 
   ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
   : null;
-
-// Replicate 클라이언트
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -32,7 +26,7 @@ export default async function handler(req, res) {
 
     const movieInfo = getMovieInfo(movie);
 
-    console.log('=== 영상 생성 시작 ===');
+    console.log('=== Veo 영상 생성 ===');
     console.log('Movie:', movieInfo.koreanTitle);
 
     // 이미지 Base64 처리
@@ -49,60 +43,7 @@ export default async function handler(req, res) {
       }
     }
 
-    let finalImageBase64 = userImageBase64;
-    let finalMimeType = mimeType;
-
-    // ========================================
-    // STEP 1: Replicate로 합성 시도 (선택적)
-    // ========================================
-    if (process.env.REPLICATE_API_TOKEN) {
-      try {
-        console.log('\n=== Replicate 합성 시도 ===');
-
-        const prompt = `A photo of a person taking a group selfie with ${movieInfo.actors} on ${movieInfo.background}. Everyone smiling at camera. Photorealistic, high quality.`;
-
-        // face-to-many 모델 사용 (더 안정적)
-        const output = await replicate.run(
-          "fofr/face-to-many:35cea9c3164d9fb7571e0e1a88f18b0a8feecf9d9ac7ac904de7e7b78f635254",
-          {
-            input: {
-              image: imageUrl,
-              style: "3D",
-              prompt: prompt,
-              lora_scale: 1,
-              negative_prompt: "ugly, deformed, blurry",
-              prompt_strength: 4.5,
-              denoising_strength: 0.65,
-              instant_id_strength: 0.8,
-              control_depth_strength: 0.8,
-            }
-          }
-        );
-
-        const compositeUrl = Array.isArray(output) ? output[0] : output;
-        console.log('Replicate 완료:', compositeUrl?.substring?.(0, 60));
-
-        if (compositeUrl) {
-          // 이미지 다운로드
-          const imgRes = await fetch(compositeUrl);
-          if (imgRes.ok) {
-            const imgBuffer = await imgRes.arrayBuffer();
-            finalImageBase64 = Buffer.from(imgBuffer).toString('base64');
-            finalMimeType = imgRes.headers.get('content-type') || 'image/png';
-            console.log('합성 이미지 준비 완료');
-          }
-        }
-      } catch (repErr) {
-        console.log('Replicate 실패, 원본 이미지로 진행:', repErr.message);
-        // 원본 이미지로 계속 진행
-      }
-    }
-
-    // ========================================
-    // STEP 2: Veo로 영상 생성
-    // ========================================
-    console.log('\n=== Veo 영상 생성 ===');
-
+    // Google Auth
     const auth = new GoogleAuth({
       credentials: credentials,
       scopes: ['https://www.googleapis.com/auth/cloud-platform'],
@@ -110,20 +51,31 @@ export default async function handler(req, res) {
     const client = await auth.getClient();
     const accessToken = await client.getAccessToken();
 
-    const videoPrompt = `Create an 8-second video where this person meets ${movieInfo.actors} on ${movieInfo.background}.
+    // 영상 프롬프트 - 사용자 얼굴 보존 + 배우 등장
+    const videoPrompt = `Create an 8-second cinematic video.
 
-Scene:
-- The person in the photo is taking a selfie
-- ${movieInfo.actors} approach from behind
-- Everyone poses together for the selfie, smiling
-- Natural conversation and laughter
-- At the end, everyone waves goodbye
+MAIN CHARACTER: The person shown in this photo is the MAIN CHARACTER. Their face, hair, skin tone, and all features must remain EXACTLY identical throughout the entire video. Do NOT change, morph, or alter their appearance in any way.
 
-CRITICAL: The person's face in the photo must stay EXACTLY the same. Do not change or morph faces.
+SCENE:
+The main character (from the photo) is visiting ${movieInfo.background}.
 
-Style: Behind-the-scenes vlog, candid, warm natural lighting.`;
+${movieInfo.actorEntrance}
 
-    console.log('Video prompt ready');
+ACTION SEQUENCE:
+0-2 sec: The main character holds up phone for selfie, looking at camera
+2-4 sec: ${movieInfo.actors} walk into frame from behind, joining the selfie
+4-6 sec: Everyone poses together - the actors put arms around the main character
+6-8 sec: Natural laughter and high-fives, actors wave goodbye
+
+CRITICAL REQUIREMENTS:
+1. The main character's face from the photo MUST stay 100% identical - same eyes, nose, mouth, skin
+2. ${movieInfo.actorLooks}
+3. Cinematic movie quality, warm natural lighting
+4. Behind-the-scenes documentary style, slight handheld camera movement
+
+The main character should be clearly visible in the CENTER of the frame throughout.`;
+
+    console.log('Video prompt length:', videoPrompt.length);
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
@@ -137,8 +89,8 @@ Style: Behind-the-scenes vlog, candid, warm natural lighting.`;
         instances: [{
           prompt: videoPrompt,
           image: {
-            bytesBase64Encoded: finalImageBase64,
-            mimeType: finalMimeType,
+            bytesBase64Encoded: userImageBase64,
+            mimeType: mimeType,
           },
         }],
         parameters: {
@@ -182,33 +134,45 @@ function getMovieInfo(movie) {
   const settings = {
     avengers: {
       koreanTitle: '어벤저스',
-      actors: 'Robert Downey Jr. as Tony Stark Iron Man (middle-aged man with dark goatee beard, brown eyes, confident smirk, wearing red and gold high-tech armor suit with glowing blue arc reactor on chest) and Chris Evans as Steve Rogers Captain America (tall muscular blonde man with blue eyes, clean-shaven square jaw, wearing blue tactical suit with white star on chest, holding round vibranium shield)',
-      background: 'the Avengers movie set at Stark Tower with high-tech screens, Iron Man suits on display, professional film crew and lighting equipment visible',
+      background: 'the Avengers movie set at Stark Tower, with Iron Man suits displayed on racks, high-tech holographic screens, professional film crew in background',
+      actors: 'Tony Stark (Robert Downey Jr.) and Steve Rogers (Chris Evans)',
+      actorEntrance: 'Robert Downey Jr. as Tony Stark wearing his signature red and gold Iron Man suit (goatee beard, confident smile) and Chris Evans as Steve Rogers Captain America (tall blonde, muscular, blue suit with white star, carrying shield) approach from behind.',
+      actorLooks: 'Tony Stark must look like Robert Downey Jr. - dark hair with grey streaks, goatee beard, brown eyes, charming smirk. Steve Rogers must look like Chris Evans - blonde hair, blue eyes, square jaw, clean-shaven, very muscular.',
     },
     spiderman: {
       koreanTitle: '스파이더맨',
-      actors: 'Tom Holland as Peter Parker Spider-Man (young man with brown wavy hair, brown eyes, boyish face, wearing iconic red and blue Spider-Man suit with web pattern, mask pulled back) and Zendaya as MJ (young woman with long curly dark brown hair, brown eyes, natural beauty, casual streetwear)',
-      background: 'the Spider-Man movie set with New York City skyline backdrop, Queens apartment building, web-shooting practical effects rigs',
+      background: 'the Spider-Man movie set with New York City Queens backdrop, apartment building rooftop',
+      actors: 'Peter Parker (Tom Holland) and MJ (Zendaya)',
+      actorEntrance: 'Tom Holland as Peter Parker Spider-Man (young, brown wavy hair, boyish face, red-blue suit with mask off) and Zendaya as MJ (curly dark hair, natural beauty) approach from behind.',
+      actorLooks: 'Peter Parker must look like Tom Holland - young face, brown wavy hair, big expressive brown eyes, friendly smile. MJ must look like Zendaya - beautiful, curly dark brown hair, elegant features.',
     },
     harrypotter: {
       koreanTitle: '해리포터',
-      actors: 'Daniel Radcliffe as Harry Potter (young man with messy black hair, bright green eyes, round wire-frame glasses, lightning bolt scar on forehead, wearing black Gryffindor robes with red and gold trim) and Emma Watson as Hermione Granger (young woman with wavy light brown hair, brown eyes, intelligent expression, wearing similar Hogwarts robes)',
-      background: 'the Hogwarts Great Hall movie set with thousands of floating candles, four long house tables, enchanted ceiling showing night sky, stone walls with medieval tapestries',
+      background: 'the Hogwarts Great Hall movie set with floating candles, long wooden tables, enchanted ceiling showing starry night',
+      actors: 'Harry Potter (Daniel Radcliffe) and Hermione (Emma Watson)',
+      actorEntrance: 'Daniel Radcliffe as Harry Potter (messy black hair, round glasses, lightning scar, Gryffindor robes) and Emma Watson as Hermione Granger (wavy brown hair, intelligent expression, Hogwarts robes) approach from behind.',
+      actorLooks: 'Harry Potter must look like Daniel Radcliffe - messy black hair, round wire glasses, green eyes, lightning bolt scar on forehead. Hermione must look like Emma Watson - wavy light brown hair, brown eyes, refined features.',
     },
     lotr: {
       koreanTitle: '반지의 제왕',
-      actors: 'Ian McKellen as Gandalf the Grey (elderly man with very long grey hair and full grey beard, wise eyes, tall pointed grey hat, grey robes, holding wooden staff with crystal) and Viggo Mortensen as Aragorn (rugged handsome man with shoulder-length dark brown hair, stubble beard, weathered face, wearing ranger leather armor, sword at his side)',
-      background: 'the Lord of the Rings movie set in New Zealand, Rivendell elven architecture with waterfalls, lush green forest, mystical atmosphere',
+      background: 'the Lord of the Rings movie set in Rivendell with elven architecture, waterfalls, mystical forest of New Zealand',
+      actors: 'Gandalf (Ian McKellen) and Aragorn (Viggo Mortensen)',
+      actorEntrance: 'Ian McKellen as Gandalf the Grey (long grey hair and beard, pointed hat, grey robes, wooden staff) and Viggo Mortensen as Aragorn (rugged, dark shoulder-length hair, stubble, ranger clothes) approach from behind.',
+      actorLooks: 'Gandalf must look like Ian McKellen - elderly, long grey hair, full grey beard, wise kind eyes. Aragorn must look like Viggo Mortensen - handsome rugged face, dark hair to shoulders, light stubble beard.',
     },
     starwars: {
       koreanTitle: '스타워즈',
-      actors: 'Mark Hamill as Luke Skywalker (young man with sandy blonde hair, blue eyes, wearing tan Jedi robes, holding glowing blue lightsaber) and Carrie Fisher as Princess Leia Organa (young woman with iconic side bun hairstyle, brown hair, brown eyes, wearing elegant white flowing robes)',
-      background: 'the Star Wars movie set inside Millennium Falcon cockpit, R2-D2 and C-3PO droids visible, holographic displays, spaceship corridors',
+      background: 'the Star Wars movie set inside Millennium Falcon with cockpit controls, droids R2-D2 and C-3PO visible',
+      actors: 'Luke Skywalker (Mark Hamill) and Princess Leia (Carrie Fisher)',
+      actorEntrance: 'Mark Hamill as Luke Skywalker (sandy blonde hair, blue eyes, tan Jedi robes, blue lightsaber) and Carrie Fisher as Princess Leia (iconic side bun hairstyle, white flowing robes) approach from behind.',
+      actorLooks: 'Luke must look like young Mark Hamill - sandy blonde hair, bright blue eyes, youthful heroic face. Leia must look like young Carrie Fisher - brown hair in side buns, brown eyes, regal elegant beauty.',
     },
     jurassic: {
       koreanTitle: '쥬라기 공원',
-      actors: 'Sam Neill as Dr. Alan Grant (middle-aged man with brown hair, blue eyes, wearing khaki paleontologist outfit with wide-brimmed hat, rugged outdoorsman look) and Jeff Goldblum as Dr. Ian Malcolm (tall man with dark curly hair, wearing all black leather jacket, unbuttoned shirt, signature quirky intellectual expression)',
-      background: 'the Jurassic Park movie set with massive animatronic T-Rex dinosaur, tropical jungle plants, iconic wooden park gates with torch lights',
+      background: 'the Jurassic Park movie set with animatronic T-Rex dinosaur visible, tropical jungle plants, iconic park gates',
+      actors: 'Dr. Alan Grant (Sam Neill) and Dr. Ian Malcolm (Jeff Goldblum)',
+      actorEntrance: 'Sam Neill as Dr. Alan Grant (khaki outfit, wide-brimmed hat, rugged paleontologist look) and Jeff Goldblum as Dr. Ian Malcolm (all black clothes, leather jacket, quirky intellectual vibe) approach from behind.',
+      actorLooks: 'Alan Grant must look like Sam Neill - weathered handsome face, brown hair. Ian Malcolm must look like Jeff Goldblum - tall, dark curly hair, black leather jacket, signature eccentric charm.',
     },
   };
   return settings[movie] || settings.avengers;
