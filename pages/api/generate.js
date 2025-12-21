@@ -182,33 +182,33 @@ function getMovieInfo(movie) {
   const settings = {
     avengers: {
       koreanTitle: '어벤저스',
-      actors: 'Iron Man in his red gold armor suit and Captain America in blue uniform with shield',
-      background: 'an Avengers movie set with superhero props',
+      actors: 'Robert Downey Jr. as Tony Stark Iron Man (middle-aged man with dark goatee beard, brown eyes, confident smirk, wearing red and gold high-tech armor suit with glowing blue arc reactor on chest) and Chris Evans as Steve Rogers Captain America (tall muscular blonde man with blue eyes, clean-shaven square jaw, wearing blue tactical suit with white star on chest, holding round vibranium shield)',
+      background: 'the Avengers movie set at Stark Tower with high-tech screens, Iron Man suits on display, professional film crew and lighting equipment visible',
     },
     spiderman: {
       koreanTitle: '스파이더맨',
-      actors: 'Spider-Man in red blue suit and a young woman (MJ)',
-      background: 'a Spider-Man movie set with NYC backdrop',
+      actors: 'Tom Holland as Peter Parker Spider-Man (young man with brown wavy hair, brown eyes, boyish face, wearing iconic red and blue Spider-Man suit with web pattern, mask pulled back) and Zendaya as MJ (young woman with long curly dark brown hair, brown eyes, natural beauty, casual streetwear)',
+      background: 'the Spider-Man movie set with New York City skyline backdrop, Queens apartment building, web-shooting practical effects rigs',
     },
     harrypotter: {
       koreanTitle: '해리포터',
-      actors: 'a wizard with round glasses (Harry) and a witch with brown hair (Hermione) in Hogwarts robes',
-      background: 'the Hogwarts Great Hall movie set',
+      actors: 'Daniel Radcliffe as Harry Potter (young man with messy black hair, bright green eyes, round wire-frame glasses, lightning bolt scar on forehead, wearing black Gryffindor robes with red and gold trim) and Emma Watson as Hermione Granger (young woman with wavy light brown hair, brown eyes, intelligent expression, wearing similar Hogwarts robes)',
+      background: 'the Hogwarts Great Hall movie set with thousands of floating candles, four long house tables, enchanted ceiling showing night sky, stone walls with medieval tapestries',
     },
     lotr: {
       koreanTitle: '반지의 제왕',
-      actors: 'an old wizard with grey beard (Gandalf) and a ranger with sword (Aragorn)',
-      background: 'a Middle-earth fantasy movie set',
+      actors: 'Ian McKellen as Gandalf the Grey (elderly man with very long grey hair and full grey beard, wise eyes, tall pointed grey hat, grey robes, holding wooden staff with crystal) and Viggo Mortensen as Aragorn (rugged handsome man with shoulder-length dark brown hair, stubble beard, weathered face, wearing ranger leather armor, sword at his side)',
+      background: 'the Lord of the Rings movie set in New Zealand, Rivendell elven architecture with waterfalls, lush green forest, mystical atmosphere',
     },
     starwars: {
       koreanTitle: '스타워즈',
-      actors: 'a Jedi with lightsaber and a princess in white robes',
-      background: 'a Star Wars movie set with spaceship',
+      actors: 'Mark Hamill as Luke Skywalker (young man with sandy blonde hair, blue eyes, wearing tan Jedi robes, holding glowing blue lightsaber) and Carrie Fisher as Princess Leia Organa (young woman with iconic side bun hairstyle, brown hair, brown eyes, wearing elegant white flowing robes)',
+      background: 'the Star Wars movie set inside Millennium Falcon cockpit, R2-D2 and C-3PO droids visible, holographic displays, spaceship corridors',
     },
     jurassic: {
       koreanTitle: '쥬라기 공원',
-      actors: 'a paleontologist in khaki and a scientist in black jacket',
-      background: 'a Jurassic Park set with dinosaur props',
+      actors: 'Sam Neill as Dr. Alan Grant (middle-aged man with brown hair, blue eyes, wearing khaki paleontologist outfit with wide-brimmed hat, rugged outdoorsman look) and Jeff Goldblum as Dr. Ian Malcolm (tall man with dark curly hair, wearing all black leather jacket, unbuttoned shirt, signature quirky intellectual expression)',
+      background: 'the Jurassic Park movie set with massive animatronic T-Rex dinosaur, tropical jungle plants, iconic wooden park gates with torch lights',
     },
   };
   return settings[movie] || settings.avengers;
