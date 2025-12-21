@@ -26,54 +26,62 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Image is required' });
     }
 
+    if (!process.env.REPLICATE_API_TOKEN) {
+      return res.status(500).json({ error: 'REPLICATE_API_TOKEN not configured' });
+    }
+
     const movieInfo = getMovieInfo(movie);
 
-    console.log('=== PhotoMaker 합성 → Veo 영상 ===');
+    console.log('=== 얼굴 합성 → Veo 영상 ===');
     console.log('Movie:', movieInfo.koreanTitle);
 
     // ========================================
-    // STEP 1: PhotoMaker로 합성 이미지 생성
-    // 사용자 얼굴을 100% 보존하면서 배우들과 함께 있는 이미지
+    // STEP 1: InstantID로 합성 이미지 생성
+    // 사용자 얼굴을 보존하면서 배우들과 함께 있는 이미지
     // ========================================
-    console.log('\n=== STEP 1: PhotoMaker 합성 ===');
+    console.log('\n=== STEP 1: InstantID 합성 ===');
 
-    const photoMakerPrompt = buildPhotoMakerPrompt(movieInfo);
-    console.log('Prompt:', photoMakerPrompt);
+    const prompt = `a photo of a person taking a group selfie with famous movie actors ${movieInfo.actors} on ${movieInfo.background}, everyone smiling at camera, friendly atmosphere, highly detailed, photorealistic, 8k`;
 
-    // PhotoMaker 실행 - 사용자 얼굴 보존
+    console.log('Prompt:', prompt);
+    console.log('Image URL length:', imageUrl.length);
+
     let compositeImageUrl;
+    
     try {
+      // InstantID 사용
+      console.log('Running InstantID...');
       const output = await replicate.run(
-        "tencentarc/photomaker:ddfc2b08d209f9fa8c1uj00000gn/tencentarc/photomaker-style:467d062309da518648ba89d226490e02b8ed09b5abc15026e54e31c5a8cd0769",
+        "zsxkib/instant-id:6af8583c541261472e92155d87bba80d5ad98461665802c6d0a9d5f1a97f80fe",
         {
           input: {
-            input_image: imageUrl,
-            prompt: photoMakerPrompt,
-            style_name: "Photographic (Default)",
-            negative_prompt: "nsfw, lowres, bad anatomy, bad hands, text, error, missing fingers, cropped, worst quality, low quality, jpeg artifacts, watermark, blurry, deformed face, ugly",
-            num_steps: 50,
-            style_strength_ratio: 20,
-            num_outputs: 1,
+            image: imageUrl,
+            prompt: prompt,
+            negative_prompt: "ugly, deformed, blurry, bad anatomy, bad face, wrong face, multiple faces",
+            num_inference_steps: 30,
             guidance_scale: 5,
+            ip_adapter_scale: 0.8,
+            controlnet_conditioning_scale: 0.8,
           }
         }
       );
       
       compositeImageUrl = Array.isArray(output) ? output[0] : output;
-      console.log('PhotoMaker 완료:', compositeImageUrl);
-    } catch (photoMakerError) {
-      console.error('PhotoMaker 실패:', photoMakerError.message);
+      console.log('InstantID 완료:', compositeImageUrl?.substring(0, 100));
       
-      // PhotoMaker 실패 시 face-to-many 시도
-      console.log('face-to-many 시도...');
+    } catch (instantIdError) {
+      console.error('InstantID 에러:', instantIdError.message);
+      
+      // 백업: face-to-many 시도
       try {
+        console.log('face-to-many 시도...');
         const output = await replicate.run(
           "fofr/face-to-many:a07f252abbbd832009640b27f063ea52d87d7a23a185ca165bec23b5adc8deaf",
           {
             input: {
               image: imageUrl,
-              style: "3D",
-              prompt: photoMakerPrompt,
+              style: "Video game",
+              prompt: prompt,
               negative_prompt: "ugly, deformed",
               prompt_strength: 4.5,
               denoising_strength: 0.65,
@@ -82,31 +90,18 @@ export default async function handler(req, res) {
           }
         );
         compositeImageUrl = Array.isArray(output) ? output[0] : output;
-        console.log('face-to-many 완료:', compositeImageUrl);
-      } catch (faceToManyError) {
-        console.error('face-to-many도 실패:', faceToManyError.message);
-        
-        // 최후의 수단: pulid 사용
-        console.log('PuLID 시도...');
-        const output = await replicate.run(
-          "zsxkib/pulid:43d309c37ab4e62361e5e29b8e9e867fb2dcbcec77ae91206a8d95ac5dd451a0",
-          {
-            input: {
-              main_face_image: imageUrl,
-              prompt: `a photo of a person taking selfie with movie stars on a film set, ${movieInfo.background}, highly detailed, photorealistic`,
-              negative_prompt: "ugly, deformed, blurry",
-              num_inference_steps: 20,
-              guidance_scale: 7,
-            }
-          }
-        );
-        compositeImageUrl = Array.isArray(output) ? output[0] : output;
-        console.log('PuLID 완료:', compositeImageUrl);
+        console.log('face-to-many 완료:', compositeImageUrl?.substring(0, 100));
+      } catch (faceError) {
+        console.error('face-to-many도 실패:', faceError.message);
+        return res.status(500).json({ 
+          error: '이미지 합성 실패', 
+          details: faceError.message 
+        });
       }
     }
 
     if (!compositeImageUrl) {
-      return res.status(500).json({ error: '이미지 합성 실패' });
+      return res.status(500).json({ error: '합성 이미지 URL이 없음' });
     }
 
     // ========================================
@@ -115,6 +110,10 @@ export default async function handler(req, res) {
     console.log('\n=== 이미지 다운로드 ===');
     
     const imageResponse = await fetch(compositeImageUrl);
+    if (!imageResponse.ok) {
+      return res.status(500).json({ error: '합성 이미지 다운로드 실패' });
+    }
+    
     const imageBuffer = await imageResponse.arrayBuffer();
     const compositeImageBase64 = Buffer.from(imageBuffer).toString('base64');
     const mimeType = imageResponse.headers.get('content-type') || 'image/png';
@@ -122,7 +121,7 @@ export default async function handler(req, res) {
     console.log('이미지 다운로드 완료, length:', compositeImageBase64.length);
 
     // ========================================
-    // STEP 3: Veo로 영상 생성 - 이미지 움직이게만!
+    // STEP 3: Veo로 영상 생성
     // ========================================
     console.log('\n=== STEP 2: Veo 영상화 ===');
 
@@ -137,21 +136,20 @@ export default async function handler(req, res) {
     const client = await auth.getClient();
     const accessToken = await client.getAccessToken();
 
-    // Veo 프롬프트 - 단순히 움직이게만!
-    const videoPrompt = `Animate this group photo into a natural 8 second video.
+    const videoPrompt = `Animate this group selfie photo into a natural 8 second video.
 
-CRITICAL: Keep ALL faces EXACTLY the same as in the image. Do not change or morph any face.
+IMPORTANT: Keep ALL faces exactly the same. Do not change any face.
 
-Simple animation:
-- Everyone smiles and poses for selfie (0-3 sec)
-- Small natural movements - nodding, laughing (3-6 sec)  
-- Wave goodbye (6-8 sec)
+Animation:
+- 0-3 sec: Everyone poses for selfie, smiling at camera
+- 3-6 sec: Natural movements, laughing, chatting
+- 6-8 sec: Wave goodbye
 
-Style: Natural, candid, behind-the-scenes feel. Slight camera movement.
+Style: Candid behind-the-scenes vlog feel, warm atmosphere, slight camera shake.
 
-DO NOT change any faces!`;
+DO NOT morph or change any faces!`;
 
-    console.log('Video Prompt:', videoPrompt.substring(0, 100) + '...');
+    console.log('Calling Veo...');
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
@@ -190,7 +188,7 @@ DO NOT change any faces!`;
     return res.status(200).json({
       id: veoData.name,
       status: 'processing',
-      message: '합성 이미지 → Veo 영상 생성 시작',
+      message: '합성 완료 → 영상 생성 중',
       provider: 'google-veo',
     });
 
@@ -204,40 +202,36 @@ function getMovieInfo(movie) {
   const settings = {
     avengers: {
       koreanTitle: '어벤저스',
-      actors: 'Iron Man (Robert Downey Jr.) and Captain America (Chris Evans)',
-      background: 'Avengers movie set with superhero props',
+      actors: 'Iron Man in red gold suit and Captain America in blue uniform',
+      background: 'Avengers movie set with superhero props and studio lights',
     },
     spiderman: {
       koreanTitle: '스파이더맨',
-      actors: 'Spider-Man (Tom Holland) and MJ (Zendaya)',
-      background: 'Spider-Man movie set in New York',
+      actors: 'Spider-Man in red blue suit and MJ',
+      background: 'Spider-Man movie set with New York backdrop',
     },
     harrypotter: {
       koreanTitle: '해리포터',
-      actors: 'Harry Potter (Daniel Radcliffe) and Hermione (Emma Watson)',
+      actors: 'Harry Potter with glasses and Hermione in Hogwarts robes',
       background: 'Hogwarts Great Hall with floating candles',
     },
     lotr: {
       koreanTitle: '반지의 제왕',
-      actors: 'Gandalf (Ian McKellen) and Aragorn (Viggo Mortensen)',
+      actors: 'Gandalf the wizard and Aragorn the ranger',
       background: 'Middle-earth fantasy movie set',
     },
     starwars: {
       koreanTitle: '스타워즈',
-      actors: 'Luke Skywalker and Princess Leia',
+      actors: 'Luke Skywalker with lightsaber and Princess Leia',
       background: 'Star Wars set with Millennium Falcon',
     },
     jurassic: {
       koreanTitle: '쥬라기 공원',
-      actors: 'Dr. Alan Grant and Dr. Ian Malcolm (Jeff Goldblum)',
-      background: 'Jurassic Park set with dinosaurs',
+      actors: 'Dr. Alan Grant and Dr. Ian Malcolm',
+      background: 'Jurassic Park set with dinosaur props',
     },
   };
   return settings[movie] || settings.avengers;
-}
-
-function buildPhotoMakerPrompt(movieInfo) {
-  return `img, a photo of a person taking a group selfie with ${movieInfo.actors} on a ${movieInfo.background}, everyone smiling at camera, friendly warm atmosphere, photorealistic, high quality, 4K`;
 }
 
 export const config = {
