@@ -91,11 +91,11 @@
             <div class="loading-progress-bar" id="loadingBar"></div>
           </div>
           <div class="loading-steps">
-            <div class="loading-step active" data-step="1">📸 셀카 이미지 생성</div>
-            <div class="loading-step" data-step="2">🎬 영상으로 변환</div>
-            <div class="loading-step" data-step="3">✨ 마무리</div>
+            <div class="loading-step active" data-step="1">🎬 영상 생성 중</div>
+            <div class="loading-step" data-step="2">🎭 배우 등장</div>
+            <div class="loading-step" data-step="3">✨ 완성</div>
           </div>
-          <p class="pipeline-info">나노바나나(Gemini) → Veo 2단계 파이프라인</p>
+          <p class="pipeline-info">Veo 2.0 - 원본 인물 + 영화 배우 합성</p>
         </div>
 
         <div class="tips-card">
@@ -402,8 +402,8 @@
         console.log('Movie:', selectedMovie);
         console.log('======================');
 
-        // 2. 영상 생성 API 호출 (Gemini 이미지 생성 → Veo 영상 생성)
-        updateStep(1, '배우들과 셀카 이미지 생성 중...', 20);
+        // 2. 영상 생성 API 호출 (Veo)
+        updateStep(1, '영상 생성 시작...', 20);
 
         const response = await fetch('/api/generate', {
           method: 'POST',
