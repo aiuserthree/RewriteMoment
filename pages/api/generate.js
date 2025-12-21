@@ -51,31 +51,31 @@ export default async function handler(req, res) {
     const client = await auth.getClient();
     const accessToken = await client.getAccessToken();
 
-    // 영상 프롬프트 - 사용자 얼굴 보존 + 배우 등장
-    const videoPrompt = `Create an 8-second cinematic video.
+    // 프롬프트 - 사용자 얼굴 절대 보존!
+    const videoPrompt = `Animate this exact photo into an 8-second video.
 
-MAIN CHARACTER: The person shown in this photo is the MAIN CHARACTER. Their face, hair, skin tone, and all features must remain EXACTLY identical throughout the entire video. Do NOT change, morph, or alter their appearance in any way.
+THE PERSON IN THIS PHOTO IS THE STAR. DO NOT CHANGE THEIR FACE AT ALL.
+- Keep their exact face shape
+- Keep their exact eyes, nose, mouth
+- Keep their exact skin tone
+- Keep their exact hair
+- Keep their exact clothing
 
-SCENE:
-The main character (from the photo) is visiting ${movieInfo.background}.
+ANIMATION:
+This person is on ${movieInfo.background}.
+They are holding up their phone taking a selfie video.
 
-${movieInfo.actorEntrance}
+0-2 sec: They smile and wave at the camera
+2-4 sec: ${movieInfo.actors} walk up behind them and join the frame
+4-6 sec: Everyone poses together for a group photo, arms around each other
+6-8 sec: They all laugh, high-five, and wave goodbye
 
-ACTION SEQUENCE:
-0-2 sec: The main character holds up phone for selfie, looking at camera
-2-4 sec: ${movieInfo.actors} walk into frame from behind, joining the selfie
-4-6 sec: Everyone poses together - the actors put arms around the main character
-6-8 sec: Natural laughter and high-fives, actors wave goodbye
+The person from this photo must be in the CENTER and CLEARLY VISIBLE the entire time.
+Their face must look EXACTLY like in this input photo - do not generate a different face.
 
-CRITICAL REQUIREMENTS:
-1. The main character's face from the photo MUST stay 100% identical - same eyes, nose, mouth, skin
-2. ${movieInfo.actorLooks}
-3. Cinematic movie quality, warm natural lighting
-4. Behind-the-scenes documentary style, slight handheld camera movement
+Style: Candid vlog footage, natural warm lighting, slight camera shake.`;
 
-The main character should be clearly visible in the CENTER of the frame throughout.`;
-
-    console.log('Video prompt length:', videoPrompt.length);
+    console.log('Prompt ready, length:', videoPrompt.length);
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
@@ -134,45 +134,33 @@ function getMovieInfo(movie) {
   const settings = {
     avengers: {
       koreanTitle: '어벤저스',
-      background: 'the Avengers movie set at Stark Tower, with Iron Man suits displayed on racks, high-tech holographic screens, professional film crew in background',
-      actors: 'Tony Stark (Robert Downey Jr.) and Steve Rogers (Chris Evans)',
-      actorEntrance: 'Robert Downey Jr. as Tony Stark wearing his signature red and gold Iron Man suit (goatee beard, confident smile) and Chris Evans as Steve Rogers Captain America (tall blonde, muscular, blue suit with white star, carrying shield) approach from behind.',
-      actorLooks: 'Tony Stark must look like Robert Downey Jr. - dark hair with grey streaks, goatee beard, brown eyes, charming smirk. Steve Rogers must look like Chris Evans - blonde hair, blue eyes, square jaw, clean-shaven, very muscular.',
+      background: 'the Avengers movie set with Iron Man suits on display and high-tech screens',
+      actors: 'Two actors in superhero costumes - one in a red and gold Iron Man suit (like Robert Downey Jr with goatee), one in a blue Captain America suit with shield (like Chris Evans, blonde muscular)',
     },
     spiderman: {
       koreanTitle: '스파이더맨',
-      background: 'the Spider-Man movie set with New York City Queens backdrop, apartment building rooftop',
-      actors: 'Peter Parker (Tom Holland) and MJ (Zendaya)',
-      actorEntrance: 'Tom Holland as Peter Parker Spider-Man (young, brown wavy hair, boyish face, red-blue suit with mask off) and Zendaya as MJ (curly dark hair, natural beauty) approach from behind.',
-      actorLooks: 'Peter Parker must look like Tom Holland - young face, brown wavy hair, big expressive brown eyes, friendly smile. MJ must look like Zendaya - beautiful, curly dark brown hair, elegant features.',
+      background: 'the Spider-Man movie set with New York City backdrop',
+      actors: 'Two actors - a young man in red-blue Spider-Man suit (like Tom Holland), and a young woman with curly hair (like Zendaya)',
     },
     harrypotter: {
       koreanTitle: '해리포터',
-      background: 'the Hogwarts Great Hall movie set with floating candles, long wooden tables, enchanted ceiling showing starry night',
-      actors: 'Harry Potter (Daniel Radcliffe) and Hermione (Emma Watson)',
-      actorEntrance: 'Daniel Radcliffe as Harry Potter (messy black hair, round glasses, lightning scar, Gryffindor robes) and Emma Watson as Hermione Granger (wavy brown hair, intelligent expression, Hogwarts robes) approach from behind.',
-      actorLooks: 'Harry Potter must look like Daniel Radcliffe - messy black hair, round wire glasses, green eyes, lightning bolt scar on forehead. Hermione must look like Emma Watson - wavy light brown hair, brown eyes, refined features.',
+      background: 'the Hogwarts Great Hall movie set with floating candles',
+      actors: 'Two actors in Hogwarts robes - a young man with round glasses and messy black hair (like Daniel Radcliffe as Harry), a young woman with wavy brown hair (like Emma Watson as Hermione)',
     },
     lotr: {
       koreanTitle: '반지의 제왕',
-      background: 'the Lord of the Rings movie set in Rivendell with elven architecture, waterfalls, mystical forest of New Zealand',
-      actors: 'Gandalf (Ian McKellen) and Aragorn (Viggo Mortensen)',
-      actorEntrance: 'Ian McKellen as Gandalf the Grey (long grey hair and beard, pointed hat, grey robes, wooden staff) and Viggo Mortensen as Aragorn (rugged, dark shoulder-length hair, stubble, ranger clothes) approach from behind.',
-      actorLooks: 'Gandalf must look like Ian McKellen - elderly, long grey hair, full grey beard, wise kind eyes. Aragorn must look like Viggo Mortensen - handsome rugged face, dark hair to shoulders, light stubble beard.',
+      background: 'the Lord of the Rings Rivendell movie set with elven architecture',
+      actors: 'Two actors - an elderly man with long grey beard and wizard hat (like Ian McKellen as Gandalf), a rugged man with dark hair and sword (like Viggo Mortensen as Aragorn)',
     },
     starwars: {
       koreanTitle: '스타워즈',
-      background: 'the Star Wars movie set inside Millennium Falcon with cockpit controls, droids R2-D2 and C-3PO visible',
-      actors: 'Luke Skywalker (Mark Hamill) and Princess Leia (Carrie Fisher)',
-      actorEntrance: 'Mark Hamill as Luke Skywalker (sandy blonde hair, blue eyes, tan Jedi robes, blue lightsaber) and Carrie Fisher as Princess Leia (iconic side bun hairstyle, white flowing robes) approach from behind.',
-      actorLooks: 'Luke must look like young Mark Hamill - sandy blonde hair, bright blue eyes, youthful heroic face. Leia must look like young Carrie Fisher - brown hair in side buns, brown eyes, regal elegant beauty.',
+      background: 'the Star Wars movie set inside the Millennium Falcon cockpit',
+      actors: 'Two actors - a young man in Jedi robes with lightsaber (like Mark Hamill as Luke), a woman with side-bun hairstyle in white robes (like Carrie Fisher as Leia)',
     },
     jurassic: {
       koreanTitle: '쥬라기 공원',
-      background: 'the Jurassic Park movie set with animatronic T-Rex dinosaur visible, tropical jungle plants, iconic park gates',
-      actors: 'Dr. Alan Grant (Sam Neill) and Dr. Ian Malcolm (Jeff Goldblum)',
-      actorEntrance: 'Sam Neill as Dr. Alan Grant (khaki outfit, wide-brimmed hat, rugged paleontologist look) and Jeff Goldblum as Dr. Ian Malcolm (all black clothes, leather jacket, quirky intellectual vibe) approach from behind.',
-      actorLooks: 'Alan Grant must look like Sam Neill - weathered handsome face, brown hair. Ian Malcolm must look like Jeff Goldblum - tall, dark curly hair, black leather jacket, signature eccentric charm.',
+      background: 'the Jurassic Park movie set with dinosaur props and jungle',
+      actors: 'Two actors - a man in khaki paleontologist clothes with hat (like Sam Neill), a tall man in black leather jacket (like Jeff Goldblum)',
     },
   };
   return settings[movie] || settings.avengers;
