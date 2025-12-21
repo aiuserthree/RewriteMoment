@@ -1,5 +1,4 @@
 import { GoogleAuth } from 'google-auth-library';
-import Replicate from 'replicate';
 
 // Google Cloud 설정
 const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || 'rewritemoment';
@@ -8,11 +7,6 @@ const LOCATION = 'us-central1';
 const credentials = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON 
   ? JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON)
   : null;
-
-// Replicate
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN,
-});
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -26,109 +20,31 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Image is required' });
     }
 
-    if (!process.env.REPLICATE_API_TOKEN) {
-      return res.status(500).json({ error: 'REPLICATE_API_TOKEN not configured' });
-    }
-
-    const movieInfo = getMovieInfo(movie);
-
-    console.log('=== 얼굴 합성 → Veo 영상 ===');
-    console.log('Movie:', movieInfo.koreanTitle);
-
-    // ========================================
-    // STEP 1: InstantID로 합성 이미지 생성
-    // 사용자 얼굴을 보존하면서 배우들과 함께 있는 이미지
-    // ========================================
-    console.log('\n=== STEP 1: InstantID 합성 ===');
-
-    const prompt = `a photo of a person taking a group selfie with famous movie actors ${movieInfo.actors} on ${movieInfo.background}, everyone smiling at camera, friendly atmosphere, highly detailed, photorealistic, 8k`;
-
-    console.log('Prompt:', prompt);
-    console.log('Image URL length:', imageUrl.length);
-
-    let compositeImageUrl;
-    
-    try {
-      // InstantID 사용
-      console.log('Running InstantID...');
-      const output = await replicate.run(
-        "zsxkib/instant-id:6af8583c541261472e92155d87bba80d5ad98461665802c6d0a9d5f1a97f80fe",
-        {
-          input: {
-            image: imageUrl,
-            prompt: prompt,
-            negative_prompt: "ugly, deformed, blurry, bad anatomy, bad face, wrong face, multiple faces",
-            num_inference_steps: 30,
-            guidance_scale: 5,
-            ip_adapter_scale: 0.8,
-            controlnet_conditioning_scale: 0.8,
-          }
-        }
-      );
-      
-      compositeImageUrl = Array.isArray(output) ? output[0] : output;
-      console.log('InstantID 완료:', compositeImageUrl?.substring(0, 100));
-      
-    } catch (instantIdError) {
-      console.error('InstantID 에러:', instantIdError.message);
-      
-      // 백업: face-to-many 시도
-      try {
-        console.log('face-to-many 시도...');
-        const output = await replicate.run(
-          "fofr/face-to-many:a07f252abbbd832009640b27f063ea52d87d7a23a185ca165bec23b5adc8deaf",
-          {
-            input: {
-              image: imageUrl,
-              style: "Video game",
-              prompt: prompt,
-              negative_prompt: "ugly, deformed",
-              prompt_strength: 4.5,
-              denoising_strength: 0.65,
-              instant_id_strength: 0.8,
-            }
-          }
-        );
-        compositeImageUrl = Array.isArray(output) ? output[0] : output;
-        console.log('face-to-many 완료:', compositeImageUrl?.substring(0, 100));
-      } catch (faceError) {
-        console.error('face-to-many도 실패:', faceError.message);
-        return res.status(500).json({ 
-          error: '이미지 합성 실패', 
-          details: faceError.message 
-        });
-      }
-    }
-
-    if (!compositeImageUrl) {
-      return res.status(500).json({ error: '합성 이미지 URL이 없음' });
-    }
-
-    // ========================================
-    // STEP 2: 합성 이미지를 Base64로 변환
-    // ========================================
-    console.log('\n=== 이미지 다운로드 ===');
-    
-    const imageResponse = await fetch(compositeImageUrl);
-    if (!imageResponse.ok) {
-      return res.status(500).json({ error: '합성 이미지 다운로드 실패' });
-    }
-    
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const compositeImageBase64 = Buffer.from(imageBuffer).toString('base64');
-    const mimeType = imageResponse.headers.get('content-type') || 'image/png';
-    
-    console.log('이미지 다운로드 완료, length:', compositeImageBase64.length);
-
-    // ========================================
-    // STEP 3: Veo로 영상 생성
-    // ========================================
-    console.log('\n=== STEP 2: Veo 영상화 ===');
-
     if (!credentials) {
       return res.status(500).json({ error: 'Google Cloud credentials not configured' });
     }
 
+    // 이미지 Base64 처리
+    let userImageBase64 = imageUrl;
+    let mimeType = 'image/jpeg';
+    
+    if (imageUrl.startsWith('data:')) {
+      const matches = imageUrl.match(/^data:([^;]+);base64,(.+)$/);
+      if (matches) {
+        mimeType = matches[1];
+        userImageBase64 = matches[2];
+      } else {
+        userImageBase64 = imageUrl.split(',')[1];
+      }
+    }
+
+    const movieInfo = getMovieInfo(movie);
+
+    console.log('=== Gemini 합성 → Veo 영상 ===');
+    console.log('Movie:', movieInfo.koreanTitle);
+    console.log('User image length:', userImageBase64?.length);
+
+    // Google Auth
     const auth = new GoogleAuth({
       credentials: credentials,
       scopes: ['https://www.googleapis.com/auth/cloud-platform'],
@@ -136,18 +52,101 @@ export default async function handler(req, res) {
     const client = await auth.getClient();
     const accessToken = await client.getAccessToken();
 
-    const videoPrompt = `Animate this group selfie photo into a natural 8 second video.
+    // ========================================
+    // STEP 1: Gemini (Imagen)로 합성 이미지 생성
+    // ========================================
+    console.log('\n=== STEP 1: Gemini 이미지 합성 ===');
 
-IMPORTANT: Keep ALL faces exactly the same. Do not change any face.
+    const imagePrompt = `Look at the person in this photo carefully. 
+    
+Create a NEW image where:
+- This EXACT same person (same face, same features) is in the CENTER
+- ${movieInfo.actors} are standing next to them
+- They are all taking a group selfie together on ${movieInfo.background}
+- Everyone is smiling warmly at the camera
+- The person from the original photo must look IDENTICAL - same face shape, eyes, nose, mouth, skin tone, hair
 
-Animation:
-- 0-3 sec: Everyone poses for selfie, smiling at camera
-- 3-6 sec: Natural movements, laughing, chatting
-- 6-8 sec: Wave goodbye
+Style: Photorealistic, like a real iPhone selfie photo, high quality, 4K`;
 
-Style: Candid behind-the-scenes vlog feel, warm atmosphere, slight camera shake.
+    console.log('Image prompt:', imagePrompt.substring(0, 200) + '...');
 
-DO NOT morph or change any faces!`;
+    // Gemini 2.0 Flash로 이미지 생성
+    const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
+
+    const geminiResponse = await fetch(geminiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                mimeType: mimeType,
+                data: userImageBase64,
+              }
+            },
+            { text: imagePrompt }
+          ]
+        }],
+        generationConfig: {
+          responseModalities: ['IMAGE', 'TEXT'],
+          temperature: 1.0,
+        },
+      }),
+    });
+
+    const geminiData = await geminiResponse.json();
+
+    if (!geminiResponse.ok) {
+      console.error('Gemini Error:', JSON.stringify(geminiData, null, 2));
+      return res.status(500).json({ 
+        error: 'Gemini 합성 실패', 
+        details: geminiData.error?.message || 'Unknown error'
+      });
+    }
+
+    // 생성된 이미지 추출
+    let compositeImageBase64 = null;
+    let compositeImageMimeType = 'image/png';
+
+    if (geminiData.candidates?.[0]?.content?.parts) {
+      for (const part of geminiData.candidates[0].content.parts) {
+        if (part.inlineData) {
+          compositeImageBase64 = part.inlineData.data;
+          compositeImageMimeType = part.inlineData.mimeType || 'image/png';
+          console.log('합성 이미지 생성됨, length:', compositeImageBase64?.length);
+          break;
+        }
+      }
+    }
+
+    // Gemini가 이미지를 생성하지 않은 경우 - 원본 이미지로 진행
+    if (!compositeImageBase64) {
+      console.log('Gemini가 이미지를 생성하지 않음, 원본 이미지로 진행');
+      compositeImageBase64 = userImageBase64;
+      compositeImageMimeType = mimeType;
+    }
+
+    // ========================================
+    // STEP 2: Veo로 영상 생성
+    // ========================================
+    console.log('\n=== STEP 2: Veo 영상화 ===');
+
+    const videoPrompt = `Create an 8-second video from this image.
+
+The video shows:
+- The people in this image taking a group selfie
+- Natural small movements - smiling, slight head turns, blinking
+- Someone makes a joke, everyone laughs
+- At the end, the movie actors wave goodbye
+
+CRITICAL: Keep ALL faces EXACTLY the same throughout. No morphing or changing faces.
+
+Style: Behind-the-scenes vlog feel, candid and warm, slight camera movement.`;
 
     console.log('Calling Veo...');
 
@@ -164,7 +163,7 @@ DO NOT morph or change any faces!`;
           prompt: videoPrompt,
           image: {
             bytesBase64Encoded: compositeImageBase64,
-            mimeType: mimeType,
+            mimeType: compositeImageMimeType,
           },
         }],
         parameters: {
@@ -180,7 +179,10 @@ DO NOT morph or change any faces!`;
 
     if (!veoResponse.ok) {
       console.error('Veo Error:', JSON.stringify(veoData, null, 2));
-      return res.status(500).json({ error: 'Veo 실패', details: veoData.error?.message });
+      return res.status(500).json({ 
+        error: 'Veo 실패', 
+        details: veoData.error?.message || 'Unknown error'
+      });
     }
 
     console.log('Veo 시작:', veoData.name);
@@ -188,13 +190,16 @@ DO NOT morph or change any faces!`;
     return res.status(200).json({
       id: veoData.name,
       status: 'processing',
-      message: '합성 완료 → 영상 생성 중',
+      message: '영상 생성 시작',
       provider: 'google-veo',
     });
 
   } catch (error) {
     console.error('Error:', error);
-    return res.status(500).json({ error: '영상 생성 실패', details: error.message });
+    return res.status(500).json({ 
+      error: '영상 생성 실패', 
+      details: error.message 
+    });
   }
 }
 
@@ -202,33 +207,33 @@ function getMovieInfo(movie) {
   const settings = {
     avengers: {
       koreanTitle: '어벤저스',
-      actors: 'Iron Man in red gold suit and Captain America in blue uniform',
-      background: 'Avengers movie set with superhero props and studio lights',
+      actors: 'Iron Man (a man in red and gold high-tech armor suit) and Captain America (a muscular blonde man in blue uniform with star)',
+      background: 'a movie set with superhero props and bright studio lights',
     },
     spiderman: {
       koreanTitle: '스파이더맨',
-      actors: 'Spider-Man in red blue suit and MJ',
-      background: 'Spider-Man movie set with New York backdrop',
+      actors: 'Spider-Man (a young man in red and blue spider suit) and MJ (a young woman with curly dark hair)',
+      background: 'a movie set with New York City backdrop',
     },
     harrypotter: {
       koreanTitle: '해리포터',
-      actors: 'Harry Potter with glasses and Hermione in Hogwarts robes',
-      background: 'Hogwarts Great Hall with floating candles',
+      actors: 'Harry Potter (a young man with round glasses and lightning scar) and Hermione (a young woman with wavy brown hair in school robes)',
+      background: 'a magical Great Hall movie set with floating candles',
     },
     lotr: {
       koreanTitle: '반지의 제왕',
-      actors: 'Gandalf the wizard and Aragorn the ranger',
-      background: 'Middle-earth fantasy movie set',
+      actors: 'Gandalf (an elderly wizard with long grey beard and staff) and Aragorn (a rugged man with sword)',
+      background: 'a fantasy Middle-earth movie set',
     },
     starwars: {
       koreanTitle: '스타워즈',
-      actors: 'Luke Skywalker with lightsaber and Princess Leia',
-      background: 'Star Wars set with Millennium Falcon',
+      actors: 'Luke Skywalker (a young man in Jedi robes with lightsaber) and Princess Leia (a woman with side hair buns in white robes)',
+      background: 'a Star Wars movie set with spaceship props',
     },
     jurassic: {
       koreanTitle: '쥬라기 공원',
-      actors: 'Dr. Alan Grant and Dr. Ian Malcolm',
-      background: 'Jurassic Park set with dinosaur props',
+      actors: 'Dr. Alan Grant (a man in khaki clothes) and Dr. Ian Malcolm (a man in black leather jacket)',
+      background: 'a Jurassic Park movie set with dinosaur props',
     },
   };
   return settings[movie] || settings.avengers;
