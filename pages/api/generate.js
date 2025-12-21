@@ -288,55 +288,71 @@ function buildImagePrompt(movieInfo, aspectRatio) {
   const shuffledActors = [...movieInfo.actors].sort(() => Math.random() - 0.5);
   const selectedActors = shuffledActors.slice(0, 2);
 
-  let prompt = `Create a highly realistic photograph of me (the person in the uploaded image) taking a selfie with famous movie actors on a film set.
+  let prompt = `[CRITICAL INSTRUCTION]
+Keep the person in the uploaded image COMPLETELY UNCHANGED - their face, clothes, hair, pose, everything must stay EXACTLY as shown in the photo.
 
-CRITICAL REQUIREMENTS:
-1. MY FACE must be EXACTLY preserved from the uploaded photo - same face shape, eyes, nose, mouth, skin tone, hair
-2. I am holding up my phone taking a selfie with the actors
-3. The actors must look EXACTLY like the real actors:
-   - ${selectedActors[0].look}
-   - ${selectedActors[1].look}
+Your task: Add famous movie actors AROUND this person, as if they walked up to take a photo together.
 
-SCENE DETAILS:
-- Location: ${movieInfo.set}
-- We are all smiling warmly at the camera (my phone for selfie)
-- The actors have their arms around me in a friendly way
+THE PERSON IN THE UPLOADED IMAGE:
+- DO NOT change their face at all
+- DO NOT change their clothes or appearance  
+- Keep them in the CENTER of the image
+- They look happy and excited to meet the actors
+
+ADD THESE ACTORS next to the person:
+1. ${selectedActors[0].look}
+2. ${selectedActors[1].look}
+
+SCENE COMPOSITION:
+- The original person is in the center, unchanged
+- ${selectedActors[0].name} stands on one side, leaning in for a photo
+- ${selectedActors[1].name} stands on the other side, arm around the person's shoulder
+- Everyone is smiling warmly, like friends taking a group selfie
+- Background: ${movieInfo.set}
 - ${movieInfo.vibe}
-- Bright natural lighting from studio lights
-- Background shows movie equipment and crew
 
-PHOTO STYLE:
-- Photorealistic, like a real iPhone selfie photo
-- Sharp focus on all faces
-- Warm friendly candid moment
-- ${aspectRatio === '9:16' ? 'Vertical portrait orientation' : 'Horizontal landscape orientation'}
-- High quality, 4K resolution
+IMPORTANT:
+- This should look like a real candid photo of a fan meeting actors
+- The actors look genuinely friendly and approachable
+- Natural lighting from studio lights
+- ${aspectRatio === '9:16' ? 'Vertical portrait format' : 'Horizontal landscape format'}
+- Photorealistic quality, like an iPhone photo
 
-Generate this as a single realistic photograph.`;
+Remember: The uploaded person stays EXACTLY the same, only ADD the actors around them.`;
 
   return prompt;
 }
 
 // STEP 2용 영상 생성 프롬프트
 function buildVideoPrompt(movieInfo) {
-  let prompt = `[IMPORTANT] Animate this selfie photo into a natural 8-second video.
+  let prompt = `[CRITICAL] Animate this group photo into a natural, candid 8-second video.
 
-The video should show:
-1. The group (me and the actors) posing together for the selfie
-2. Everyone smiling, maybe slight natural movements
-3. One actor giving a thumbs up or friendly gesture
-4. Natural candid reactions - laughing, chatting
-5. At the end, the actors wave goodbye and walk back toward the set
+SCENE FLOW (8 seconds):
+0-2s: The group is posing for a selfie together, everyone smiling at the camera
+2-4s: One actor says something funny, everyone laughs naturally
+4-6s: Quick candid moment - maybe a high-five, fist bump, or the actors chatting with the fan
+6-8s: The actors wave goodbye warmly, start walking back toward the film set
+
+NATURAL INTERACTIONS:
+- Actors put arms around the fan like old friends
+- Genuine laughter and smiles
+- Small talk gestures (nodding, pointing at camera)
+- Actors act down-to-earth and friendly
+
+CRITICAL RULES:
+- The MAIN PERSON (fan) must keep their EXACT same face and clothes throughout
+- Actors remain recognizable as themselves
+- No morphing or distortion of any faces
+- Movements are smooth and natural
 
 STYLE:
-- Realistic documentary/vlog style
-- Smooth natural movements
-- Keep all faces clearly visible and consistent
+- Behind-the-scenes vlog feel
+- Warm, friendly atmosphere
 - ${movieInfo.vibe}
-- Natural lighting, warm atmosphere
-- Camera slightly moves like a handheld selfie video
+- Camera has slight handheld movement
+- Natural studio lighting
 
-The faces in the image must remain EXACTLY the same throughout the video - no morphing or changing.`;
+This should feel like a real fan's lucky moment meeting their favorite actors!`;
 
   return prompt;
 }
