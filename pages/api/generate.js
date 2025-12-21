@@ -26,113 +26,82 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Image is required' });
     }
 
-    if (!process.env.REPLICATE_API_TOKEN) {
-      console.error('REPLICATE_API_TOKEN is not set');
-      return res.status(500).json({ error: 'Replicate API token not configured' });
-    }
-
     if (!credentials) {
       return res.status(500).json({ error: 'Google Cloud credentials not configured' });
     }
 
     const movieInfo = getMovieInfo(movie);
 
-    console.log('=== IP-Adapter 합성 → Veo 영상 ===');
+    console.log('=== 영상 생성 시작 ===');
     console.log('Movie:', movieInfo.koreanTitle);
-    console.log('Replicate token exists:', !!process.env.REPLICATE_API_TOKEN);
 
-    // ========================================
-    // STEP 1: IP-Adapter FaceID Plus로 합성
-    // 사용자 얼굴을 정확히 보존하면서 새로운 장면 생성
-    // ========================================
-    console.log('\n=== STEP 1: IP-Adapter 얼굴 합성 ===');
-
-    const prompt = `A high quality photo of a person standing with ${movieInfo.actors}, taking a group selfie together on ${movieInfo.background}. Everyone is smiling warmly at the camera. The person in the center has their phone raised for a selfie. Photorealistic, high detail, natural lighting, 8k quality.`;
-
-    console.log('Prompt:', prompt);
-
-    let compositeImageUrl;
-
-    try {
-      // IP-Adapter FaceID Plus V2 - 얼굴 보존에 최적화
-      console.log('Running IP-Adapter FaceID...');
-      const output = await replicate.run(
-        "lucataco/ip-adapter-faceid-plusv2:3c1f19d108ce7c0f09c6cf8ec76afe1a93c6823cb8dee0f23c9e1c0c75c1d2e0",
-        {
-          input: {
-            image: imageUrl,
-            prompt: prompt,
-            negative_prompt: "ugly, deformed, blurry, bad anatomy, bad proportions, extra limbs, cloned face, disfigured, gross proportions, malformed limbs, missing arms, missing legs, extra arms, extra legs, mutated hands, fused fingers, too many fingers, long neck, low quality, worst quality",
-            num_outputs: 1,
-            num_inference_steps: 30,
-            guidance_scale: 7.5,
-            ip_adapter_scale: 0.6,
-            seed: Math.floor(Math.random() * 1000000),
-          }
-        }
-      );
-
-      compositeImageUrl = Array.isArray(output) ? output[0] : output;
-      console.log('IP-Adapter 완료:', typeof compositeImageUrl, compositeImageUrl?.substring?.(0, 80));
-
-    } catch (ipAdapterError) {
-      console.error('IP-Adapter 실패:', ipAdapterError.message);
-
-      // 백업: face-to-sticker (더 안정적)
-      try {
-        console.log('face-to-sticker 시도...');
-        const output = await replicate.run(
-          "fofr/face-to-sticker:764d4827ea159608a07cdde8ddf1c6000019627571f37b111e2e17e1d8957613",
-          {
-            input: {
-              image: imageUrl,
-              prompt: `${prompt}, sticker style`,
-              negative_prompt: "ugly, deformed",
-              steps: 20,
-              width: 1024,
-              height: 1024,
-              ip_adapter_noise: 0.5,
-              ip_adapter_weight: 0.2,
-              instant_id_strength: 0.7,
-            }
-          }
-        );
-        compositeImageUrl = Array.isArray(output) ? output[0] : output;
-        console.log('face-to-sticker 완료');
-      } catch (stickerError) {
-        console.error('face-to-sticker도 실패:', stickerError.message);
-        return res.status(500).json({ 
-          error: '이미지 합성 실패',
-          details: stickerError.message
-        });
+    // 이미지 Base64 처리
+    let userImageBase64 = imageUrl;
+    let mimeType = 'image/jpeg';
+    
+    if (imageUrl.startsWith('data:')) {
+      const matches = imageUrl.match(/^data:([^;]+);base64,(.+)$/);
+      if (matches) {
+        mimeType = matches[1];
+        userImageBase64 = matches[2];
+      } else {
+        userImageBase64 = imageUrl.split(',')[1];
       }
     }
 
-    if (!compositeImageUrl) {
-      return res.status(500).json({ error: '합성 이미지 생성 실패' });
+    let finalImageBase64 = userImageBase64;
+    let finalMimeType = mimeType;
+
+    // ========================================
+    // STEP 1: Replicate로 합성 시도 (선택적)
+    // ========================================
+    if (process.env.REPLICATE_API_TOKEN) {
+      try {
+        console.log('\n=== Replicate 합성 시도 ===');
+
+        const prompt = `A photo of a person taking a group selfie with ${movieInfo.actors} on ${movieInfo.background}. Everyone smiling at camera. Photorealistic, high quality.`;
+
+        // face-to-many 모델 사용 (더 안정적)
+        const output = await replicate.run(
+          "fofr/face-to-many:35cea9c3164d9fb7571e0e1a88f18b0a8feecf9d9ac7ac904de7e7b78f635254",
+          {
+            input: {
+              image: imageUrl,
+              style: "3D",
+              prompt: prompt,
+              lora_scale: 1,
+              negative_prompt: "ugly, deformed, blurry",
+              prompt_strength: 4.5,
+              denoising_strength: 0.65,
+              instant_id_strength: 0.8,
+              control_depth_strength: 0.8,
+            }
+          }
+        );
+
+        const compositeUrl = Array.isArray(output) ? output[0] : output;
+        console.log('Replicate 완료:', compositeUrl?.substring?.(0, 60));
+
+        if (compositeUrl) {
+          // 이미지 다운로드
+          const imgRes = await fetch(compositeUrl);
+          if (imgRes.ok) {
+            const imgBuffer = await imgRes.arrayBuffer();
+            finalImageBase64 = Buffer.from(imgBuffer).toString('base64');
+            finalMimeType = imgRes.headers.get('content-type') || 'image/png';
+            console.log('합성 이미지 준비 완료');
+          }
+        }
+      } catch (repErr) {
+        console.log('Replicate 실패, 원본 이미지로 진행:', repErr.message);
+        // 원본 이미지로 계속 진행
+      }
     }
 
     // ========================================
-    // STEP 2: 합성 이미지 다운로드
+    // STEP 2: Veo로 영상 생성
     // ========================================
-    console.log('\n=== 이미지 다운로드 ===');
-
-    const imageResponse = await fetch(compositeImageUrl);
-    if (!imageResponse.ok) {
-      console.error('이미지 다운로드 실패:', imageResponse.status);
-      return res.status(500).json({ error: '합성 이미지 다운로드 실패' });
-    }
-
-    const imageBuffer = await imageResponse.arrayBuffer();
-    const compositeImageBase64 = Buffer.from(imageBuffer).toString('base64');
-    const mimeType = imageResponse.headers.get('content-type') || 'image/png';
-
-    console.log('이미지 다운로드 완료, size:', compositeImageBase64.length);
-
-    // ========================================
-    // STEP 3: Veo로 영상 생성
-    // ========================================
-    console.log('\n=== STEP 2: Veo 영상 생성 ===');
+    console.log('\n=== Veo 영상 생성 ===');
 
     const auth = new GoogleAuth({
       credentials: credentials,
@@ -141,21 +110,20 @@ export default async function handler(req, res) {
     const client = await auth.getClient();
     const accessToken = await client.getAccessToken();
 
-    const videoPrompt = `Animate this group photo into a natural 8-second video.
+    const videoPrompt = `Create an 8-second video where this person meets ${movieInfo.actors} on ${movieInfo.background}.
 
-CRITICAL: All faces must stay EXACTLY the same throughout the video. Do not morph or change any face.
+Scene:
+- The person in the photo is taking a selfie
+- ${movieInfo.actors} approach from behind
+- Everyone poses together for the selfie, smiling
+- Natural conversation and laughter
+- At the end, everyone waves goodbye
 
-Animation sequence:
-0-2 sec: Everyone poses for the selfie, smiling at camera
-2-4 sec: Small natural movements, someone tells a joke
-4-6 sec: Everyone laughs naturally, high-fives
-6-8 sec: The movie stars wave goodbye warmly
+CRITICAL: The person's face in the photo must stay EXACTLY the same. Do not change or morph faces.
 
-Style: Behind-the-scenes documentary feel, natural candid moments, warm lighting, slight handheld camera movement.
+Style: Behind-the-scenes vlog, candid, warm natural lighting.`;
 
-IMPORTANT: Keep all faces identical to the input image!`;
-
-    console.log('Calling Veo...');
+    console.log('Video prompt ready');
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
@@ -169,8 +137,8 @@ IMPORTANT: Keep all faces identical to the input image!`;
         instances: [{
           prompt: videoPrompt,
           image: {
-            bytesBase64Encoded: compositeImageBase64,
-            mimeType: mimeType,
+            bytesBase64Encoded: finalImageBase64,
+            mimeType: finalMimeType,
           },
         }],
         parameters: {
@@ -188,7 +156,7 @@ IMPORTANT: Keep all faces identical to the input image!`;
       console.error('Veo Error:', JSON.stringify(veoData, null, 2));
       return res.status(500).json({ 
         error: 'Veo 영상 생성 실패',
-        details: veoData.error?.message
+        details: veoData.error?.message || JSON.stringify(veoData)
       });
     }
 
@@ -197,7 +165,7 @@ IMPORTANT: Keep all faces identical to the input image!`;
     return res.status(200).json({
       id: veoData.name,
       status: 'processing',
-      message: '합성 완료 → 영상 생성 중',
+      message: '영상 생성 시작',
       provider: 'google-veo',
     });
 
@@ -214,33 +182,33 @@ function getMovieInfo(movie) {
   const settings = {
     avengers: {
       koreanTitle: '어벤저스',
-      actors: 'Tony Stark (Robert Downey Jr. in his iconic red and gold Iron Man suit with glowing arc reactor) and Steve Rogers (Chris Evans as Captain America in blue suit with white star, holding his vibranium shield)',
-      background: 'the Avengers movie set with high-tech Stark Industries lab equipment, superhero costumes on display racks, professional studio lighting',
+      actors: 'Iron Man in his red gold armor suit and Captain America in blue uniform with shield',
+      background: 'an Avengers movie set with superhero props',
     },
     spiderman: {
       koreanTitle: '스파이더맨',
-      actors: 'Peter Parker (Tom Holland in his red and blue Spider-Man suit with mask pulled back showing his young friendly face) and MJ (Zendaya with her curly hair and casual style)',
-      background: 'the Spider-Man movie set with New York City skyline backdrop, web-shooting props',
+      actors: 'Spider-Man in red blue suit and a young woman (MJ)',
+      background: 'a Spider-Man movie set with NYC backdrop',
     },
     harrypotter: {
       koreanTitle: '해리포터',
-      actors: 'Harry Potter (Daniel Radcliffe with messy black hair, round glasses, lightning bolt scar, wearing Gryffindor robes) and Hermione Granger (Emma Watson with wavy brown hair in Hogwarts robes)',
-      background: 'the magical Hogwarts Great Hall movie set with floating candles, long house tables, enchanted ceiling',
+      actors: 'a wizard with round glasses (Harry) and a witch with brown hair (Hermione) in Hogwarts robes',
+      background: 'the Hogwarts Great Hall movie set',
     },
     lotr: {
       koreanTitle: '반지의 제왕',
-      actors: 'Gandalf (Ian McKellen with long grey beard, grey wizard robes, tall pointed hat, wooden staff) and Aragorn (Viggo Mortensen with rugged look, stubble, ranger clothes, sword)',
-      background: 'the Lord of the Rings movie set in New Zealand with elven Rivendell architecture, waterfalls, mystical forest',
+      actors: 'an old wizard with grey beard (Gandalf) and a ranger with sword (Aragorn)',
+      background: 'a Middle-earth fantasy movie set',
     },
     starwars: {
       koreanTitle: '스타워즈',
-      actors: 'Luke Skywalker (Mark Hamill in tan Jedi robes holding glowing blue lightsaber) and Princess Leia (Carrie Fisher with iconic side hair buns, white flowing robes)',
-      background: 'the Star Wars movie set with Millennium Falcon cockpit, R2-D2 and C-3PO droids, holographic displays',
+      actors: 'a Jedi with lightsaber and a princess in white robes',
+      background: 'a Star Wars movie set with spaceship',
     },
     jurassic: {
       koreanTitle: '쥬라기 공원',
-      actors: 'Dr. Alan Grant (Sam Neill in khaki paleontologist outfit with wide-brimmed hat) and Dr. Ian Malcolm (Jeff Goldblum in black leather jacket with his signature witty expression)',
-      background: 'the Jurassic Park movie set with animatronic T-Rex dinosaur, tropical jungle foliage, iconic park gates',
+      actors: 'a paleontologist in khaki and a scientist in black jacket',
+      background: 'a Jurassic Park set with dinosaur props',
     },
   };
   return settings[movie] || settings.avengers;
