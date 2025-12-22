@@ -57,22 +57,52 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini 합성 ===');
 
-    const geminiPrompt = `Generate a photo of two people taking a friendly selfie together.
+    // 얼굴 보존 강화 프롬프트
+    const geminiPrompt = `You are a photo editing expert. Your task is to create a composite image.
+
+INPUT IMAGES:
+- Reference Face A: The first image (USE THIS EXACT FACE for Person A)
+- Reference Face B: The second image (USE THIS EXACT FACE for Person B)
+
+TASK:
+Create a new image where Person A and Person B appear together, side by side, like friends taking a selfie.
+
+⚠️ CRITICAL FACE PRESERVATION RULES ⚠️
+
+For Person A (left side):
+- MUST use the EXACT face from Reference Face A
+- Same eyes (shape, color, size, distance)
+- Same nose (shape, size, bridge)
+- Same mouth (shape, lips)
+- Same face shape (jawline, chin, cheekbones)
+- Same skin tone and texture
+- Same eyebrows (shape, thickness)
+- Same hair (color, style)
+
+For Person B (right side):
+- MUST use the EXACT face from Reference Face B
+- Same eyes (shape, color, size, distance)
+- Same nose (shape, size, bridge)
+- Same mouth (shape, lips)
+- Same face shape (jawline, chin, cheekbones)
+- Same skin tone and texture
+- Same eyebrows (shape, thickness)
+- Same hair (color, style)
+
+🚫 FORBIDDEN:
+- Do NOT create new or different faces
+- Do NOT blend or morph the faces
+- Do NOT change facial proportions
+- Do NOT alter skin tones
+- Do NOT modify any facial features
 
 COMPOSITION:
-- Person A (from first image) on the left side, smiling
-- Person B (from second image) on the right side, smiling  
-- Both facing the camera like taking a group selfie
-- Casual, friendly atmosphere
-- Good lighting, natural look
+- Person A on LEFT, Person B on RIGHT
+- Both facing camera, natural smiles
+- Selfie-style composition
+- Warm, friendly lighting
 
-FACE REQUIREMENTS:
-- Person A must look exactly like the person in Image 1
-- Person B must look exactly like the person in Image 2
-- Preserve all facial features accurately
-- Both faces clearly visible
-
-Style: Candid selfie photo, warm lighting, 8K quality.`;
+The faces must be IDENTICAL to the reference images. This is a face-swap/composite task, not face generation.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -95,14 +125,14 @@ Style: Candid selfie photo, warm lighting, 8K quality.`;
             contents: [{
               role: 'user',
               parts: [
-                { text: "Image 1 (Person A - put on LEFT):" },
+                { text: "=== Reference Face A (Person A - USE THIS EXACT FACE on LEFT side) ===" },
                 {
                   inlineData: {
                     mimeType: myPhotoData.mimeType,
                     data: myPhotoData.base64,
                   }
                 },
-                { text: "Image 2 (Person B - put on RIGHT):" },
+                { text: "=== Reference Face B (Person B - USE THIS EXACT FACE on RIGHT side) ===" },
                 {
                   inlineData: {
                     mimeType: actorPhotoData.mimeType,
@@ -114,7 +144,7 @@ Style: Candid selfie photo, warm lighting, 8K quality.`;
             }],
             generationConfig: {
               responseModalities: ['IMAGE', 'TEXT'],
-              temperature: 1.0,
+              temperature: 0.4,  // 낮은 temperature로 더 정확하게
             },
           }),
         });
