@@ -14,18 +14,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 클라이언트에서 이미 Canvas로 합성된 이미지를 받음
-    const { compositeImage, aspectRatio = '16:9' } = req.body;
+    const { myPhoto, actorPhoto, aspectRatio = '16:9' } = req.body;
 
-    if (!compositeImage) {
-      return res.status(400).json({ error: '합성 이미지가 필요합니다' });
+    if (!myPhoto || !actorPhoto) {
+      return res.status(400).json({ error: '사진 2장이 필요합니다' });
     }
 
     if (!credentials) {
       return res.status(500).json({ error: 'Google Cloud credentials not configured' });
     }
 
-    console.log('=== Canvas 합성 → Gemini 배경 통일 → Veo 영상화 ===');
+    console.log('=== Gemini 합성 → Veo 영상화 ===');
 
     // 이미지 Base64 처리
     function extractBase64(imageUrl) {
@@ -39,8 +38,11 @@ export default async function handler(req, res) {
       return { mimeType: 'image/jpeg', base64: imageUrl };
     }
 
-    const compositeData = extractBase64(compositeImage);
-    console.log('Canvas 합성 이미지 length:', compositeData.base64?.length);
+    const myPhotoData = extractBase64(myPhoto);
+    const actorPhotoData = extractBase64(actorPhoto);
+
+    console.log('내 사진 length:', myPhotoData.base64?.length);
+    console.log('함께할 사람 사진 length:', actorPhotoData.base64?.length);
 
     // Google Auth
     const auth = new GoogleAuth({
@@ -51,45 +53,36 @@ export default async function handler(req, res) {
     const accessToken = await client.getAccessToken();
 
     // ========================================
-    // STEP 1: Gemini로 배경만 자연스럽게 통일 (얼굴은 그대로!)
+    // STEP 1: Gemini로 두 사진 합성
     // ========================================
-    console.log('\n=== STEP 1: Gemini 배경 통일 ===');
+    console.log('\n=== STEP 1: Gemini 합성 ===');
 
-    // 배경만 수정하는 프롬프트 - 얼굴은 절대 건드리지 않음
-    const geminiPrompt = `This image shows two people side by side. Your task is to make the background look natural and unified.
+    const geminiPrompt = `Create a photo of these two people together, like friends taking a group photo.
 
-⚠️ CRITICAL RULES - READ CAREFULLY ⚠️
+COMPOSITION:
+- Person from Image 1 on the LEFT
+- Person from Image 2 on the RIGHT
+- Wide shot showing from waist up (not close-up faces)
+- Natural group photo style, not tight selfie
+- Nice background (studio, cafe, outdoors)
 
-🔴 DO NOT TOUCH THE FACES 🔴
-- The faces of both people must remain EXACTLY as they are
-- Do not modify, enhance, or change any facial features
-- Do not alter skin tones
-- Do not change hair
-- The faces are PERFECT as they are - leave them alone
+FACE PRESERVATION:
+- Keep Person 1's face exactly as shown in Image 1
+- Keep Person 2's face exactly as shown in Image 2
+- Do not modify or blend facial features
+- Preserve skin tones and hair
 
-✅ YOUR ONLY TASK:
-- Make the background behind both people look natural and unified
-- Create a seamless transition where the two photos meet
-- Add a nice, cohesive background (studio, cafe, outdoors, etc.)
-- Keep both people's bodies and poses similar to the original
-
-OUTPUT:
-- Same two people with their EXACT original faces
-- Natural, unified background
-- Wide shot composition (waist up)
-- Professional group photo look
-
-Remember: You are ONLY editing the background. The faces must be pixel-perfect identical to the input.`;
+OUTPUT: A natural-looking group photo with both people together.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
     // 최대 3번 재시도
-    let enhancedImageBase64 = null;
-    let enhancedImageMimeType = 'image/png';
+    let compositeImageBase64 = null;
+    let compositeImageMimeType = 'image/png';
     let lastError = null;
 
     for (let attempt = 1; attempt <= 3; attempt++) {
-      console.log(`Gemini 배경 통일 시도 ${attempt}/3...`);
+      console.log(`Gemini 시도 ${attempt}/3...`);
 
       try {
         const geminiResponse = await fetch(geminiEndpoint, {
@@ -102,11 +95,18 @@ Remember: You are ONLY editing the background. The faces must be pixel-perfect i
             contents: [{
               role: 'user',
               parts: [
-                { text: "Here is a composite photo of two people. Please unify the background while keeping their faces EXACTLY the same:" },
+                { text: "Image 1 (Person A):" },
                 {
                   inlineData: {
-                    mimeType: compositeData.mimeType,
-                    data: compositeData.base64,
+                    mimeType: myPhotoData.mimeType,
+                    data: myPhotoData.base64,
+                  }
+                },
+                { text: "Image 2 (Person B):" },
+                {
+                  inlineData: {
+                    mimeType: actorPhotoData.mimeType,
+                    data: actorPhotoData.base64,
                   }
                 },
                 { text: geminiPrompt }
@@ -114,7 +114,7 @@ Remember: You are ONLY editing the background. The faces must be pixel-perfect i
             }],
             generationConfig: {
               responseModalities: ['IMAGE', 'TEXT'],
-              temperature: 0,
+              temperature: 0.5,
             },
           }),
         });
@@ -127,20 +127,20 @@ Remember: You are ONLY editing the background. The faces must be pixel-perfect i
           continue;
         }
 
-        // 배경 통일된 이미지 추출
+        // 합성된 이미지 추출
         if (geminiData.candidates?.[0]?.content?.parts) {
           for (const part of geminiData.candidates[0].content.parts) {
             if (part.inlineData) {
-              enhancedImageBase64 = part.inlineData.data;
-              enhancedImageMimeType = part.inlineData.mimeType || 'image/png';
-              console.log(`배경 통일 이미지 생성됨 (attempt ${attempt}), length:`, enhancedImageBase64?.length);
+              compositeImageBase64 = part.inlineData.data;
+              compositeImageMimeType = part.inlineData.mimeType || 'image/png';
+              console.log(`합성 이미지 생성됨 (attempt ${attempt}), length:`, compositeImageBase64?.length);
               break;
             }
           }
         }
 
-        if (enhancedImageBase64) {
-          break; // 성공하면 루프 탈출
+        if (compositeImageBase64) {
+          break;
         } else {
           console.log(`Gemini가 이미지를 생성하지 않음 (attempt ${attempt})`);
           const textParts = geminiData.candidates?.[0]?.content?.parts?.filter(p => p.text);
@@ -155,22 +155,17 @@ Remember: You are ONLY editing the background. The faces must be pixel-perfect i
         lastError = fetchError.message;
       }
 
-      // 재시도 전 잠시 대기
       if (attempt < 3) {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
-    // Gemini 실패 시 원본 Canvas 합성 이미지 사용 (얼굴 100% 보존!)
-    let finalImageBase64, finalImageMimeType;
-    if (enhancedImageBase64) {
-      console.log('Gemini 배경 통일 성공 - 향상된 이미지 사용');
-      finalImageBase64 = enhancedImageBase64;
-      finalImageMimeType = enhancedImageMimeType;
-    } else {
-      console.log('Gemini 실패 - 원본 Canvas 합성 이미지 사용 (얼굴 100% 보존)');
-      finalImageBase64 = compositeData.base64;
-      finalImageMimeType = compositeData.mimeType;
+    if (!compositeImageBase64) {
+      console.error('모든 Gemini 시도 실패');
+      return res.status(500).json({ 
+        error: '이미지 합성 실패', 
+        details: lastError || 'Gemini가 합성 이미지를 생성하지 못했습니다. 다른 사진으로 다시 시도해주세요.' 
+      });
     }
 
     // ========================================
@@ -178,15 +173,11 @@ Remember: You are ONLY editing the background. The faces must be pixel-perfect i
     // ========================================
     console.log('\n=== STEP 2: Veo 영상화 ===');
 
-    const videoPrompt = `Animate this photo of two people standing together into an 8-second video.
+    const videoPrompt = `Animate this photo of two friends into an 8-second video.
 
-Animation:
-- Both people smile naturally at the camera
-- Subtle realistic movements: breathing, blinking, small head movements
-- Friendly, casual atmosphere
-- Keep the composition and framing similar to the input
+Animation: Both people smile and pose naturally. Subtle movements like breathing and blinking. Friendly atmosphere. Warm lighting.
 
-IMPORTANT: Keep both faces exactly as shown in the photo. Do not change or morph the faces.`;
+Keep both faces exactly as shown in the photo.`;
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
@@ -200,8 +191,8 @@ IMPORTANT: Keep both faces exactly as shown in the photo. Do not change or morph
         instances: [{
           prompt: videoPrompt,
           image: {
-            bytesBase64Encoded: finalImageBase64,
-            mimeType: finalImageMimeType,
+            bytesBase64Encoded: compositeImageBase64,
+            mimeType: compositeImageMimeType,
           },
         }],
         parameters: {
