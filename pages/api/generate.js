@@ -215,7 +215,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Animate these two friends together in same space. KEEP EXPRESSIONS SUBTLE - only gentle smiles, no big laughs or exaggerated expressions. Natural body movement - head turns, hand gestures, body sway. But FACES stay calm and stable. Both faces must remain EXACTLY like the photo - same eyes, nose, lips, jaw shape in every frame. Minimal expression changes to preserve face identity. Warm cinematic.',
+          prompt: 'Animate this photo. Two friends in same space, natural interaction. CRITICAL FACE PRESERVATION: The LEFT person face must be EXACTLY IDENTICAL to the photo - same eye shape, same nose, same lips, same jawline, same skin tone. The RIGHT person face must also be EXACTLY IDENTICAL to the photo. Do NOT change, morph, or alter ANY facial features. Faces must look like the SAME PEOPLE as in the photo. Allow gentle movement but faces stay EXACTLY as shown. Warm cinematic.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -246,7 +246,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Animate two friends together. KEEP EXPRESSIONS SUBTLE - gentle smiles only, no big expressions. Natural body movement but faces stay calm and stable. Both faces must remain EXACTLY like the photo in every frame - same eyes, nose, lips, jaw. Minimal expression changes. Warm cinematic. 8 seconds.`;
+      const videoPrompt = `Animate this photo. CRITICAL: LEFT person face must be EXACTLY IDENTICAL to photo - same eyes, nose, lips, jaw, skin. RIGHT person face must also be EXACTLY IDENTICAL. Do NOT change or morph any facial features. They must look like the SAME PEOPLE. Gentle natural movement but faces stay EXACTLY as shown. Warm cinematic. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
