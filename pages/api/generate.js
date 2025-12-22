@@ -99,8 +99,17 @@ For Person B (right side):
 COMPOSITION:
 - Person A on LEFT, Person B on RIGHT
 - Both facing camera, natural smiles
-- Selfie-style composition
+- Medium shot (chest/shoulder level visible, NOT just faces)
+- Leave space around the subjects (don't crop tight on faces)
+- Show upper body, not just head shots
+- Background visible (movie set, studio, or casual setting)
 - Warm, friendly lighting
+
+FRAMING:
+- Wide enough to see both people's shoulders
+- NOT a close-up face shot
+- Similar to a casual group photo, not a tight selfie
+- Include some background/environment
 
 The faces must be IDENTICAL to the reference images. This is a face-swap/composite task, not face generation.`;
 
