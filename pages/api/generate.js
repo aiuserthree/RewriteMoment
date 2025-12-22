@@ -96,20 +96,27 @@ For Person B (right side):
 - Do NOT alter skin tones
 - Do NOT modify any facial features
 
-COMPOSITION:
+COMPOSITION & FRAMING (VERY IMPORTANT):
 - Person A on LEFT, Person B on RIGHT
-- Both facing camera, natural smiles
-- Medium shot (chest/shoulder level visible, NOT just faces)
-- Leave space around the subjects (don't crop tight on faces)
-- Show upper body, not just head shots
-- Background visible (movie set, studio, or casual setting)
-- Warm, friendly lighting
+- ⚠️ WIDE SHOT - show from WAIST UP (not just head/shoulders)
+- Faces should occupy only about 20-30% of the image height
+- LOTS of empty space around the subjects
+- Show full upper body (waist to head)
+- Include visible background (room, outdoor scene, studio)
+- Both people standing or sitting at a natural distance from camera
 
-FRAMING:
-- Wide enough to see both people's shoulders
-- NOT a close-up face shot
-- Similar to a casual group photo, not a tight selfie
-- Include some background/environment
+🚫 DO NOT:
+- Close-up face shots
+- Tight cropping on faces
+- Faces filling most of the frame
+- Selfie-style close compositions
+
+✅ DO:
+- Wide angle group photo style
+- Full upper body visible (waist up)
+- Background takes up 40-50% of the image
+- Natural distance as if photographer is 2-3 meters away
+- Warm, friendly lighting
 
 The faces must be IDENTICAL to the reference images. This is a face-swap/composite task, not face generation.`;
 
