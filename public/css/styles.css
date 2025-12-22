@@ -1267,8 +1267,9 @@ h4 { font-size: 1.25rem; }
 
 /* Responsive */
 @media (max-width: 768px) {
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.75rem; }
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
   
   .container {
     padding: 0 var(--space-md);
@@ -1276,6 +1277,18 @@ h4 { font-size: 1.25rem; }
   
   .nav-links {
     display: none;
+  }
+  
+  .nav-credits {
+    display: none;
+  }
+  
+  .nav-inner {
+    padding: 0 12px;
+  }
+  
+  .nav-logo-text {
+    font-size: 1rem;
   }
   
   .mode-cards {
@@ -1294,8 +1307,24 @@ h4 { font-size: 1.25rem; }
     grid-template-columns: repeat(3, 1fr);
   }
   
+  /* Steps - 모바일에서 숫자만 표시 */
+  .steps {
+    gap: 8px;
+    padding: 0 8px;
+  }
+  
   .step-text {
     display: none !important;
+  }
+  
+  .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  
+  .step-line {
+    width: 20px;
   }
   
   .result-actions {
@@ -1304,6 +1333,36 @@ h4 { font-size: 1.25rem; }
   
   .upgrade-options {
     flex-direction: column;
+  }
+  
+  /* Page header 모바일 */
+  .page-header {
+    padding: 0 8px;
+  }
+  
+  .page-title {
+    font-size: 1.5rem !important;
+    line-height: 1.3;
+  }
+  
+  .page-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+  
+  /* Card 모바일 */
+  .card {
+    padding: 16px;
+  }
+  
+  /* Buttons 모바일 */
+  .btn {
+    padding: 12px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .btn-lg {
+    padding: 14px 24px;
   }
 }
 
