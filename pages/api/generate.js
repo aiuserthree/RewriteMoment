@@ -215,7 +215,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Animate these two friends together. Natural interaction - smiling, looking at each other, friendly gestures. STRICT FACE RULES: The person on the LEFT side must keep their EXACT face - same eyes, nose, lips, jaw, skin in EVERY frame. Do NOT change or morph the left persons face at all. The person on RIGHT also keeps their exact face. Both faces must look IDENTICAL to the photo throughout. No face changes. Warm cinematic.',
+          prompt: 'Animate these two friends together in same space. KEEP EXPRESSIONS SUBTLE - only gentle smiles, no big laughs or exaggerated expressions. Natural body movement - head turns, hand gestures, body sway. But FACES stay calm and stable. Both faces must remain EXACTLY like the photo - same eyes, nose, lips, jaw shape in every frame. Minimal expression changes to preserve face identity. Warm cinematic.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -246,7 +246,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Animate these two friends together. Natural interaction - smiling, friendly gestures. STRICT: The LEFT person must keep their EXACT face unchanged in every frame - same eyes, nose, lips, jaw. Do NOT morph the left face. RIGHT person also keeps exact face. Both faces identical to photo throughout. Warm cinematic. 8 seconds.`;
+      const videoPrompt = `Animate two friends together. KEEP EXPRESSIONS SUBTLE - gentle smiles only, no big expressions. Natural body movement but faces stay calm and stable. Both faces must remain EXACTLY like the photo in every frame - same eyes, nose, lips, jaw. Minimal expression changes. Warm cinematic. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
