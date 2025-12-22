@@ -62,22 +62,50 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini(나노바나나) 합성 ===');
 
-    const geminiPrompt = `Create a photo of these two people together, like friends taking a group photo.
+    const geminiPrompt = `[FACE SWAP TASK] Place these two people in the same photo.
 
-COMPOSITION:
-- Person from Image 1 on the LEFT
-- Person from Image 2 on the RIGHT
-- Wide shot showing from waist up
-- Natural group photo style
-- Nice background (cafe, studio, park)
+⚠️ CRITICAL: This is a FACE TRANSFER task. You must COPY the exact faces from the input images.
 
-FACE PRESERVATION:
-- Keep Person 1's face exactly as shown in Image 1
-- Keep Person 2's face exactly as shown in Image 2
-- Do not modify facial features
-- Preserve skin tones and hair
+📸 TASK:
+Create ONE photo showing both people together like friends.
+- Person A (from Image 1) → LEFT side
+- Person B (from Image 2) → RIGHT side
 
-OUTPUT: A natural-looking group photo with both people together.`;
+🔒 MANDATORY FACE RULES (DO NOT IGNORE):
+For Person A (LEFT):
+✓ COPY exact eye shape, eye color, eye spacing from Image 1
+✓ COPY exact nose shape and size from Image 1  
+✓ COPY exact lip shape and mouth from Image 1
+✓ COPY exact face shape (jaw, chin, cheekbones) from Image 1
+✓ COPY exact eyebrow shape from Image 1
+✓ COPY exact skin tone and texture from Image 1
+✓ COPY exact hair color and style from Image 1
+
+For Person B (RIGHT):
+✓ COPY exact eye shape, eye color, eye spacing from Image 2
+✓ COPY exact nose shape and size from Image 2
+✓ COPY exact lip shape and mouth from Image 2
+✓ COPY exact face shape (jaw, chin, cheekbones) from Image 2
+✓ COPY exact eyebrow shape from Image 2
+✓ COPY exact skin tone and texture from Image 2
+✓ COPY exact hair color and style from Image 2
+
+🚫 FORBIDDEN - DO NOT:
+- Create new faces or blend faces
+- Change eye shapes or colors
+- Modify nose or mouth shapes
+- Alter jaw lines or face shapes
+- Change skin tones
+- "Improve" or "beautify" any features
+- Average or merge features from both people
+
+📐 FRAMING:
+- Wide angle shot (like photographer 3m away)
+- Show waist to head (upper body)
+- Both people side by side, friendly pose
+- Background: studio, cafe, or neutral setting
+
+The faces must be IDENTICAL to input images. Think of this as cutting out the faces and placing them on new bodies - the faces themselves should not change at all.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -118,7 +146,7 @@ OUTPUT: A natural-looking group photo with both people together.`;
             }],
             generationConfig: {
               responseModalities: ['IMAGE', 'TEXT'],
-              temperature: 0.5,
+              temperature: 0.2,  // 낮을수록 일관성 높음
             },
           }),
         });
@@ -197,7 +225,7 @@ OUTPUT: A natural-looking group photo with both people together.`;
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Two friends smiling and posing naturally. Subtle movements like breathing and blinking. Friendly atmosphere. Keep faces exactly as shown.',
+          prompt: 'Gentle animation of two friends. IMPORTANT: Keep both faces EXACTLY as shown - same eyes, nose, mouth, face shape. Only add subtle movements: gentle breathing, natural blinking, slight smile. Do NOT change or morph any facial features. Warm friendly lighting.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -228,11 +256,21 @@ OUTPUT: A natural-looking group photo with both people together.`;
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Animate this photo of two friends into an 8-second video.
+      const videoPrompt = `Animate this photo with minimal movement.
 
-Animation: Both people smile and pose naturally. Subtle movements like breathing and blinking. Friendly atmosphere. Warm lighting.
+CRITICAL - FACE PRESERVATION:
+- Keep BOTH faces EXACTLY as shown in the image
+- Do NOT change or morph any facial features
+- Eyes, nose, mouth, face shape must remain IDENTICAL
+- Only add very subtle movements
 
-Keep both faces exactly as shown in the photo.`;
+ANIMATION (subtle only):
+- Gentle breathing motion
+- Natural eye blinking
+- Very slight smile
+- Minimal body movement
+
+Keep faces frozen/static - only animate body slightly. Warm lighting. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
