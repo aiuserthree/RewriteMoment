@@ -62,70 +62,28 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini(나노바나나) 합성 ===');
 
-    const geminiPrompt = `You are performing a PHOTOREALISTIC FACE COMPOSITING task.
+    const geminiPrompt = `Look at these two photos. I need you to create ONE new photo where both people appear TOGETHER.
 
-YOUR MISSION: Create a single photograph where TWO SPECIFIC PEOPLE appear together.
+INSTRUCTIONS:
+1. Take the EXACT face from Photo 1 - copy it pixel by pixel
+2. Take the EXACT face from Photo 2 - copy it pixel by pixel  
+3. Put them side by side in a new scene
 
-═══════════════════════════════════════════════════════════════
-🎯 FACE IDENTITY PRESERVATION - THIS IS THE #1 PRIORITY
-═══════════════════════════════════════════════════════════════
+CRITICAL - READ CAREFULLY:
+- The face from Photo 1 must look EXACTLY like Photo 1. Not similar. EXACTLY the same.
+- The face from Photo 2 must look EXACTLY like Photo 2. Not similar. EXACTLY the same.
+- Do NOT create new faces. Do NOT modify the faces. Just COPY them.
+- If the person in Photo 1 has small eyes, the result must have small eyes.
+- If the person in Photo 2 has a big nose, the result must have a big nose.
+- Every detail matters: eye shape, nose shape, lip shape, face shape, skin color, hair.
 
-PERSON A (Image 1 → Place on LEFT side):
-Analyze Image 1 carefully. The person has UNIQUE facial characteristics:
-- Specific EYE SHAPE (round/almond/hooded), EYE SIZE, EYE COLOR, DISTANCE between eyes
-- Specific NOSE BRIDGE WIDTH, NOSE TIP SHAPE, NOSTRIL SIZE
-- Specific LIP THICKNESS (upper/lower), LIP SHAPE, MOUTH WIDTH  
-- Specific JAWLINE (square/round/V-shaped), CHIN SHAPE
-- Specific CHEEKBONE HEIGHT and prominence
-- Specific FOREHEAD SIZE and shape
-- Specific EYEBROW THICKNESS, ARCH, COLOR
-- Specific SKIN TONE (warm/cool/neutral undertone), TEXTURE, any marks/moles
-- Specific HAIR COLOR, TEXTURE, STYLE, HAIRLINE SHAPE
+LAYOUT:
+- Photo 1 person on LEFT
+- Photo 2 person on RIGHT
+- Upper body shot (waist to head)
+- Simple background
 
-→ YOU MUST REPRODUCE EVERY SINGLE ONE OF THESE FEATURES EXACTLY AS THEY APPEAR IN IMAGE 1.
-
-PERSON B (Image 2 → Place on RIGHT side):
-Analyze Image 2 carefully. This person also has UNIQUE facial characteristics:
-- Their own specific EYE SHAPE, SIZE, COLOR, SPACING
-- Their own specific NOSE SHAPE and proportions
-- Their own specific LIP and MOUTH features
-- Their own specific JAW and CHIN structure
-- Their own specific CHEEKBONES
-- Their own specific FOREHEAD
-- Their own specific EYEBROWS
-- Their own specific SKIN TONE and TEXTURE
-- Their own specific HAIR
-
-→ YOU MUST REPRODUCE EVERY SINGLE ONE OF THESE FEATURES EXACTLY AS THEY APPEAR IN IMAGE 2.
-
-═══════════════════════════════════════════════════════════════
-❌ ABSOLUTE PROHIBITIONS - VIOLATION = TASK FAILURE
-═══════════════════════════════════════════════════════════════
-• DO NOT generate "similar looking" faces - use the EXACT faces
-• DO NOT create an "averaged" face between the two people
-• DO NOT change eye shapes to be more "standard"
-• DO NOT adjust nose sizes to be more "proportional"  
-• DO NOT modify lip shapes
-• DO NOT alter face shapes to be more "balanced"
-• DO NOT change skin tones
-• DO NOT "improve" or "beautify" any features
-• DO NOT make the two people look more similar to each other
-• DO NOT add or remove facial features (moles, marks, etc.)
-
-═══════════════════════════════════════════════════════════════
-📸 COMPOSITION REQUIREMENTS
-═══════════════════════════════════════════════════════════════
-• Person A on LEFT, Person B on RIGHT
-• Medium-wide shot: show from WAIST to HEAD (upper body visible)
-• Distance: as if photographer is standing 2-3 meters away
-• Pose: friendly, natural, like two friends taking a photo together
-• Expression: natural smile or neutral
-• Background: clean studio backdrop or simple indoor setting
-• Lighting: soft, flattering, even on both faces
-
-═══════════════════════════════════════════════════════════════
-
-REMEMBER: If someone who knows Person A looks at the result, they should INSTANTLY recognize them. Same for Person B. The faces must be IDENTICAL to the input photos - this is a face PLACEMENT task, not face GENERATION.`;
+This is like cutting out two photos and pasting them together. The faces should not change AT ALL.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -245,7 +203,7 @@ REMEMBER: If someone who knows Person A looks at the result, they should INSTANT
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Animate this photo with MINIMAL movement. CRITICAL FACE RULE: Both faces must remain EXACTLY as shown in the image - preserve exact eye shape, nose shape, lip shape, jaw line, skin tone for BOTH people. DO NOT morph, change, or modify any facial features. Animation allowed: very subtle breathing motion in chest/shoulders, gentle natural eye blinks (2-3 times), micro head tilts (less than 5 degrees). Keep faces almost FROZEN - they should look identical frame by frame. Warm soft lighting. Cinematic quality.',
+          prompt: 'Make this photo move slightly. Keep the faces EXACTLY as they are - do not change any facial features. Only add: subtle breathing, eye blinks. The faces must stay FROZEN and UNCHANGED. Do not modify eyes, nose, mouth, or face shape. Very minimal movement.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -276,35 +234,7 @@ REMEMBER: If someone who knows Person A looks at the result, they should INSTANT
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Create a subtle animation from this photo.
-
-═══ FACE PRESERVATION (HIGHEST PRIORITY) ═══
-Both people's faces MUST remain EXACTLY as shown:
-- Same eye shape, eye color, eye size, eye spacing
-- Same nose bridge, nose tip, nostril shape
-- Same lip shape, lip thickness, mouth width
-- Same jawline, chin shape, cheekbone position
-- Same skin tone, skin texture
-- Same eyebrow shape and thickness
-- Same hair color and style
-
-DO NOT change, morph, or modify ANY facial features.
-Faces should be nearly STATIC - identical frame by frame.
-
-═══ ALLOWED ANIMATION (very subtle) ═══
-- Gentle breathing (chest/shoulder movement only)
-- Natural eye blinks (2-3 times in 8 seconds)
-- Micro head movements (less than 3 degrees)
-- Soft ambient motion in background
-
-═══ FORBIDDEN ═══
-- Face morphing or warping
-- Expression changes that alter face shape
-- Skin tone shifts
-- Eye shape changes
-- Any modification to facial features
-
-Warm cinematic lighting. 8 seconds. High quality.`;
+      const videoPrompt = `Add very subtle animation to this photo. Keep both faces EXACTLY as shown - do not change any facial features at all. Only add minimal breathing motion and eye blinks. Faces must remain unchanged and frozen. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
