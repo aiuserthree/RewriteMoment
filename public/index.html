@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rewrite Moment - 내가 주인공인 영화를 만들어봐</title>
+  <title>Rewrite Moment - 누구와든 함께하는 영상을 만들어봐</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
 </head>
@@ -29,9 +29,7 @@
           <span class="nav-credits-value" id="nav-credits">0</span>
           <span style="color: var(--text-muted)">크레딧</span>
         </div>
-        <!-- 로그인 전 -->
         <button class="btn-login" id="btn-open-login" onclick="openAuthModal('login')">로그인</button>
-        <!-- 로그인 후 (hidden by default) -->
         <div class="user-menu hidden" id="user-menu">
           <div class="user-avatar" id="user-avatar" onclick="toggleUserDropdown()">U</div>
           <div class="user-dropdown" id="user-dropdown">
@@ -42,7 +40,6 @@
             <div class="user-dropdown-menu">
               <a href="pricing.html" class="user-dropdown-item">💎 크레딧 충전</a>
               <a href="#" class="user-dropdown-item">📋 내 영상</a>
-              <a href="#" class="user-dropdown-item">⚙️ 설정</a>
               <div class="user-dropdown-item logout" onclick="logout()">🚪 로그아웃</div>
             </div>
           </div>
@@ -57,29 +54,29 @@
     <div class="container">
       <div class="hero-content" data-animate>
         <div class="hero-badge">
-          <span>✨ AI 영상 생성</span>
+          <span>✨ AI 합성 영상</span>
         </div>
         <h1 class="hero-title">
-          <span class="text-gradient">내가 주인공</span>인<br>
-          영화를 만들어봐
+          <span class="text-gradient">누구와든</span><br>
+          함께하는 영상
         </h1>
         <p class="hero-desc">
-          사진 한 장으로 나만의 오리지널 세계관 영상을 만들어보세요.<br>
-          청소년부터 신혼까지, 5가지 장르로 바이럴 숏폼을 생성합니다.
+          내 사진 + 함께하고 싶은 사람 사진 = 둘이 함께하는 영상!<br>
+          좋아하는 배우, 유명인, 친구와 함께하는 순간을 만들어보세요.
         </p>
         <div class="hero-actions">
           <a href="upload.html" class="btn btn-primary btn-lg">
             <span>🚀</span>
-            무료로 시작하기
+            지금 만들기
           </a>
           <a href="#how" class="btn btn-secondary btn-lg">
             이용방법 보기
           </a>
         </div>
         <div class="hero-note">
-          <span>✓</span> 하루 1팩 무료
-          <span>✓</span> 회원가입 불필요
-          <span>✓</span> 저작권 걱정 없는 오리지널
+          <span>✓</span> 사진 2장으로 간단하게
+          <span>✓</span> AI가 자연스럽게 합성
+          <span>✓</span> 8초 영상 생성
         </div>
       </div>
 
@@ -91,7 +88,13 @@
             <div class="hero-preview-screen">
               <div class="hero-preview-content">
                 <div class="hero-preview-video">
-                  <div class="hero-preview-play">▶</div>
+                  <div class="hero-preview-icons">
+                    <span>👤</span>
+                    <span class="plus">+</span>
+                    <span>⭐</span>
+                  </div>
+                  <div class="hero-preview-arrow">↓</div>
+                  <div class="hero-preview-result">🎬</div>
                 </div>
               </div>
             </div>
@@ -105,61 +108,46 @@
   <!-- Features Section -->
   <section class="section" id="features">
     <div class="container">
-      <!-- Video Section -->
-      <div class="video-showcase" data-animate>
-        <div class="video-container">
-          <video 
-            autoplay 
-            muted 
-            loop 
-            playsinline
-            controls>
-            <source src="KakaoTalk_20251217_093253033.mp4" type="video/mp4">
-            브라우저가 비디오를 지원하지 않습니다.
-          </video>
-        </div>
-      </div>
-
       <div class="section-header" data-animate>
         <h2 class="section-title">왜 <span class="text-gradient">Rewrite Moment</span>인가요?</h2>
-        <p class="section-desc">당신의 이야기를 영화처럼 만들어드립니다</p>
+        <p class="section-desc">두 사람이 함께하는 순간을 AI가 만들어드립니다</p>
       </div>
 
       <div class="features-grid">
         <div class="feature-card" data-animate style="animation-delay: 0.1s">
-          <div class="feature-icon">👤</div>
-          <h3 class="feature-title">나 중심 몰입</h3>
-          <p class="feature-desc">내 사진으로 내가 주인공인 영상을 생성합니다. 완벽한 몰입감을 경험하세요.</p>
+          <div class="feature-icon">🎨</div>
+          <h3 class="feature-title">Gemini 합성</h3>
+          <p class="feature-desc">Google의 최신 AI가 두 사진을 자연스럽게 합성합니다. 얼굴 특징을 최대한 보존해요.</p>
         </div>
 
         <div class="feature-card" data-animate style="animation-delay: 0.2s">
-          <div class="feature-icon">🎭</div>
-          <h3 class="feature-title">5가지 장르</h3>
-          <p class="feature-desc">다큐, 코미디, 드라마, 멜로, 판타지. 원하는 분위기로 나만의 이야기를 만드세요.</p>
+          <div class="feature-icon">🎬</div>
+          <h3 class="feature-title">Veo 영상화</h3>
+          <p class="feature-desc">합성된 이미지를 8초 영상으로 변환. 자연스러운 움직임과 표정이 담겨요.</p>
         </div>
 
         <div class="feature-card" data-animate style="animation-delay: 0.3s">
-          <div class="feature-icon">🔄</div>
-          <h3 class="feature-title">Rewrite Moment</h3>
-          <p class="feature-desc">잊지 못하는 순간을 다른 결말로. 과거를 재구성해 새로운 엔딩을 만나보세요.</p>
+          <div class="feature-icon">⭐</div>
+          <h3 class="feature-title">누구든 가능</h3>
+          <p class="feature-desc">배우, 유명인, 친구, 가족 누구와든! 함께하고 싶은 사람 사진만 있으면 돼요.</p>
         </div>
 
         <div class="feature-card" data-animate style="animation-delay: 0.4s">
-          <div class="feature-icon">⚡</div>
-          <h3 class="feature-title">빠른 생성</h3>
-          <p class="feature-desc">8초 클립부터 60초 예고편까지. 원하는 길이로 빠르게 생성됩니다.</p>
+          <div class="feature-icon">👤</div>
+          <h3 class="feature-title">얼굴 보존</h3>
+          <p class="feature-desc">내 얼굴과 상대방 얼굴 모두 원본에 가깝게 유지되도록 최적화되어 있어요.</p>
         </div>
 
         <div class="feature-card" data-animate style="animation-delay: 0.5s">
-          <div class="feature-icon">🔒</div>
-          <h3 class="feature-title">저작권 안전</h3>
-          <p class="feature-desc">완전한 오리지널 세계관으로 생성됩니다. 저작권 걱정 없이 공유하세요.</p>
+          <div class="feature-icon">📐</div>
+          <h3 class="feature-title">화면비 선택</h3>
+          <p class="feature-desc">16:9 가로(유튜브) 또는 9:16 세로(릴스/숏츠) 중 원하는 비율로 생성해요.</p>
         </div>
 
         <div class="feature-card" data-animate style="animation-delay: 0.6s">
-          <div class="feature-icon">📱</div>
-          <h3 class="feature-title">바로 공유</h3>
-          <p class="feature-desc">9:16 세로 포맷으로 숏폼에 최적화. 다운로드 후 바로 업로드 가능합니다.</p>
+          <div class="feature-icon">💾</div>
+          <h3 class="feature-title">바로 다운로드</h3>
+          <p class="feature-desc">생성된 영상을 바로 다운로드! SNS에 공유하거나 저장할 수 있어요.</p>
         </div>
       </div>
     </div>
@@ -170,44 +158,35 @@
     <div class="container">
       <div class="section-header" data-animate>
         <h2 class="section-title">어떻게 <span class="text-gradient">만들어지나요?</span></h2>
-        <p class="section-desc">4단계로 나만의 영화를 완성하세요</p>
+        <p class="section-desc">3단계로 함께하는 영상 완성!</p>
       </div>
 
       <div class="how-steps">
         <div class="how-step" data-animate style="animation-delay: 0.1s">
           <div class="how-step-number">01</div>
           <div class="how-step-content">
-            <h3>사진 업로드</h3>
-            <p>정면/밝은 사진 1~3장을 업로드하세요. 다양한 표정이면 더 좋아요.</p>
+            <h3>사진 2장 업로드</h3>
+            <p><strong>내 사진</strong>과 <strong>함께하고 싶은 사람 사진</strong>을 각각 업로드하세요.</p>
           </div>
-          <div class="how-step-visual">📸</div>
+          <div class="how-step-visual">📸 + ⭐</div>
         </div>
 
         <div class="how-step" data-animate style="animation-delay: 0.2s">
           <div class="how-step-number">02</div>
           <div class="how-step-content">
-            <h3>스테이지 & 장르 선택</h3>
-            <p>청소년/20대/신혼/초기육아 중 선택하고, 원하는 장르를 골라요.</p>
+            <h3>화면비 선택</h3>
+            <p>16:9(유튜브용) 또는 9:16(릴스/숏츠용) 중 원하는 비율을 선택하세요.</p>
           </div>
-          <div class="how-step-visual">🎬</div>
+          <div class="how-step-visual">📐</div>
         </div>
 
         <div class="how-step" data-animate style="animation-delay: 0.3s">
           <div class="how-step-number">03</div>
           <div class="how-step-content">
-            <h3>Rewrite Moment (선택)</h3>
-            <p>바꾸고 싶은 기억이 있다면 입력하세요. 다른 결말로 재구성됩니다.</p>
+            <h3>AI가 합성 & 영상 생성</h3>
+            <p>Gemini가 두 사람을 합성하고, Veo가 8초 영상으로 만들어줍니다!</p>
           </div>
-          <div class="how-step-visual">✨</div>
-        </div>
-
-        <div class="how-step" data-animate style="animation-delay: 0.4s">
-          <div class="how-step-number">04</div>
-          <div class="how-step-content">
-            <h3>결과 확인 & 공유</h3>
-            <p>생성된 클립을 확인하고 다운로드하거나 공유 링크를 만드세요.</p>
-          </div>
-          <div class="how-step-visual">🎉</div>
+          <div class="how-step-visual">🎬</div>
         </div>
       </div>
 
@@ -223,11 +202,11 @@
   <section class="section-cta">
     <div class="container">
       <div class="cta-content" data-animate>
-        <h2 class="cta-title">지금 <span class="text-gradient">나만의 영화</span>를 만들어보세요</h2>
-        <p class="cta-desc">무료로 Quick Pack을 체험하고, 내가 주인공인 영상을 공유해보세요.</p>
+        <h2 class="cta-title"><span class="text-gradient">함께하고 싶은 사람</span>이 있나요?</h2>
+        <p class="cta-desc">좋아하는 배우, 유명인, 아이돌과 함께하는 순간을 만들어보세요!</p>
         <a href="upload.html" class="btn btn-primary btn-lg">
           <span>🎬</span>
-          무료로 시작하기
+          영상 만들기
         </a>
       </div>
     </div>
@@ -257,7 +236,6 @@
   </footer>
 
   <script src="/js/app.js"></script>
-  <script src="/js/videoGenerator.js"></script>
   <style>
     /* Hero Specific Styles */
     .hero {
@@ -348,7 +326,7 @@
 
     .hero-preview-phone {
       width: 280px;
-      height: 560px;
+      height: 500px;
       background: #1a1a26;
       border-radius: 40px;
       padding: 12px;
@@ -384,34 +362,42 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 20px;
       position: relative;
-      background: 
-        linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 100%),
-        linear-gradient(135deg, #3a2a4a 0%, #2a1a3a 100%);
+      background: linear-gradient(135deg, #3a2a4a 0%, #2a1a3a 100%);
     }
 
-    .hero-preview-play {
-      width: 60px;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
+    .hero-preview-icons {
       display: flex;
       align-items: center;
-      justify-content: center;
+      gap: 15px;
+      font-size: 2.5rem;
+    }
+
+    .hero-preview-icons .plus {
       font-size: 1.5rem;
-      backdrop-filter: blur(10px);
+      color: var(--accent-primary);
+    }
+
+    .hero-preview-arrow {
+      font-size: 2rem;
+      color: var(--accent-primary);
+      animation: bounce 1s ease-in-out infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(10px); }
+    }
+
+    .hero-preview-result {
+      font-size: 4rem;
       animation: pulse 2s ease-in-out infinite;
     }
 
-    .hero-preview-caption {
-      position: absolute;
-      bottom: 40px;
-      left: 20px;
-      right: 20px;
-      text-align: center;
-      font-size: 1.25rem;
-      font-weight: 600;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
     }
 
     .hero-preview-glow {
@@ -424,34 +410,6 @@
       background: radial-gradient(circle, rgba(240, 180, 41, 0.2) 0%, transparent 70%);
       filter: blur(60px);
       z-index: 0;
-    }
-
-    /* Video Showcase */
-    .video-showcase {
-      margin-bottom: 80px;
-    }
-
-    .video-container {
-      position: relative;
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      aspect-ratio: 16 / 9;
-      border-radius: 20px;
-      overflow: hidden;
-      box-shadow: 
-        0 40px 80px rgba(0, 0, 0, 0.5),
-        0 0 60px rgba(240, 180, 41, 0.15);
-      border: 2px solid rgba(240, 180, 41, 0.2);
-    }
-
-    .video-container video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
     }
 
     /* Sections */
@@ -559,111 +517,13 @@
       font-size: 0.95rem;
     }
 
+    .how-step-content strong {
+      color: var(--accent-primary);
+    }
+
     .how-step-visual {
-      font-size: 2.5rem;
-      opacity: 0.5;
-    }
-
-    /* Pack Cards */
-    .pack-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-    }
-
-    .pack-card {
-      padding: 32px;
-      background: var(--bg-secondary);
-      border: 2px solid transparent;
-      border-radius: 24px;
-      transition: all var(--transition-base);
-      position: relative;
-    }
-
-    .pack-card:hover {
-      transform: translateY(-8px);
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .pack-card.featured {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 40px var(--accent-glow);
-    }
-
-    .pack-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      border-radius: 6px;
-      margin-bottom: 16px;
-    }
-
-    .pack-badge.free {
-      background: rgba(74, 222, 128, 0.15);
-      color: var(--success);
-    }
-
-    .pack-badge.paid {
-      background: var(--gradient-gold);
-      color: #0a0a0f;
-    }
-
-    .pack-badge.premium {
-      background: rgba(240, 180, 41, 0.15);
-      color: var(--accent-primary);
-    }
-
-    .pack-title {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
-    }
-
-    .pack-duration {
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-    }
-
-    .pack-features {
-      list-style: none;
-      margin-bottom: 24px;
-    }
-
-    .pack-features li {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 0;
-      font-size: 0.9rem;
-      color: var(--text-tertiary);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-
-    .pack-features li:last-child {
-      border-bottom: none;
-    }
-
-    .pack-features li::before {
-      content: '✓';
-      color: var(--accent-primary);
-    }
-
-    .pack-price {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-    }
-
-    .pack-price-value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--accent-primary);
-    }
-
-    .pack-price-unit {
-      color: var(--text-secondary);
+      font-size: 2rem;
+      opacity: 0.7;
     }
 
     /* CTA Section */
@@ -742,15 +602,11 @@
 
       .hero-preview-phone {
         width: 220px;
-        height: 440px;
+        height: 400px;
       }
 
       .features-grid {
         grid-template-columns: repeat(2, 1fr);
-      }
-
-      .pack-cards {
-        grid-template-columns: 1fr;
       }
     }
 
@@ -785,4 +641,3 @@
   </style>
 </body>
 </html>
-
