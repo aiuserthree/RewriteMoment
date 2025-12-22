@@ -76,11 +76,24 @@ COMPOSITION:
 - SAME lighting on both faces
 - Upper body shot (waist to head)
 
-FACE PRESERVATION (CRITICAL):
-- Copy the EXACT face from Photo 1 for the left person
-- Copy the EXACT face from Photo 2 for the right person
-- Same eye shape, nose, mouth, face shape, skin tone as original photos
-- Do NOT modify or blend the faces
+FACE PRESERVATION (MOST IMPORTANT - DO NOT IGNORE):
+- Person on LEFT must have the EXACT SAME face as Photo 1:
+  * Identical eye shape, eye size, eye color
+  * Identical nose shape and size
+  * Identical lip shape and mouth
+  * Identical jawline and face shape
+  * Identical skin tone and texture
+  * Identical eyebrows and hair
+  
+- Person on RIGHT must have the EXACT SAME face as Photo 2:
+  * Identical eye shape, eye size, eye color
+  * Identical nose shape and size
+  * Identical lip shape and mouth
+  * Identical jawline and face shape
+  * Identical skin tone and texture
+  * Identical eyebrows and hair
+
+DO NOT create new faces. DO NOT average or blend features. Copy faces EXACTLY as shown.
 
 Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
 
@@ -202,7 +215,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Animate these two friends together in the same space. They INTERACT with each other - turning to look at each other, smiling at each other, maybe a friendly shoulder touch or nudge, laughing together at something. They share the same moment, same lighting, same environment. Natural friendly interaction like close friends. IMPORTANT: Keep each person facial structure exactly the same throughout (same eyes, nose, face shape) - no morphing. Warm cinematic lighting.',
+          prompt: 'Animate these two friends together in the same space. They interact naturally - looking at each other, smiling, friendly gestures. Same lighting, same environment. CRITICAL FACE RULE: Each person must keep their EXACT facial features throughout the ENTIRE video - same eye shape, same nose, same lips, same jaw, same skin tone from start to end. Their faces must be RECOGNIZABLE as the same people in every frame. No face morphing or changing. Warm cinematic.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -233,7 +246,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Animate these two friends together in the same space. They INTERACT - turning to each other, smiling together, friendly gestures, sharing a moment. Same lighting, same environment for both. Natural friendly interaction. Keep each person's facial structure exactly the same throughout - no morphing faces. Warm cinematic. 8 seconds.`;
+      const videoPrompt = `Animate these two friends together in the same space. Natural interaction - looking at each other, smiling, friendly gestures. CRITICAL: Each person must keep their EXACT facial features throughout - same eyes, nose, lips, jaw, skin tone in every frame. Faces must be recognizable as the same people from start to end. No morphing. Warm cinematic. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
