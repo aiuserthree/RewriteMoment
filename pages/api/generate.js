@@ -14,17 +14,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { myPhoto, actorPhoto, aspectRatio = '16:9' } = req.body;
+    // 클라이언트에서 이미 합성된 이미지를 받음 (Canvas로 나란히 합성된 상태)
+    const { compositeImage, aspectRatio = '16:9' } = req.body;
 
-    if (!myPhoto || !actorPhoto) {
-      return res.status(400).json({ error: '사진 2장이 필요합니다' });
+    if (!compositeImage) {
+      return res.status(400).json({ error: '합성 이미지가 필요합니다' });
     }
 
     if (!credentials) {
       return res.status(500).json({ error: 'Google Cloud credentials not configured' });
     }
 
-    console.log('=== 2장 합성 → Veo 영상화 ===');
+    console.log('=== 클라이언트 합성 → Veo 영상화 ===');
 
     // 이미지 Base64 처리
     function extractBase64(imageUrl) {
@@ -38,11 +39,8 @@ export default async function handler(req, res) {
       return { mimeType: 'image/jpeg', base64: imageUrl };
     }
 
-    const myPhotoData = extractBase64(myPhoto);
-    const actorPhotoData = extractBase64(actorPhoto);
-
-    console.log('내 사진 length:', myPhotoData.base64?.length);
-    console.log('배우 사진 length:', actorPhotoData.base64?.length);
+    const compositeData = extractBase64(compositeImage);
+    console.log('합성 이미지 length:', compositeData.base64?.length);
 
     // Google Auth
     const auth = new GoogleAuth({
@@ -53,162 +51,37 @@ export default async function handler(req, res) {
     const accessToken = await client.getAccessToken();
 
     // ========================================
-    // STEP 1: Gemini로 두 사진 합성
+    // Veo로 영상 생성 (합성은 이미 클라이언트에서 완료)
     // ========================================
-    console.log('\n=== STEP 1: Gemini 합성 ===');
+    console.log('\n=== Veo 영상화 시작 ===');
 
-    const geminiPrompt = `You are a professional photo compositor. Your job is to create a COLLAGE/COMPOSITE image.
+    const videoPrompt = `Animate this photo of two people into an 8-second video.
 
-INPUT:
-- Image 1: Person A (this is me)
-- Image 2: Person B (the celebrity/friend I want to meet)
+CRITICAL REQUIREMENT:
+- This image shows TWO DIFFERENT PEOPLE side by side
+- BOTH faces must remain EXACTLY as shown - do not change, morph, or alter either face
+- The person on the LEFT and the person on the RIGHT must keep their EXACT original faces
 
-YOUR TASK:
-Create a composite image showing Person A and Person B together, as if taking a group selfie.
+ANIMATION:
+0-2s: Both people smile and look at the camera, like posing for a selfie together
+2-4s: Natural small movements - blinking, slight head tilts, breathing
+4-6s: They turn to look at each other and share a laugh
+6-8s: They wave at the camera and give thumbs up
 
-=== ABSOLUTE REQUIREMENTS FOR FACES ===
-⚠️ CRITICAL: You must COPY the faces EXACTLY as they appear in the original photos.
+STYLE:
+- Candid behind-the-scenes vlog footage
+- Warm, friendly atmosphere
+- Natural lighting
+- Slight camera movement for realism
 
-For Person A (from Image 1):
-- Copy their EXACT face - every facial feature must be identical
-- Same eye shape, eye color, eyebrows
-- Same nose shape and size
-- Same mouth, lips, teeth
-- Same face shape, jawline, chin
-- Same skin tone, texture, any marks or features
-- Same hair color, style, texture
-
-For Person B (from Image 2):
-- Copy their EXACT face - every facial feature must be identical
-- Same eye shape, eye color, eyebrows  
-- Same nose shape and size
-- Same mouth, lips, teeth
-- Same face shape, jawline, chin
-- Same skin tone, texture, any marks or features
-- Same hair color, style, texture
-
-=== COMPOSITION ===
-- Person A on the left, holding phone for selfie
-- Person B on the right, posing together
-- Both facing camera, friendly poses
-- Background: movie set or studio
-
-=== FORBIDDEN ===
-❌ Do NOT generate new faces
-❌ Do NOT modify facial features
+FORBIDDEN:
+❌ Do NOT change or morph any faces
+❌ Do NOT blend the two faces together
+❌ Do NOT alter facial features
 ❌ Do NOT change skin tones
-❌ Do NOT alter hair
-❌ Do NOT use generic faces
+❌ The two people must remain as two distinct individuals
 
-The faces must be PIXEL-PERFECT copies from the input images. Only change body position and background.
-
-Output a single high-quality composite image.`;
-
-    const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
-
-    const geminiResponse = await fetch(geminiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken.token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{
-          role: 'user',
-          parts: [
-            {
-              inlineData: {
-                mimeType: myPhotoData.mimeType,
-                data: myPhotoData.base64,
-              }
-            },
-            {
-              inlineData: {
-                mimeType: actorPhotoData.mimeType,
-                data: actorPhotoData.base64,
-              }
-            },
-            { text: geminiPrompt }
-          ]
-        }],
-        generationConfig: {
-          responseModalities: ['IMAGE', 'TEXT'],
-          temperature: 1.0,
-        },
-      }),
-    });
-
-    const geminiData = await geminiResponse.json();
-
-    if (!geminiResponse.ok) {
-      console.error('Gemini Error:', JSON.stringify(geminiData, null, 2));
-      return res.status(500).json({ 
-        error: 'Gemini 합성 실패', 
-        details: geminiData.error?.message 
-      });
-    }
-
-    // 합성된 이미지 추출
-    let compositeImageBase64 = null;
-    let compositeImageMimeType = 'image/png';
-
-    if (geminiData.candidates?.[0]?.content?.parts) {
-      for (const part of geminiData.candidates[0].content.parts) {
-        if (part.inlineData) {
-          compositeImageBase64 = part.inlineData.data;
-          compositeImageMimeType = part.inlineData.mimeType || 'image/png';
-          console.log('합성 이미지 생성됨, length:', compositeImageBase64?.length);
-          break;
-        }
-      }
-    }
-
-    // Gemini가 이미지를 생성하지 않으면 에러
-    if (!compositeImageBase64) {
-      console.error('Gemini가 합성 이미지를 생성하지 않음');
-      console.error('Gemini response:', JSON.stringify(geminiData, null, 2));
-      return res.status(500).json({ 
-        error: '이미지 합성 실패', 
-        details: 'Gemini가 합성 이미지를 생성하지 못했습니다. 다른 사진으로 다시 시도해주세요.' 
-      });
-    }
-
-    // ========================================
-    // STEP 2: Veo로 영상 생성
-    // ========================================
-    console.log('\n=== STEP 2: Veo 영상화 ===');
-
-    const videoPrompt = `Animate this photo into an 8-second video.
-
-=== FACE PRESERVATION - CRITICAL ===
-⚠️ BOTH FACES IN THIS IMAGE MUST REMAIN 100% IDENTICAL THROUGHOUT THE ENTIRE VIDEO.
-
-Rules for faces:
-- Every frame must show the EXACT same faces as the input
-- Eye shape, nose, mouth, jawline - ALL must stay identical
-- Skin tone must not change
-- No morphing, no transformation, no alteration
-- Faces can move (turn, tilt) but features stay the same
-
-=== ANIMATION ===
-0-2s: Both people pose for selfie, smiling at camera
-2-4s: Small natural movements - blinking, slight head turns
-4-6s: They share a laugh, natural expressions
-6-8s: Wave goodbye, thumbs up
-
-=== STYLE ===
-- Candid vlog footage
-- Warm natural lighting  
-- Slight handheld camera movement
-- Friendly casual atmosphere
-
-=== FORBIDDEN ===
-❌ Face morphing
-❌ Face changing
-❌ Different faces appearing
-❌ Distorted features
-
-Keep the faces EXACTLY as shown in the input image!`;
+Both faces must remain 100% identical to the input image throughout the entire video!`;
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
@@ -222,8 +95,8 @@ Keep the faces EXACTLY as shown in the input image!`;
         instances: [{
           prompt: videoPrompt,
           image: {
-            bytesBase64Encoded: compositeImageBase64,
-            mimeType: compositeImageMimeType,
+            bytesBase64Encoded: compositeData.base64,
+            mimeType: compositeData.mimeType,
           },
         }],
         parameters: {
@@ -250,7 +123,7 @@ Keep the faces EXACTLY as shown in the input image!`;
     return res.status(200).json({
       id: veoData.name,
       status: 'processing',
-      message: '합성 완료 → 영상 생성 중',
+      message: '영상 생성 중',
       provider: 'google-veo',
     });
 

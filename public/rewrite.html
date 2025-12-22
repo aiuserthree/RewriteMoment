@@ -68,10 +68,10 @@
             <div class="loading-progress-bar" id="loadingBar"></div>
           </div>
           <div class="loading-steps">
-            <div class="loading-step active" data-step="1">🎨 Gemini 합성</div>
+            <div class="loading-step active" data-step="1">🖼️ 이미지 합성</div>
             <div class="loading-step" data-step="2">🎬 Veo 영상화</div>
           </div>
-          <p class="pipeline-info">Gemini (나노바나나) → Veo 영상화</p>
+          <p class="pipeline-info">두 사진 합성 → Veo 영상화 (얼굴 100% 보존)</p>
         </div>
 
         <div class="tips-card">
@@ -332,11 +332,11 @@
   <script>
     // 팁 목록
     const tips = [
-      'AI가 두 사람의 얼굴을 자연스럽게 합성하고 있어요!',
-      'Gemini가 사진을 분석하고 합성 이미지를 만들고 있어요.',
-      'Veo가 합성된 이미지를 영상으로 변환합니다.',
+      '업로드한 사진 그대로! 얼굴이 변형되지 않아요.',
+      '두 사진을 나란히 합성해서 Veo에 전달했어요.',
+      'Veo가 합성 이미지를 기반으로 영상을 만들고 있어요.',
       '약 1-2분 정도 소요됩니다. 잠시만 기다려주세요!',
-      '두 사람이 함께하는 자연스러운 영상이 만들어져요.',
+      '두 사람의 원본 얼굴이 100% 유지돼요!',
     ];
 
     // 사진 미리보기 표시
@@ -416,6 +416,55 @@
       });
     }
 
+    // Canvas로 두 이미지를 나란히 합성하는 함수
+    function compositeImages(img1Src, img2Src) {
+      return new Promise((resolve, reject) => {
+        const img1 = new Image();
+        const img2 = new Image();
+        let loaded = 0;
+
+        const checkComplete = () => {
+          loaded++;
+          if (loaded === 2) {
+            // 두 이미지를 나란히 합성
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // 각 이미지의 크기를 동일하게 맞추고 나란히 배치
+            const targetHeight = Math.max(img1.height, img2.height);
+            const targetWidth1 = (img1.width / img1.height) * targetHeight;
+            const targetWidth2 = (img2.width / img2.height) * targetHeight;
+
+            canvas.width = targetWidth1 + targetWidth2;
+            canvas.height = targetHeight;
+
+            // 배경을 검은색으로
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 첫 번째 이미지 (내 사진 - 왼쪽)
+            ctx.drawImage(img1, 0, 0, targetWidth1, targetHeight);
+
+            // 두 번째 이미지 (함께할 사람 - 오른쪽)
+            ctx.drawImage(img2, targetWidth1, 0, targetWidth2, targetHeight);
+
+            // Base64로 변환
+            const compositeBase64 = canvas.toDataURL('image/jpeg', 0.9);
+            console.log('Canvas 합성 완료, length:', compositeBase64.length);
+            resolve(compositeBase64);
+          }
+        };
+
+        img1.onload = checkComplete;
+        img2.onload = checkComplete;
+        img1.onerror = () => reject(new Error('내 사진 로드 실패'));
+        img2.onerror = () => reject(new Error('함께할 사람 사진 로드 실패'));
+
+        img1.src = img1Src;
+        img2.src = img2Src;
+      });
+    }
+
     // 영상 생성 시작
     async function startGeneration() {
       try {
@@ -423,26 +472,31 @@
         await clearVideoFromIndexedDB();
         console.log('Previous video cache cleared');
 
-        // 1. 사진 가져오기
-        updateStep(1, '사진 분석 중...', 10);
+        // 1. 두 이미지를 Canvas로 합성
+        updateStep(1, '두 사진 합성 중...', 10);
 
         const aspectRatio = sessionStorage.getItem('aspectRatio') || '16:9';
 
-        console.log('=== Sending to API ===');
+        console.log('=== Canvas 합성 시작 ===');
         console.log('My photo length:', myPhoto.length);
         console.log('Actor photo length:', actorPhoto.length);
+
+        // Canvas로 직접 합성 (얼굴 변형 없음!)
+        const compositeImage = await compositeImages(myPhoto, actorPhoto);
+
+        console.log('=== Sending to API ===');
+        console.log('Composite image length:', compositeImage.length);
         console.log('Aspect Ratio:', aspectRatio);
         console.log('======================');
 
-        // 2. 영상 생성 API 호출
-        updateStep(1, 'Gemini 합성 중...', 20);
+        // 2. 영상 생성 API 호출 (합성된 이미지 전달)
+        updateStep(1, '합성 완료! 영상 생성 시작...', 30);
 
         const response = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            myPhoto,
-            actorPhoto,
+            compositeImage,
             aspectRatio,
           }),
         });
