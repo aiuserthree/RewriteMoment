@@ -62,28 +62,27 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini(나노바나나) 합성 ===');
 
-    const geminiPrompt = `Look at these two photos. I need you to create ONE new photo where both people appear TOGETHER.
+    const geminiPrompt = `Create a photo of these two people as CLOSE FRIENDS together in the SAME SPACE.
 
-INSTRUCTIONS:
-1. Take the EXACT face from Photo 1 - copy it pixel by pixel
-2. Take the EXACT face from Photo 2 - copy it pixel by pixel  
-3. Put them side by side in a new scene
+SCENE: Two friends standing close together, shoulders nearly touching, like they're taking a selfie or group photo together. They share the SAME background, SAME lighting, SAME environment. It should look like ONE photo taken of TWO people together - not two separate photos combined.
 
-CRITICAL - READ CAREFULLY:
-- The face from Photo 1 must look EXACTLY like Photo 1. Not similar. EXACTLY the same.
-- The face from Photo 2 must look EXACTLY like Photo 2. Not similar. EXACTLY the same.
-- Do NOT create new faces. Do NOT modify the faces. Just COPY them.
-- If the person in Photo 1 has small eyes, the result must have small eyes.
-- If the person in Photo 2 has a big nose, the result must have a big nose.
-- Every detail matters: eye shape, nose shape, lip shape, face shape, skin color, hair.
-
-LAYOUT:
-- Photo 1 person on LEFT
-- Photo 2 person on RIGHT
+COMPOSITION:
+- Person from Photo 1 on LEFT
+- Person from Photo 2 on RIGHT  
+- They are CLOSE to each other (friendly distance, not far apart)
+- Bodies slightly angled toward each other
+- Natural poses like real friends taking a photo
+- SINGLE unified background behind both (cafe, studio, park - same for both)
+- SAME lighting on both faces
 - Upper body shot (waist to head)
-- Simple background
 
-This is like cutting out two photos and pasting them together. The faces should not change AT ALL.`;
+FACE PRESERVATION (CRITICAL):
+- Copy the EXACT face from Photo 1 for the left person
+- Copy the EXACT face from Photo 2 for the right person
+- Same eye shape, nose, mouth, face shape, skin tone as original photos
+- Do NOT modify or blend the faces
+
+Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -203,7 +202,7 @@ This is like cutting out two photos and pasting them together. The faces should 
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Animate this photo naturally. STRICT RULE: The two people must keep their EXACT facial structure - same eye shape, same nose, same face shape, same skin tone throughout the entire video. Allow natural movement: gentle smiles, head turns, hand gestures, body sway, looking at each other. But their facial BONE STRUCTURE and FEATURES must remain IDENTICAL to the photo - no morphing, no changing face shapes. Like real people moving - their face structure stays the same even when they smile or turn. Warm cinematic lighting.',
+          prompt: 'Animate these two friends together in the same space. They INTERACT with each other - turning to look at each other, smiling at each other, maybe a friendly shoulder touch or nudge, laughing together at something. They share the same moment, same lighting, same environment. Natural friendly interaction like close friends. IMPORTANT: Keep each person facial structure exactly the same throughout (same eyes, nose, face shape) - no morphing. Warm cinematic lighting.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -234,7 +233,7 @@ This is like cutting out two photos and pasting them together. The faces should 
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Animate this photo naturally. STRICT RULE: Both people must keep their EXACT facial structure throughout - same eye shape, nose, face shape, skin tone. No morphing or changing faces. Allow natural movement: smiles, head turns, gestures, looking at each other. Their bone structure and features stay IDENTICAL to the photo even when moving. Like real people - face structure is constant. Warm cinematic. 8 seconds.`;
+      const videoPrompt = `Animate these two friends together in the same space. They INTERACT - turning to each other, smiling together, friendly gestures, sharing a moment. Same lighting, same environment for both. Natural friendly interaction. Keep each person's facial structure exactly the same throughout - no morphing faces. Warm cinematic. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
