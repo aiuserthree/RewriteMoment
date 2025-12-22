@@ -69,9 +69,9 @@
           </div>
           <div class="loading-steps">
             <div class="loading-step active" data-step="1">🎨 Gemini 합성</div>
-            <div class="loading-step" data-step="2">🎬 Veo 영상화</div>
+            <div class="loading-step" data-step="2">🎬 Kling 영상화</div>
           </div>
-          <p class="pipeline-info">Gemini 합성 → Veo 영상화</p>
+          <p class="pipeline-info">Gemini(나노바나나) 합성 → Kling AI 영상화</p>
         </div>
 
         <div class="tips-card">
@@ -332,11 +332,11 @@
   <script>
     // 팁 목록
     const tips = [
-      'Gemini가 두 사진을 자연스럽게 합성하고 있어요!',
+      'Gemini(나노바나나)가 두 사진을 합성하고 있어요!',
       'AI가 두 사람이 함께 있는 것처럼 합성해요.',
-      'Veo가 합성 이미지를 영상으로 만들어요.',
+      'Kling AI가 합성 이미지를 영상으로 만들어요.',
       '약 1-2분 정도 소요됩니다. 잠시만 기다려주세요!',
-      '두 사람이 함께하는 자연스러운 영상이 만들어져요.',
+      'Kling은 얼굴 보존에 강점이 있어요!',
     ];
 
     // 사진 미리보기 표시
@@ -462,7 +462,7 @@
         const maxAttempts = 120; // 10분
 
         while (attempts < maxAttempts) {
-          const statusResponse = await fetch(`/api/status/${encodeURIComponent(predictionId)}`);
+          const statusResponse = await fetch(`/api/status/${encodeURIComponent(predictionId)}?provider=kling`);
           const status = await statusResponse.json();
 
           console.log('Status:', status.status);
