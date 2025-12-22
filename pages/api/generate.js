@@ -14,17 +14,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { myPhoto, actorPhoto, aspectRatio = '16:9' } = req.body;
+    // 클라이언트에서 이미 Canvas로 합성된 이미지를 받음
+    const { compositeImage, aspectRatio = '16:9' } = req.body;
 
-    if (!myPhoto || !actorPhoto) {
-      return res.status(400).json({ error: '사진 2장이 필요합니다' });
+    if (!compositeImage) {
+      return res.status(400).json({ error: '합성 이미지가 필요합니다' });
     }
 
     if (!credentials) {
       return res.status(500).json({ error: 'Google Cloud credentials not configured' });
     }
 
-    console.log('=== Gemini 합성 → Veo 영상화 ===');
+    console.log('=== Canvas 합성 → Gemini 배경 통일 → Veo 영상화 ===');
 
     // 이미지 Base64 처리
     function extractBase64(imageUrl) {
@@ -38,11 +39,8 @@ export default async function handler(req, res) {
       return { mimeType: 'image/jpeg', base64: imageUrl };
     }
 
-    const myPhotoData = extractBase64(myPhoto);
-    const actorPhotoData = extractBase64(actorPhoto);
-
-    console.log('내 사진 length:', myPhotoData.base64?.length);
-    console.log('함께할 사람 사진 length:', actorPhotoData.base64?.length);
+    const compositeData = extractBase64(compositeImage);
+    console.log('Canvas 합성 이미지 length:', compositeData.base64?.length);
 
     // Google Auth
     const auth = new GoogleAuth({
@@ -53,62 +51,45 @@ export default async function handler(req, res) {
     const accessToken = await client.getAccessToken();
 
     // ========================================
-    // STEP 1: Gemini로 두 사진 합성
+    // STEP 1: Gemini로 배경만 자연스럽게 통일 (얼굴은 그대로!)
     // ========================================
-    console.log('\n=== STEP 1: Gemini 합성 ===');
+    console.log('\n=== STEP 1: Gemini 배경 통일 ===');
 
-    // 얼굴 100% 보존 프롬프트 - 최대 강화
-    const geminiPrompt = `⚠️⚠️⚠️ FACE TRANSFER TASK - NOT FACE GENERATION ⚠️⚠️⚠️
+    // 배경만 수정하는 프롬프트 - 얼굴은 절대 건드리지 않음
+    const geminiPrompt = `This image shows two people side by side. Your task is to make the background look natural and unified.
 
-You are performing a FACE TRANSFER operation, NOT creating new faces.
+⚠️ CRITICAL RULES - READ CAREFULLY ⚠️
 
-SOURCE IMAGES:
-- SOURCE FACE 1 (Image 1): Extract and use THIS EXACT FACE for Person A
-- SOURCE FACE 2 (Image 2): Extract and use THIS EXACT FACE for Person B
+🔴 DO NOT TOUCH THE FACES 🔴
+- The faces of both people must remain EXACTLY as they are
+- Do not modify, enhance, or change any facial features
+- Do not alter skin tones
+- Do not change hair
+- The faces are PERFECT as they are - leave them alone
 
-🔴 ABSOLUTE RULE: COPY FACES PIXEL-BY-PIXEL 🔴
+✅ YOUR ONLY TASK:
+- Make the background behind both people look natural and unified
+- Create a seamless transition where the two photos meet
+- Add a nice, cohesive background (studio, cafe, outdoors, etc.)
+- Keep both people's bodies and poses similar to the original
 
-You must TRANSFER the faces from the source images, not generate new ones.
-Think of this as cutting out the faces and pasting them into a new scene.
+OUTPUT:
+- Same two people with their EXACT original faces
+- Natural, unified background
+- Wide shot composition (waist up)
+- Professional group photo look
 
-For PERSON A (left side of output):
-→ COPY the face from Image 1 EXACTLY
-→ Every pixel of the face must match the source
-→ No artistic interpretation - just transfer
-
-For PERSON B (right side of output):  
-→ COPY the face from Image 2 EXACTLY
-→ Every pixel of the face must match the source
-→ No artistic interpretation - just transfer
-
-❌ STRICTLY FORBIDDEN - DO NOT:
-- Generate new faces
-- Interpret or reimagine faces
-- Blend features from both people
-- Change ANY facial feature (eyes, nose, mouth, jaw, skin)
-- Alter skin tone or texture
-- Modify hair color or style
-- Make faces look "better" or "different"
-
-✅ REQUIRED OUTPUT:
-- Wide shot showing both people from WAIST UP
-- Person A on LEFT with EXACT face from Image 1
-- Person B on RIGHT with EXACT face from Image 2
-- Casual friendly scene, nice background
-- Faces should be 20-30% of image height (not close-up)
-- Natural lighting, group photo style
-
-Remember: This is FACE TRANSFER. The faces in your output must be IDENTICAL to the input faces. If you change any facial feature, you have failed the task.`;
+Remember: You are ONLY editing the background. The faces must be pixel-perfect identical to the input.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
     // 최대 3번 재시도
-    let compositeImageBase64 = null;
-    let compositeImageMimeType = 'image/png';
+    let enhancedImageBase64 = null;
+    let enhancedImageMimeType = 'image/png';
     let lastError = null;
 
     for (let attempt = 1; attempt <= 3; attempt++) {
-      console.log(`Gemini 시도 ${attempt}/3...`);
+      console.log(`Gemini 배경 통일 시도 ${attempt}/3...`);
 
       try {
         const geminiResponse = await fetch(geminiEndpoint, {
@@ -121,18 +102,11 @@ Remember: This is FACE TRANSFER. The faces in your output must be IDENTICAL to t
             contents: [{
               role: 'user',
               parts: [
-                { text: "=== Reference Face A (Person A - USE THIS EXACT FACE on LEFT side) ===" },
+                { text: "Here is a composite photo of two people. Please unify the background while keeping their faces EXACTLY the same:" },
                 {
                   inlineData: {
-                    mimeType: myPhotoData.mimeType,
-                    data: myPhotoData.base64,
-                  }
-                },
-                { text: "=== Reference Face B (Person B - USE THIS EXACT FACE on RIGHT side) ===" },
-                {
-                  inlineData: {
-                    mimeType: actorPhotoData.mimeType,
-                    data: actorPhotoData.base64,
+                    mimeType: compositeData.mimeType,
+                    data: compositeData.base64,
                   }
                 },
                 { text: geminiPrompt }
@@ -140,7 +114,7 @@ Remember: This is FACE TRANSFER. The faces in your output must be IDENTICAL to t
             }],
             generationConfig: {
               responseModalities: ['IMAGE', 'TEXT'],
-              temperature: 0,  // 0으로 설정해서 최대한 정확하게 얼굴 보존
+              temperature: 0,
             },
           }),
         });
@@ -153,23 +127,22 @@ Remember: This is FACE TRANSFER. The faces in your output must be IDENTICAL to t
           continue;
         }
 
-        // 합성된 이미지 추출
+        // 배경 통일된 이미지 추출
         if (geminiData.candidates?.[0]?.content?.parts) {
           for (const part of geminiData.candidates[0].content.parts) {
             if (part.inlineData) {
-              compositeImageBase64 = part.inlineData.data;
-              compositeImageMimeType = part.inlineData.mimeType || 'image/png';
-              console.log(`합성 이미지 생성됨 (attempt ${attempt}), length:`, compositeImageBase64?.length);
+              enhancedImageBase64 = part.inlineData.data;
+              enhancedImageMimeType = part.inlineData.mimeType || 'image/png';
+              console.log(`배경 통일 이미지 생성됨 (attempt ${attempt}), length:`, enhancedImageBase64?.length);
               break;
             }
           }
         }
 
-        if (compositeImageBase64) {
+        if (enhancedImageBase64) {
           break; // 성공하면 루프 탈출
         } else {
           console.log(`Gemini가 이미지를 생성하지 않음 (attempt ${attempt})`);
-          // 텍스트 응답이 있으면 출력
           const textParts = geminiData.candidates?.[0]?.content?.parts?.filter(p => p.text);
           if (textParts?.length) {
             console.log('Gemini 텍스트 응답:', textParts.map(p => p.text).join('\n'));
@@ -188,13 +161,16 @@ Remember: This is FACE TRANSFER. The faces in your output must be IDENTICAL to t
       }
     }
 
-    // 모든 시도 실패
-    if (!compositeImageBase64) {
-      console.error('모든 Gemini 시도 실패');
-      return res.status(500).json({ 
-        error: '이미지 합성 실패', 
-        details: lastError || 'Gemini가 합성 이미지를 생성하지 못했습니다. 다른 사진으로 다시 시도해주세요.' 
-      });
+    // Gemini 실패 시 원본 Canvas 합성 이미지 사용 (얼굴 100% 보존!)
+    let finalImageBase64, finalImageMimeType;
+    if (enhancedImageBase64) {
+      console.log('Gemini 배경 통일 성공 - 향상된 이미지 사용');
+      finalImageBase64 = enhancedImageBase64;
+      finalImageMimeType = enhancedImageMimeType;
+    } else {
+      console.log('Gemini 실패 - 원본 Canvas 합성 이미지 사용 (얼굴 100% 보존)');
+      finalImageBase64 = compositeData.base64;
+      finalImageMimeType = compositeData.mimeType;
     }
 
     // ========================================
@@ -202,11 +178,15 @@ Remember: This is FACE TRANSFER. The faces in your output must be IDENTICAL to t
     // ========================================
     console.log('\n=== STEP 2: Veo 영상화 ===');
 
-    const videoPrompt = `Create a short video from this photo of two friends.
+    const videoPrompt = `Animate this photo of two people standing together into an 8-second video.
 
-Animation: Both people smile and pose naturally. Subtle movements like breathing and blinking. Friendly, casual atmosphere. Warm natural lighting.
+Animation:
+- Both people smile naturally at the camera
+- Subtle realistic movements: breathing, blinking, small head movements
+- Friendly, casual atmosphere
+- Keep the composition and framing similar to the input
 
-Keep both faces exactly as shown in the photo.`;
+IMPORTANT: Keep both faces exactly as shown in the photo. Do not change or morph the faces.`;
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
@@ -220,8 +200,8 @@ Keep both faces exactly as shown in the photo.`;
         instances: [{
           prompt: videoPrompt,
           image: {
-            bytesBase64Encoded: compositeImageBase64,
-            mimeType: compositeImageMimeType,
+            bytesBase64Encoded: finalImageBase64,
+            mimeType: finalImageMimeType,
           },
         }],
         parameters: {

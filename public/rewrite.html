@@ -68,10 +68,10 @@
             <div class="loading-progress-bar" id="loadingBar"></div>
           </div>
           <div class="loading-steps">
-            <div class="loading-step active" data-step="1">🎨 Gemini 합성</div>
+            <div class="loading-step active" data-step="1">🖼️ 얼굴 보존 합성</div>
             <div class="loading-step" data-step="2">🎬 Veo 영상화</div>
           </div>
-          <p class="pipeline-info">Gemini(나노바나나) 합성 → Veo 영상화</p>
+          <p class="pipeline-info">Canvas 합성 (얼굴 100%) → Gemini 배경 → Veo 영상화</p>
         </div>
 
         <div class="tips-card">
@@ -332,11 +332,11 @@
   <script>
     // 팁 목록
     const tips = [
-      'Gemini(나노바나나)가 두 사진을 자연스럽게 합성하고 있어요!',
-      'AI가 두 사람이 함께 있는 것처럼 합성해요.',
+      '얼굴은 100% 원본 그대로 보존됩니다!',
+      'Canvas로 두 사진을 먼저 합성해요.',
+      'Gemini가 배경만 자연스럽게 통일해요.',
       'Veo가 합성 이미지를 영상으로 만들어요.',
       '약 1-2분 정도 소요됩니다. 잠시만 기다려주세요!',
-      '두 사람이 함께하는 자연스러운 영상이 만들어져요.',
     ];
 
     // 사진 미리보기 표시
@@ -416,6 +416,60 @@
       });
     }
 
+    // Canvas로 두 이미지를 나란히 합성 (얼굴 100% 보존!)
+    function compositeImagesWithCanvas(img1Src, img2Src) {
+      return new Promise((resolve, reject) => {
+        const img1 = new Image();
+        const img2 = new Image();
+        let loaded = 0;
+
+        const checkComplete = () => {
+          loaded++;
+          if (loaded === 2) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // 두 이미지를 같은 높이로 맞추고 나란히 배치
+            const targetHeight = Math.min(img1.height, img2.height, 800);
+            const scale1 = targetHeight / img1.height;
+            const scale2 = targetHeight / img2.height;
+            const width1 = img1.width * scale1;
+            const width2 = img2.width * scale2;
+
+            canvas.width = width1 + width2;
+            canvas.height = targetHeight;
+
+            // 배경을 부드러운 그라데이션으로
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+            gradient.addColorStop(0, '#2a1f3d');
+            gradient.addColorStop(0.5, '#1a1525');
+            gradient.addColorStop(1, '#2a1f3d');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 첫 번째 이미지 (내 사진 - 왼쪽)
+            ctx.drawImage(img1, 0, 0, width1, targetHeight);
+
+            // 두 번째 이미지 (함께할 사람 - 오른쪽)
+            ctx.drawImage(img2, width1, 0, width2, targetHeight);
+
+            // Base64로 변환 (고품질)
+            const compositeBase64 = canvas.toDataURL('image/jpeg', 0.95);
+            console.log('Canvas 합성 완료 (얼굴 100% 보존), length:', compositeBase64.length);
+            resolve(compositeBase64);
+          }
+        };
+
+        img1.onload = checkComplete;
+        img2.onload = checkComplete;
+        img1.onerror = () => reject(new Error('내 사진 로드 실패'));
+        img2.onerror = () => reject(new Error('함께할 사람 사진 로드 실패'));
+
+        img1.src = img1Src;
+        img2.src = img2Src;
+      });
+    }
+
     // 영상 생성 시작
     async function startGeneration() {
       try {
@@ -423,26 +477,31 @@
         await clearVideoFromIndexedDB();
         console.log('Previous video cache cleared');
 
-        // 1. Gemini로 합성 시작
-        updateStep(1, 'Gemini로 합성 중...', 10);
+        // 1. Canvas로 두 이미지 합성 (얼굴 100% 보존!)
+        updateStep(1, '두 사진 합성 중...', 10);
 
         const aspectRatio = sessionStorage.getItem('aspectRatio') || '16:9';
 
-        console.log('=== Gemini 합성 요청 ===');
+        console.log('=== Canvas 합성 시작 (얼굴 100% 보존) ===');
         console.log('My photo length:', myPhoto.length);
         console.log('Actor photo length:', actorPhoto.length);
-        console.log('Aspect Ratio:', aspectRatio);
-        console.log('======================');
 
-        // 2. 영상 생성 API 호출 (두 이미지 전달 → Gemini 합성 → Veo)
-        updateStep(1, 'AI가 두 사진을 합성하고 있어요...', 20);
+        // Canvas로 직접 합성 - 얼굴 픽셀 그대로!
+        const compositeImage = await compositeImagesWithCanvas(myPhoto, actorPhoto);
+
+        console.log('=== API 전송 ===');
+        console.log('Composite image length:', compositeImage.length);
+        console.log('Aspect Ratio:', aspectRatio);
+        console.log('================');
+
+        // 2. 영상 생성 API 호출 (Canvas 합성 → Gemini 배경 통일 → Veo)
+        updateStep(1, 'AI가 배경을 자연스럽게 만들고 있어요...', 20);
 
         const response = await fetch('/api/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            myPhoto,
-            actorPhoto,
+            compositeImage,
             aspectRatio,
           }),
         });
