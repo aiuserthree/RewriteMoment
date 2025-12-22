@@ -203,7 +203,7 @@ This is like cutting out two photos and pasting them together. The faces should 
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Make this photo move slightly. Keep the faces EXACTLY as they are - do not change any facial features. Only add: subtle breathing, eye blinks. The faces must stay FROZEN and UNCHANGED. Do not modify eyes, nose, mouth, or face shape. Very minimal movement.',
+          prompt: 'Bring this photo to life with natural movement. Two friends having a conversation - they smile, laugh gently, turn heads slightly to look at each other, natural hand gestures, body sway. Keep their face IDENTITY the same (same person) but allow natural expressions and movement. Lively, warm, cinematic. Like a candid moment between friends.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -234,7 +234,7 @@ This is like cutting out two photos and pasting them together. The faces should 
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Add very subtle animation to this photo. Keep both faces EXACTLY as shown - do not change any facial features at all. Only add minimal breathing motion and eye blinks. Faces must remain unchanged and frozen. 8 seconds.`;
+      const videoPrompt = `Bring this photo to life. Two friends having a fun moment together - they smile, laugh gently, turn to look at each other, natural conversation gestures. Keep their face IDENTITY (same person) but allow natural expressions and lively movement. Warm, cinematic, candid feeling. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
