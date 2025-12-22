@@ -468,7 +468,42 @@
       if (e.target.files[0]) handleFile(e.target.files[0], 1);
     });
 
-    function handleFile(file, index) {
+    // 이미지 압축 함수 (sessionStorage 용량 제한 대응)
+    function compressImage(file, maxWidth = 1024, quality = 0.8) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // 최대 너비 제한
+            if (width > maxWidth) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const compressedData = canvas.toDataURL('image/jpeg', quality);
+            console.log('Image compressed:', Math.round(compressedData.length / 1024) + 'KB');
+            resolve(compressedData);
+          };
+          img.onerror = () => reject(new Error('이미지 로드 실패'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('파일 읽기 실패'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleFile(file, index) {
       const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
       const maxSize = 10 * 1024 * 1024;
 
@@ -482,9 +517,9 @@
         return;
       }
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const imageData = e.target.result;
+      try {
+        // 이미지 압축해서 sessionStorage 용량 문제 해결
+        const imageData = await compressImage(file);
         
         if (index === 0) {
           myPhoto = imageData;
@@ -495,8 +530,10 @@
         }
         
         checkCanProceed();
-      };
-      reader.readAsDataURL(file);
+      } catch (error) {
+        console.error('Image processing error:', error);
+        alert('이미지 처리 중 오류가 발생했습니다. 다른 이미지를 시도해주세요.');
+      }
     }
 
     function showPreview(previewEl, zoneEl, imageData, index) {
@@ -534,13 +571,49 @@
     consent1.addEventListener('change', checkCanProceed);
     consent2.addEventListener('change', checkCanProceed);
 
-    // 다음 버튼
-    nextBtn.addEventListener('click', () => {
-      if (!nextBtn.disabled) {
+    // 다음 버튼 - Safari 호환성 개선
+    function goToNextStep(e) {
+      if (e) e.preventDefault();
+      
+      console.log('Next button clicked');
+      console.log('Button disabled:', nextBtn.disabled);
+      console.log('myPhoto:', myPhoto ? 'exists (' + Math.round(myPhoto.length/1024) + 'KB)' : 'null');
+      console.log('actorPhoto:', actorPhoto ? 'exists (' + Math.round(actorPhoto.length/1024) + 'KB)' : 'null');
+      
+      if (nextBtn.disabled) {
+        console.log('Button is disabled, checking why...');
+        if (!myPhoto) alert('내 사진을 업로드해주세요.');
+        else if (!actorPhoto) alert('함께할 사람 사진을 업로드해주세요.');
+        else if (!consent1.checked) alert('첫 번째 동의사항을 체크해주세요.');
+        else if (!consent2.checked) alert('두 번째 동의사항을 체크해주세요.');
+        return;
+      }
+      
+      try {
+        // sessionStorage 저장 시도
         sessionStorage.setItem('myPhoto', myPhoto);
         sessionStorage.setItem('actorPhoto', actorPhoto);
+        console.log('Photos saved to sessionStorage');
+        
+        // 페이지 이동
         window.location.href = 'select.html';
+      } catch (error) {
+        console.error('Storage error:', error);
+        
+        // Safari Private Browsing 또는 용량 초과
+        if (error.name === 'QuotaExceededError' || error.message.includes('quota')) {
+          alert('저장 공간이 부족합니다. 브라우저 캐시를 비우거나 일반 모드로 이용해주세요.');
+        } else {
+          alert('저장 중 오류가 발생했습니다: ' + error.message);
+        }
       }
+    }
+
+    // click과 touchend 모두 지원 (모바일 Safari 호환)
+    nextBtn.addEventListener('click', goToNextStep);
+    nextBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      goToNextStep(e);
     });
   </script>
 </body>
