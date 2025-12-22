@@ -452,17 +452,21 @@
           throw new Error(error.error || '영상 생성 요청 실패');
         }
 
-        const { id: predictionId } = await response.json();
+        const generateResult = await response.json();
+        const predictionId = generateResult.id;
+        const provider = generateResult.provider || 'kling';
         console.log('Prediction ID:', predictionId);
+        console.log('Provider:', provider);
 
         // 3. 상태 폴링
-        updateStep(2, 'Veo 영상화 중...', 50);
+        const providerName = provider === 'kling' ? 'Kling AI' : 'Veo';
+        updateStep(2, `${providerName} 영상화 중...`, 50);
 
         let attempts = 0;
         const maxAttempts = 120; // 10분
 
         while (attempts < maxAttempts) {
-          const statusResponse = await fetch(`/api/status/${encodeURIComponent(predictionId)}?provider=kling`);
+          const statusResponse = await fetch(`/api/status/${encodeURIComponent(predictionId)}?provider=${provider}`);
           const status = await statusResponse.json();
 
           console.log('Status:', status.status);

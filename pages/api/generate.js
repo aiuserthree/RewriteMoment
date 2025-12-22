@@ -1,4 +1,5 @@
 import { GoogleAuth } from 'google-auth-library';
+import jwt from 'jsonwebtoken';
 
 // Google Cloud 설정
 const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT || 'rewritemoment';
@@ -166,60 +167,122 @@ OUTPUT: A natural-looking group photo with both people together.`;
     }
 
     // ========================================
-    // STEP 2: Kling AI로 영상 생성
+    // STEP 2: 영상 생성 (Kling AI 또는 Veo)
     // ========================================
-    console.log('\n=== STEP 2: Kling AI 영상화 ===');
-
-    // Kling AI API 호출
-    const klingEndpoint = 'https://api.klingai.com/v1/videos/image2video';
     
-    // JWT 토큰 생성 (Kling AI 인증)
-    const jwt = require('jsonwebtoken');
-    const now = Math.floor(Date.now() / 1000);
-    const klingToken = jwt.sign(
-      {
-        iss: KLING_ACCESS_KEY,
-        exp: now + 1800, // 30분
-        nbf: now - 5,
-      },
-      KLING_ACCESS_SECRET,
-      { algorithm: 'HS256', header: { alg: 'HS256', typ: 'JWT' } }
-    );
+    // Kling API 키가 있으면 Kling 사용, 없으면 Veo 사용
+    const useKling = KLING_ACCESS_KEY && KLING_ACCESS_SECRET;
+    
+    if (useKling) {
+      console.log('\n=== STEP 2: Kling AI 영상화 ===');
+      
+      // JWT 토큰 생성 (Kling AI 인증)
+      const now = Math.floor(Date.now() / 1000);
+      const klingToken = jwt.sign(
+        {
+          iss: KLING_ACCESS_KEY,
+          exp: now + 1800, // 30분
+          nbf: now - 5,
+        },
+        KLING_ACCESS_SECRET,
+        { algorithm: 'HS256', header: { alg: 'HS256', typ: 'JWT' } }
+      );
 
-    const klingResponse = await fetch(klingEndpoint, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${klingToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model_name: 'kling-v1',
-        image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-        prompt: 'Two friends smiling and posing naturally. Subtle movements like breathing and blinking. Friendly atmosphere. Keep faces exactly as shown.',
-        duration: '5',
-        aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
-        mode: 'std',
-      }),
-    });
+      const klingResponse = await fetch('https://api.klingai.com/v1/videos/image2video', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${klingToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model_name: 'kling-v1',
+          image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
+          prompt: 'Two friends smiling and posing naturally. Subtle movements like breathing and blinking. Friendly atmosphere. Keep faces exactly as shown.',
+          duration: '5',
+          aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
+          mode: 'std',
+        }),
+      });
 
-    const klingData = await klingResponse.json();
+      const klingData = await klingResponse.json();
 
-    if (!klingResponse.ok || klingData.code !== 0) {
-      console.error('Kling Error:', klingData);
-      return res.status(500).json({ 
-        error: 'Kling 영상 생성 실패',
-        details: klingData.message || klingData.error?.message
+      if (!klingResponse.ok || klingData.code !== 0) {
+        console.error('Kling Error:', klingData);
+        return res.status(500).json({ 
+          error: 'Kling 영상 생성 실패',
+          details: klingData.message || klingData.error?.message
+        });
+      }
+
+      console.log('Kling 작업 시작:', klingData.data?.task_id);
+
+      return res.status(200).json({
+        id: klingData.data?.task_id,
+        status: 'processing',
+        message: 'Gemini 합성 완료 → Kling 영상 생성 중',
+        provider: 'kling',
+      });
+    } else {
+      // Veo로 fallback
+      console.log('\n=== STEP 2: Veo 영상화 (Kling 키 없음) ===');
+      
+      const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
+
+      const videoPrompt = `Animate this photo of two friends into an 8-second video.
+
+Animation: Both people smile and pose naturally. Subtle movements like breathing and blinking. Friendly atmosphere. Warm lighting.
+
+Keep both faces exactly as shown in the photo.`;
+
+      const auth = new GoogleAuth({
+        credentials: credentials,
+        scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+      });
+      const client = await auth.getClient();
+      const accessToken = await client.getAccessToken();
+
+      const veoResponse = await fetch(veoEndpoint, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${accessToken.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          instances: [{
+            prompt: videoPrompt,
+            image: {
+              bytesBase64Encoded: compositeImageBase64,
+              mimeType: compositeImageMimeType,
+            },
+          }],
+          parameters: {
+            aspectRatio: aspectRatio || '16:9',
+            sampleCount: 1,
+            durationSeconds: 8,
+            personGeneration: 'allow_adult',
+          },
+        }),
+      });
+
+      const veoData = await veoResponse.json();
+
+      if (!veoResponse.ok) {
+        console.error('Veo Error:', veoData);
+        return res.status(500).json({ 
+          error: 'Veo 영상 생성 실패',
+          details: veoData.error?.message || JSON.stringify(veoData)
+        });
+      }
+
+      console.log('Veo 작업 시작:', veoData.name);
+
+      return res.status(200).json({
+        id: veoData.name,
+        status: 'processing',
+        message: 'Gemini 합성 완료 → Veo 영상 생성 중',
+        provider: 'veo',
       });
     }
-
-    console.log('Kling 작업 시작:', klingData.data?.task_id);
-
-    return res.status(200).json({
-      id: klingData.data?.task_id,
-      status: 'processing',
-      message: 'Gemini 합성 완료 → Kling 영상 생성 중',
-      provider: 'kling',
-    });
 
   } catch (error) {
     console.error('전체 에러:', error);
