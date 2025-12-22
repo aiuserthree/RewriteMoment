@@ -141,26 +141,6 @@
             </div>
           </div>
 
-          <!-- Regenerate -->
-          <div class="card result-card" data-animate style="animation-delay: 0.3s">
-            <h3 class="result-card-title">다른 사진으로 다시 만들기</h3>
-            <p class="result-card-desc">다른 사진으로 새로운 영상을 만들어보세요!</p>
-            <a href="upload.html" class="btn btn-secondary w-full">
-              <span>📸</span> 새 사진 업로드하기
-            </a>
-          </div>
-
-          <!-- Info Card -->
-          <div class="card result-card movie-info-result" data-animate style="animation-delay: 0.4s" id="movieInfoCard">
-            <div class="movie-result-header">
-              <span class="movie-result-icon" id="movieResultIcon">✨</span>
-              <div>
-                <h3 class="movie-result-title" id="movieResultTitle">AI 합성 영상</h3>
-                <p class="movie-result-actors" id="movieResultActors">두 사람이 함께하는 특별한 순간</p>
-            </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
@@ -507,9 +487,6 @@
     // 페이지 정보 업데이트
     document.getElementById('pageSubtitle').textContent = `함께하는 특별한 순간 · ${aspectRatio}`;
     document.getElementById('videoCaption').textContent = `"함께하는 순간"`;
-    document.getElementById('movieResultIcon').textContent = '✨';
-    document.getElementById('movieResultTitle').textContent = 'AI 합성 영상';
-    document.getElementById('movieResultActors').textContent = '두 사람이 함께하는 특별한 순간';
 
     // 비디오 메타 업데이트
     if (videoMeta) {
