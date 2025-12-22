@@ -62,40 +62,47 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini(나노바나나) 합성 ===');
 
-    const geminiPrompt = `Create a photo of these two people as CLOSE FRIENDS together in the SAME SPACE.
+    const geminiPrompt = `⚠️⚠️⚠️ FACE PRESERVATION IS THE #1 PRIORITY ⚠️⚠️⚠️
 
-SCENE: Two friends standing close together, shoulders nearly touching, like they're taking a selfie or group photo together. They share the SAME background, SAME lighting, SAME environment. It should look like ONE photo taken of TWO people together - not two separate photos combined.
+This is a FACE PLACEMENT task, NOT a face generation task.
+You must COPY the faces from the input photos - do NOT create new faces.
 
-COMPOSITION:
-- Person from Photo 1 on LEFT
-- Person from Photo 2 on RIGHT  
-- They are CLOSE to each other (friendly distance, not far apart)
-- Bodies slightly angled toward each other
-- Natural poses like real friends taking a photo
-- SINGLE unified background behind both (cafe, studio, park - same for both)
-- SAME lighting on both faces
+TASK: Place these two people together in one photo.
+
+🔴 ABSOLUTE RULE FOR FACES:
+
+PERSON A (Photo 1 → LEFT side):
+The face MUST be a PIXEL-PERFECT COPY of Photo 1.
+- Copy the EXACT eyes (shape, size, color, distance between them)
+- Copy the EXACT nose (bridge, tip, nostrils - every detail)
+- Copy the EXACT mouth and lips (shape, size, color)
+- Copy the EXACT face shape (jawline, chin, cheekbones)
+- Copy the EXACT skin (tone, texture, any marks or moles)
+- Copy the EXACT eyebrows (shape, thickness, color)
+- Copy the EXACT hair (color, style, hairline)
+If someone knows this person, they MUST instantly recognize them.
+
+PERSON B (Photo 2 → RIGHT side):
+The face MUST be a PIXEL-PERFECT COPY of Photo 2.
+- Copy ALL facial features EXACTLY as they appear in Photo 2
+- Same eyes, nose, mouth, face shape, skin, hair as Photo 2
+If someone knows this person, they MUST instantly recognize them.
+
+🚫 FORBIDDEN:
+- Creating new or different faces
+- Blending or averaging the two faces
+- Making faces look "better" or "more attractive"
+- Changing ANY facial feature
+- Making the two people look similar to each other
+
+SCENE COMPOSITION:
+- Person A on LEFT, Person B on RIGHT
+- Close together like friends (shoulders nearly touching)
+- Same background, same lighting for both
 - Upper body shot (waist to head)
+- Friendly natural poses
 
-FACE PRESERVATION (HIGHEST PRIORITY):
-
-⚠️ PERSON ON LEFT (from Photo 1) - PRESERVE WITH EXTREME CARE:
-This face is the MOST IMPORTANT to preserve exactly.
-- EXACT same eye shape, size, color, spacing as Photo 1
-- EXACT same nose - bridge width, tip shape, nostril size as Photo 1
-- EXACT same lips and mouth shape as Photo 1
-- EXACT same face shape - jawline, chin, cheekbones as Photo 1
-- EXACT same skin tone and any facial marks as Photo 1
-- EXACT same eyebrows and hairline as Photo 1
-- EXACT same hair color and style as Photo 1
-DO NOT modify this face AT ALL. Copy it EXACTLY.
-
-PERSON ON RIGHT (from Photo 2):
-- EXACT same facial features as Photo 2
-- Same eyes, nose, lips, face shape, skin tone as Photo 2
-
-CRITICAL: Both faces must be IDENTICAL to their source photos. No new faces. No blending. No modifications.
-
-Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
+The faces are NON-NEGOTIABLE. They must be IDENTICAL to the source photos.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -215,7 +222,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Animate this photo. Two friends in same space, natural interaction. CRITICAL FACE PRESERVATION: The LEFT person face must be EXACTLY IDENTICAL to the photo - same eye shape, same nose, same lips, same jawline, same skin tone. The RIGHT person face must also be EXACTLY IDENTICAL to the photo. Do NOT change, morph, or alter ANY facial features. Faces must look like the SAME PEOPLE as in the photo. Allow gentle movement but faces stay EXACTLY as shown. Warm cinematic.',
+          prompt: 'Bring this photo to life. ⚠️CRITICAL: PRESERVE BOTH FACES EXACTLY. The left person and right person must look IDENTICAL to the photo throughout the entire video - same eyes, same nose, same mouth, same face shape, same skin. DO NOT morph, change, or alter faces AT ALL. Faces must be recognizable as the SAME PEOPLE. Natural movement allowed: smiling, turning heads, gestures, interaction. But facial STRUCTURE stays EXACTLY as shown. Warm cinematic lighting.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -246,7 +253,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Animate this photo. CRITICAL: LEFT person face must be EXACTLY IDENTICAL to photo - same eyes, nose, lips, jaw, skin. RIGHT person face must also be EXACTLY IDENTICAL. Do NOT change or morph any facial features. They must look like the SAME PEOPLE. Gentle natural movement but faces stay EXACTLY as shown. Warm cinematic. 8 seconds.`;
+      const videoPrompt = `Bring this photo to life. ⚠️CRITICAL: PRESERVE BOTH FACES EXACTLY throughout the video. Left and right person must look IDENTICAL to the photo - same eyes, nose, mouth, face shape, skin. DO NOT morph or change faces. They must be recognizable as the SAME PEOPLE. Natural movement: smiling, head turns, gestures, interaction. Facial STRUCTURE stays EXACTLY as shown. Warm cinematic. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
