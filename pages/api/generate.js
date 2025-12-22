@@ -62,47 +62,37 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini(나노바나나) 합성 ===');
 
-    const geminiPrompt = `⚠️⚠️⚠️ FACE PRESERVATION IS THE #1 PRIORITY ⚠️⚠️⚠️
+    const geminiPrompt = `You are an expert photo editor. Your task: combine two people into ONE group photo.
 
-This is a FACE PLACEMENT task, NOT a face generation task.
-You must COPY the faces from the input photos - do NOT create new faces.
+INPUT:
+- Image 1: Reference face for LEFT person
+- Image 2: Reference face for RIGHT person
 
-TASK: Place these two people together in one photo.
+OUTPUT: A single photo with both people together.
 
-🔴 ABSOLUTE RULE FOR FACES:
+⚠️ FACE RULES - READ 3 TIMES BEFORE GENERATING ⚠️
 
-PERSON A (Photo 1 → LEFT side):
-The face MUST be a PIXEL-PERFECT COPY of Photo 1.
-- Copy the EXACT eyes (shape, size, color, distance between them)
-- Copy the EXACT nose (bridge, tip, nostrils - every detail)
-- Copy the EXACT mouth and lips (shape, size, color)
-- Copy the EXACT face shape (jawline, chin, cheekbones)
-- Copy the EXACT skin (tone, texture, any marks or moles)
-- Copy the EXACT eyebrows (shape, thickness, color)
-- Copy the EXACT hair (color, style, hairline)
-If someone knows this person, they MUST instantly recognize them.
+For the LEFT person, use ONLY the face from Image 1:
+• Eyes: Use the EXACT eye shape from Image 1. If Image 1 has small eyes, output must have small eyes. If Image 1 has double eyelids, output must have double eyelids. Copy the exact eye color.
+• Nose: Use the EXACT nose from Image 1. If it's wide, keep it wide. If it's narrow, keep it narrow. Copy the bridge shape exactly.
+• Mouth: Use the EXACT lip shape from Image 1. Thin lips stay thin. Full lips stay full.
+• Face shape: Use the EXACT jawline and face outline from Image 1. Round face stays round. Square jaw stays square.
+• Skin: Use the EXACT skin tone from Image 1. Do not lighten or darken.
+• Hair: Use the EXACT hair color and style from Image 1.
 
-PERSON B (Photo 2 → RIGHT side):
-The face MUST be a PIXEL-PERFECT COPY of Photo 2.
-- Copy ALL facial features EXACTLY as they appear in Photo 2
-- Same eyes, nose, mouth, face shape, skin, hair as Photo 2
-If someone knows this person, they MUST instantly recognize them.
+For the RIGHT person, use ONLY the face from Image 2:
+• Apply the same rules - copy EVERY facial feature EXACTLY from Image 2.
 
-🚫 FORBIDDEN:
-- Creating new or different faces
-- Blending or averaging the two faces
-- Making faces look "better" or "more attractive"
-- Changing ANY facial feature
-- Making the two people look similar to each other
+TEST: Would the person's mother recognize them? If not, you failed.
 
-SCENE COMPOSITION:
-- Person A on LEFT, Person B on RIGHT
-- Close together like friends (shoulders nearly touching)
-- Same background, same lighting for both
-- Upper body shot (waist to head)
-- Friendly natural poses
+COMPOSITION:
+- Two people standing close together like friends
+- Shoulders nearly touching
+- Same background and lighting
+- Upper body visible (waist to head)
+- Natural friendly poses
 
-The faces are NON-NEGOTIABLE. They must be IDENTICAL to the source photos.`;
+DO NOT: Create new faces, blend faces, "improve" faces, or change any features.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -222,7 +212,7 @@ The faces are NON-NEGOTIABLE. They must be IDENTICAL to the source photos.`;
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Bring this photo to life. ⚠️CRITICAL: PRESERVE BOTH FACES EXACTLY. The left person and right person must look IDENTICAL to the photo throughout the entire video - same eyes, same nose, same mouth, same face shape, same skin. DO NOT morph, change, or alter faces AT ALL. Faces must be recognizable as the SAME PEOPLE. Natural movement allowed: smiling, turning heads, gestures, interaction. But facial STRUCTURE stays EXACTLY as shown. Warm cinematic lighting.',
+          prompt: 'Animate this photo. FACE LOCK MODE: Both faces must stay EXACTLY as shown in every frame - same eye shape, same nose shape, same lip shape, same jaw shape, same skin tone. The faces should look like the EXACT same people from start to end. No face morphing. No face changing. Movement allowed: subtle smile, head tilt, body gestures, eye contact between them. Keep facial bone structure LOCKED. Cinematic warm lighting. Two friends sharing a moment.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -253,7 +243,7 @@ The faces are NON-NEGOTIABLE. They must be IDENTICAL to the source photos.`;
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Bring this photo to life. ⚠️CRITICAL: PRESERVE BOTH FACES EXACTLY throughout the video. Left and right person must look IDENTICAL to the photo - same eyes, nose, mouth, face shape, skin. DO NOT morph or change faces. They must be recognizable as the SAME PEOPLE. Natural movement: smiling, head turns, gestures, interaction. Facial STRUCTURE stays EXACTLY as shown. Warm cinematic. 8 seconds.`;
+      const videoPrompt = `Animate this photo. FACE LOCK MODE: Both faces must stay EXACTLY as shown in every frame - same eye shape, nose shape, lip shape, jaw shape, skin tone. Faces should look like the EXACT same people from start to end. No face morphing or changing. Movement allowed: subtle smile, head tilt, body gestures, eye contact. Keep facial bone structure LOCKED. Cinematic warm lighting. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
