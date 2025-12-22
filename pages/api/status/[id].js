@@ -113,6 +113,14 @@ export default async function handler(req, res) {
       if (statusData.error) {
         status = 'failed';
         console.error('Veo generation failed:', statusData.error);
+        return res.status(200).json({
+          id: operationId,
+          status: 'failed',
+          output: null,
+          error: statusData.error.message || '영상 생성 실패',
+          details: JSON.stringify(statusData.error),
+          provider: 'google-veo'
+        });
       } else {
         status = 'succeeded';
         

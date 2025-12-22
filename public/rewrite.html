@@ -491,7 +491,8 @@
           }
 
           if (status.status === 'failed' || status.status === 'canceled') {
-            const errorMsg = status.error || '영상 생성 실패';
+            console.error('Generation failed:', status);
+            const errorMsg = status.error || status.details || '영상 생성 실패. 다른 사진으로 다시 시도해주세요.';
             throw new Error(errorMsg);
           }
 

@@ -57,25 +57,22 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini 합성 ===');
 
-    const geminiPrompt = `Create a single photo showing these two people together.
+    const geminiPrompt = `Generate a photo of two people taking a friendly selfie together.
 
-TASK: Combine the two input images into ONE photo where both people appear together, like they're taking a selfie or posing for a photo together.
+COMPOSITION:
+- Person A (from first image) on the left side, smiling
+- Person B (from second image) on the right side, smiling  
+- Both facing the camera like taking a group selfie
+- Casual, friendly atmosphere
+- Good lighting, natural look
 
-REQUIREMENTS:
-1. Person from Image 1 should be on the LEFT side
-2. Person from Image 2 should be on the RIGHT side  
-3. Both people are facing the camera, smiling
-4. They look like friends taking a photo together
-5. Natural, casual selfie style composition
-6. Warm lighting, friendly atmosphere
+FACE REQUIREMENTS:
+- Person A must look exactly like the person in Image 1
+- Person B must look exactly like the person in Image 2
+- Preserve all facial features accurately
+- Both faces clearly visible
 
-CRITICAL - FACE PRESERVATION:
-- Keep Person 1's face EXACTLY as shown in Image 1
-- Keep Person 2's face EXACTLY as shown in Image 2
-- Do NOT modify, blend, or change any facial features
-- Both faces must be clearly visible and recognizable
-
-OUTPUT: A single composite photo with both people together.`;
+Style: Candid selfie photo, warm lighting, 8K quality.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -179,23 +176,11 @@ OUTPUT: A single composite photo with both people together.`;
     // ========================================
     console.log('\n=== STEP 2: Veo 영상화 ===');
 
-    const videoPrompt = `Animate this photo of two people into an 8-second video.
+    const videoPrompt = `Create a short video from this photo of two friends.
 
-SCENE: Two people (friends) who just met, taking a selfie together.
+Animation: Both people smile and pose naturally. Subtle movements like breathing and blinking. Friendly, casual atmosphere. Warm natural lighting.
 
-ANIMATION SEQUENCE:
-0-2s: Both smile at camera, posing for the photo
-2-4s: Natural movements - breathing, blinking, slight head tilts
-4-6s: They look at each other and laugh together
-6-8s: Wave goodbye to camera, thumbs up
-
-STYLE:
-- Candid vlog/behind-the-scenes footage
-- Warm, friendly atmosphere
-- Natural lighting
-- Subtle camera shake for realism
-
-CRITICAL: Both faces must remain exactly as shown in the input image throughout the entire video. No face morphing or changes allowed.`;
+Keep both faces exactly as shown in the photo.`;
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
