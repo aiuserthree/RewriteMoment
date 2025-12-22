@@ -212,7 +212,7 @@ DO NOT: Create new faces, blend faces, "improve" faces, or change any features.`
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Animate this photo. FACE LOCK MODE: Both faces must stay EXACTLY as shown in every frame - same eye shape, same nose shape, same lip shape, same jaw shape, same skin tone. The faces should look like the EXACT same people from start to end. No face morphing. No face changing. Movement allowed: subtle smile, head tilt, body gestures, eye contact between them. Keep facial bone structure LOCKED. Cinematic warm lighting. Two friends sharing a moment.',
+          prompt: 'Animate this photo with MINIMAL facial expression changes. FACE LOCK: Both faces must stay EXACTLY as shown - same eye shape, nose, lips, jaw, skin tone in every frame. EXPRESSION LIMIT: Only allow gentle soft smile (no big laughs, no wide grins, no exaggerated expressions). Movement allowed: slight head turn, gentle nod, soft eye blinks, subtle body sway. Keep expressions CALM and SUBTLE. Faces must look like the SAME people throughout. Warm soft lighting.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -243,7 +243,7 @@ DO NOT: Create new faces, blend faces, "improve" faces, or change any features.`
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Animate this photo. FACE LOCK MODE: Both faces must stay EXACTLY as shown in every frame - same eye shape, nose shape, lip shape, jaw shape, skin tone. Faces should look like the EXACT same people from start to end. No face morphing or changing. Movement allowed: subtle smile, head tilt, body gestures, eye contact. Keep facial bone structure LOCKED. Cinematic warm lighting. 8 seconds.`;
+      const videoPrompt = `Animate this photo with MINIMAL facial expression changes. FACE LOCK: Both faces stay EXACTLY as shown - same eye shape, nose, lips, jaw, skin tone. EXPRESSION LIMIT: Only gentle soft smile (no big laughs, no wide grins, no exaggerated expressions). Movement: slight head turn, gentle nod, soft blinks, subtle body sway. Keep expressions CALM and SUBTLE. Faces must look like SAME people. Warm lighting. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
