@@ -57,68 +57,48 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini 합성 ===');
 
-    // 얼굴 보존 강화 프롬프트
-    const geminiPrompt = `You are a photo editing expert. Your task is to create a composite image.
+    // 얼굴 100% 보존 프롬프트 - 최대 강화
+    const geminiPrompt = `⚠️⚠️⚠️ FACE TRANSFER TASK - NOT FACE GENERATION ⚠️⚠️⚠️
 
-INPUT IMAGES:
-- Reference Face A: The first image (USE THIS EXACT FACE for Person A)
-- Reference Face B: The second image (USE THIS EXACT FACE for Person B)
+You are performing a FACE TRANSFER operation, NOT creating new faces.
 
-TASK:
-Create a new image where Person A and Person B appear together, side by side, like friends taking a selfie.
+SOURCE IMAGES:
+- SOURCE FACE 1 (Image 1): Extract and use THIS EXACT FACE for Person A
+- SOURCE FACE 2 (Image 2): Extract and use THIS EXACT FACE for Person B
 
-⚠️ CRITICAL FACE PRESERVATION RULES ⚠️
+🔴 ABSOLUTE RULE: COPY FACES PIXEL-BY-PIXEL 🔴
 
-For Person A (left side):
-- MUST use the EXACT face from Reference Face A
-- Same eyes (shape, color, size, distance)
-- Same nose (shape, size, bridge)
-- Same mouth (shape, lips)
-- Same face shape (jawline, chin, cheekbones)
-- Same skin tone and texture
-- Same eyebrows (shape, thickness)
-- Same hair (color, style)
+You must TRANSFER the faces from the source images, not generate new ones.
+Think of this as cutting out the faces and pasting them into a new scene.
 
-For Person B (right side):
-- MUST use the EXACT face from Reference Face B
-- Same eyes (shape, color, size, distance)
-- Same nose (shape, size, bridge)
-- Same mouth (shape, lips)
-- Same face shape (jawline, chin, cheekbones)
-- Same skin tone and texture
-- Same eyebrows (shape, thickness)
-- Same hair (color, style)
+For PERSON A (left side of output):
+→ COPY the face from Image 1 EXACTLY
+→ Every pixel of the face must match the source
+→ No artistic interpretation - just transfer
 
-🚫 FORBIDDEN:
-- Do NOT create new or different faces
-- Do NOT blend or morph the faces
-- Do NOT change facial proportions
-- Do NOT alter skin tones
-- Do NOT modify any facial features
+For PERSON B (right side of output):  
+→ COPY the face from Image 2 EXACTLY
+→ Every pixel of the face must match the source
+→ No artistic interpretation - just transfer
 
-COMPOSITION & FRAMING (VERY IMPORTANT):
-- Person A on LEFT, Person B on RIGHT
-- ⚠️ WIDE SHOT - show from WAIST UP (not just head/shoulders)
-- Faces should occupy only about 20-30% of the image height
-- LOTS of empty space around the subjects
-- Show full upper body (waist to head)
-- Include visible background (room, outdoor scene, studio)
-- Both people standing or sitting at a natural distance from camera
+❌ STRICTLY FORBIDDEN - DO NOT:
+- Generate new faces
+- Interpret or reimagine faces
+- Blend features from both people
+- Change ANY facial feature (eyes, nose, mouth, jaw, skin)
+- Alter skin tone or texture
+- Modify hair color or style
+- Make faces look "better" or "different"
 
-🚫 DO NOT:
-- Close-up face shots
-- Tight cropping on faces
-- Faces filling most of the frame
-- Selfie-style close compositions
+✅ REQUIRED OUTPUT:
+- Wide shot showing both people from WAIST UP
+- Person A on LEFT with EXACT face from Image 1
+- Person B on RIGHT with EXACT face from Image 2
+- Casual friendly scene, nice background
+- Faces should be 20-30% of image height (not close-up)
+- Natural lighting, group photo style
 
-✅ DO:
-- Wide angle group photo style
-- Full upper body visible (waist up)
-- Background takes up 40-50% of the image
-- Natural distance as if photographer is 2-3 meters away
-- Warm, friendly lighting
-
-The faces must be IDENTICAL to the reference images. This is a face-swap/composite task, not face generation.`;
+Remember: This is FACE TRANSFER. The faces in your output must be IDENTICAL to the input faces. If you change any facial feature, you have failed the task.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -160,7 +140,7 @@ The faces must be IDENTICAL to the reference images. This is a face-swap/composi
             }],
             generationConfig: {
               responseModalities: ['IMAGE', 'TEXT'],
-              temperature: 0.4,  // 낮은 temperature로 더 정확하게
+              temperature: 0,  // 0으로 설정해서 최대한 정확하게 얼굴 보존
             },
           }),
         });
