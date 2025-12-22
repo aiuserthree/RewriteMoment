@@ -57,25 +57,52 @@ export default async function handler(req, res) {
     // ========================================
     console.log('\n=== STEP 1: Gemini 합성 ===');
 
-    const geminiPrompt = `You are an expert photo editor.
+    const geminiPrompt = `You are a professional photo compositor. Your job is to create a COLLAGE/COMPOSITE image.
 
-I'm giving you TWO photos:
-1. Photo 1 (first image): This is ME - the main person
-2. Photo 2 (second image): This is another person I want to take a photo WITH
+INPUT:
+- Image 1: Person A (this is me)
+- Image 2: Person B (the celebrity/friend I want to meet)
 
-Create a NEW composite image where:
-- I (from Photo 1) am on the LEFT side, holding up my phone like taking a selfie
-- The person from Photo 2 is on the RIGHT side, posing with me
-- We are both smiling at the camera like friends taking a selfie together
-- The background is a movie set with professional lighting equipment visible
+YOUR TASK:
+Create a composite image showing Person A and Person B together, as if taking a group selfie.
 
-CRITICAL REQUIREMENTS:
-- My face (from Photo 1) must look EXACTLY the same - same face shape, eyes, nose, mouth, skin tone
-- The other person's face (from Photo 2) must also look EXACTLY the same
-- DO NOT change or morph either face
-- Make it look like a natural selfie photo
+=== ABSOLUTE REQUIREMENTS FOR FACES ===
+⚠️ CRITICAL: You must COPY the faces EXACTLY as they appear in the original photos.
 
-Style: Candid selfie photo, warm natural lighting, friendly atmosphere, 8K quality`;
+For Person A (from Image 1):
+- Copy their EXACT face - every facial feature must be identical
+- Same eye shape, eye color, eyebrows
+- Same nose shape and size
+- Same mouth, lips, teeth
+- Same face shape, jawline, chin
+- Same skin tone, texture, any marks or features
+- Same hair color, style, texture
+
+For Person B (from Image 2):
+- Copy their EXACT face - every facial feature must be identical
+- Same eye shape, eye color, eyebrows  
+- Same nose shape and size
+- Same mouth, lips, teeth
+- Same face shape, jawline, chin
+- Same skin tone, texture, any marks or features
+- Same hair color, style, texture
+
+=== COMPOSITION ===
+- Person A on the left, holding phone for selfie
+- Person B on the right, posing together
+- Both facing camera, friendly poses
+- Background: movie set or studio
+
+=== FORBIDDEN ===
+❌ Do NOT generate new faces
+❌ Do NOT modify facial features
+❌ Do NOT change skin tones
+❌ Do NOT alter hair
+❌ Do NOT use generic faces
+
+The faces must be PIXEL-PERFECT copies from the input images. Only change body position and background.
+
+Output a single high-quality composite image.`;
 
     const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
 
@@ -153,20 +180,35 @@ Style: Candid selfie photo, warm natural lighting, friendly atmosphere, 8K quali
 
     const videoPrompt = `Animate this photo into an 8-second video.
 
-CRITICAL: Both people's faces must stay EXACTLY the same throughout the video.
-- Do NOT change any facial features
-- Do NOT morph faces
-- Keep faces identical to this input image
+=== FACE PRESERVATION - CRITICAL ===
+⚠️ BOTH FACES IN THIS IMAGE MUST REMAIN 100% IDENTICAL THROUGHOUT THE ENTIRE VIDEO.
 
-Animation:
-0-2 sec: Both people smile and pose for the selfie
-2-4 sec: The person holding the phone adjusts the angle
-4-6 sec: Both laugh naturally, share a moment
-6-8 sec: They high-five and wave goodbye to camera
+Rules for faces:
+- Every frame must show the EXACT same faces as the input
+- Eye shape, nose, mouth, jawline - ALL must stay identical
+- Skin tone must not change
+- No morphing, no transformation, no alteration
+- Faces can move (turn, tilt) but features stay the same
 
-Style: Behind-the-scenes vlog footage, candid and warm, natural lighting, slight handheld camera shake.
+=== ANIMATION ===
+0-2s: Both people pose for selfie, smiling at camera
+2-4s: Small natural movements - blinking, slight head turns
+4-6s: They share a laugh, natural expressions
+6-8s: Wave goodbye, thumbs up
 
-IMPORTANT: Both faces must remain 100% identical to the input image!`;
+=== STYLE ===
+- Candid vlog footage
+- Warm natural lighting  
+- Slight handheld camera movement
+- Friendly casual atmosphere
+
+=== FORBIDDEN ===
+❌ Face morphing
+❌ Face changing
+❌ Different faces appearing
+❌ Distorted features
+
+Keep the faces EXACTLY as shown in the input image!`;
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
