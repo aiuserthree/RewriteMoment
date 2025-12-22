@@ -76,24 +76,24 @@ COMPOSITION:
 - SAME lighting on both faces
 - Upper body shot (waist to head)
 
-FACE PRESERVATION (MOST IMPORTANT - DO NOT IGNORE):
-- Person on LEFT must have the EXACT SAME face as Photo 1:
-  * Identical eye shape, eye size, eye color
-  * Identical nose shape and size
-  * Identical lip shape and mouth
-  * Identical jawline and face shape
-  * Identical skin tone and texture
-  * Identical eyebrows and hair
-  
-- Person on RIGHT must have the EXACT SAME face as Photo 2:
-  * Identical eye shape, eye size, eye color
-  * Identical nose shape and size
-  * Identical lip shape and mouth
-  * Identical jawline and face shape
-  * Identical skin tone and texture
-  * Identical eyebrows and hair
+FACE PRESERVATION (HIGHEST PRIORITY):
 
-DO NOT create new faces. DO NOT average or blend features. Copy faces EXACTLY as shown.
+⚠️ PERSON ON LEFT (from Photo 1) - PRESERVE WITH EXTREME CARE:
+This face is the MOST IMPORTANT to preserve exactly.
+- EXACT same eye shape, size, color, spacing as Photo 1
+- EXACT same nose - bridge width, tip shape, nostril size as Photo 1
+- EXACT same lips and mouth shape as Photo 1
+- EXACT same face shape - jawline, chin, cheekbones as Photo 1
+- EXACT same skin tone and any facial marks as Photo 1
+- EXACT same eyebrows and hairline as Photo 1
+- EXACT same hair color and style as Photo 1
+DO NOT modify this face AT ALL. Copy it EXACTLY.
+
+PERSON ON RIGHT (from Photo 2):
+- EXACT same facial features as Photo 2
+- Same eyes, nose, lips, face shape, skin tone as Photo 2
+
+CRITICAL: Both faces must be IDENTICAL to their source photos. No new faces. No blending. No modifications.
 
 Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
 
@@ -215,7 +215,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
         body: JSON.stringify({
           model_name: 'kling-v1',
           image: `data:${compositeImageMimeType};base64,${compositeImageBase64}`,
-          prompt: 'Animate these two friends together in the same space. They interact naturally - looking at each other, smiling, friendly gestures. Same lighting, same environment. CRITICAL FACE RULE: Each person must keep their EXACT facial features throughout the ENTIRE video - same eye shape, same nose, same lips, same jaw, same skin tone from start to end. Their faces must be RECOGNIZABLE as the same people in every frame. No face morphing or changing. Warm cinematic.',
+          prompt: 'Animate these two friends together. Natural interaction - smiling, looking at each other, friendly gestures. STRICT FACE RULES: The person on the LEFT side must keep their EXACT face - same eyes, nose, lips, jaw, skin in EVERY frame. Do NOT change or morph the left persons face at all. The person on RIGHT also keeps their exact face. Both faces must look IDENTICAL to the photo throughout. No face changes. Warm cinematic.',
           duration: '5',
           aspect_ratio: aspectRatio === '9:16' ? '9:16' : '16:9',
           mode: 'std',
@@ -246,7 +246,7 @@ Make it look like they are truly TOGETHER in one moment, one place, one photo.`;
       
       const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
-      const videoPrompt = `Animate these two friends together in the same space. Natural interaction - looking at each other, smiling, friendly gestures. CRITICAL: Each person must keep their EXACT facial features throughout - same eyes, nose, lips, jaw, skin tone in every frame. Faces must be recognizable as the same people from start to end. No morphing. Warm cinematic. 8 seconds.`;
+      const videoPrompt = `Animate these two friends together. Natural interaction - smiling, friendly gestures. STRICT: The LEFT person must keep their EXACT face unchanged in every frame - same eyes, nose, lips, jaw. Do NOT morph the left face. RIGHT person also keeps exact face. Both faces identical to photo throughout. Warm cinematic. 8 seconds.`;
 
       const auth = new GoogleAuth({
         credentials: credentials,
