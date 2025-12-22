@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>영화 선택 - Rewrite Moment</title>
+  <title>설정 - Rewrite Moment</title>
   <link rel="stylesheet" href="/css/styles.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎬</text></svg>">
 </head>
@@ -23,28 +23,6 @@
         <li><a href="index.html#how" class="nav-link">이용방법</a></li>
         <li><a href="pricing.html" class="nav-link">가격</a></li>
       </ul>
-      <div class="nav-auth">
-        <div class="nav-credits">
-          <span class="nav-credits-icon">💎</span>
-          <span class="nav-credits-value" id="creditBalance">0</span>
-          <span style="color: var(--text-muted)">크레딧</span>
-        </div>
-        <button class="btn-login" id="btn-open-login" onclick="openAuthModal('login')">로그인</button>
-        <div class="user-menu hidden" id="user-menu">
-          <div class="user-avatar" id="user-avatar" onclick="toggleUserDropdown()">U</div>
-          <div class="user-dropdown" id="user-dropdown">
-            <div class="user-dropdown-header">
-              <div class="user-dropdown-name" id="user-name">사용자</div>
-              <div class="user-dropdown-email" id="user-email">user@email.com</div>
-            </div>
-            <div class="user-dropdown-menu">
-              <a href="pricing.html" class="user-dropdown-item">💎 크레딧 충전</a>
-              <a href="#" class="user-dropdown-item">📋 내 영상</a>
-              <div class="user-dropdown-item logout" onclick="logout()">🚪 로그아웃</div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </nav>
 
@@ -58,10 +36,10 @@
           <div class="step-number">✓</div>
           <span class="step-text">업로드</span>
         </div>
-        <div class="step-line completed"></div>
+        <div class="step-line active"></div>
         <div class="step active">
           <div class="step-number">2</div>
-          <span class="step-text">선택</span>
+          <span class="step-text">설정</span>
         </div>
         <div class="step-line"></div>
         <div class="step">
@@ -78,145 +56,59 @@
       <!-- Page Header -->
       <div class="page-header" data-animate>
         <h1 class="page-title">
-          어떤 <span class="text-gradient">영화</span>에서<br>
-          셀카를 찍을까요?
+          <span class="text-gradient">영상 설정</span>
         </h1>
         <p class="page-subtitle">
-          좋아하는 영화를 선택하면,<br>
-          그 영화 배우들과 함께 셀카를 찍는 영상이 만들어져요! 📸
+          화면 비율을 선택하고 미리보기를 확인하세요
         </p>
       </div>
 
+      <!-- Preview Card -->
+      <div class="card" data-animate style="animation-delay: 0.1s">
+        <h3 class="section-title">📷 업로드한 사진</h3>
+        <div class="photo-preview-grid">
+          <div class="photo-preview-item">
+            <span class="photo-label">내 사진</span>
+            <img id="myPhotoPreview" src="" alt="내 사진">
+          </div>
+          <div class="photo-preview-plus">+</div>
+          <div class="photo-preview-item">
+            <span class="photo-label">함께할 사람</span>
+            <img id="actorPhotoPreview" src="" alt="함께할 사람">
+          </div>
+        </div>
+      </div>
+
       <!-- Aspect Ratio Selection -->
-      <section class="select-section" data-animate style="animation-delay: 0.1s">
-        <h3 class="select-section-title">
-          <span class="select-section-icon">📐</span>
-          영상 비율
-        </h3>
-        <div class="ratio-cards">
-          <label class="ratio-card active">
-            <input type="radio" name="ratio" value="16:9" checked>
-            <div class="ratio-preview ratio-16-9">
-              <span>16:9</span>
-            </div>
-            <div class="ratio-label">가로형</div>
-            <div class="ratio-desc">YouTube, 데스크탑</div>
-          </label>
-
-          <label class="ratio-card">
-            <input type="radio" name="ratio" value="9:16">
-            <div class="ratio-preview ratio-9-16">
-              <span>9:16</span>
-            </div>
-            <div class="ratio-label">세로형</div>
-            <div class="ratio-desc">릴스, 쇼츠, TikTok</div>
-          </label>
-        </div>
-      </section>
-
-      <!-- Movie Selection -->
-      <section class="select-section" data-animate style="animation-delay: 0.2s">
-        <h3 class="select-section-title">
-          <span class="select-section-icon">🎬</span>
-          영화 선택
-        </h3>
-        <div class="movie-grid">
-          <label class="movie-card active">
-            <input type="radio" name="movie" value="avengers" checked>
-            <div class="movie-poster avengers">
-              <div class="movie-overlay">
-                <span class="movie-icon">🦸</span>
-              </div>
-            </div>
-            <div class="movie-info">
-              <div class="movie-title">어벤저스</div>
-              <div class="movie-actors">아이언맨, 캡틴, 토르, 블랙위도우</div>
+      <div class="card mt-lg" data-animate style="animation-delay: 0.2s">
+        <h3 class="section-title">📐 화면 비율</h3>
+        <div class="ratio-options">
+          <label class="ratio-option">
+            <input type="radio" name="aspectRatio" value="16:9" checked>
+            <div class="ratio-card">
+              <div class="ratio-preview ratio-16-9"></div>
+              <span class="ratio-label">16:9</span>
+              <span class="ratio-desc">유튜브, TV</span>
             </div>
           </label>
-
-          <label class="movie-card">
-            <input type="radio" name="movie" value="spiderman">
-            <div class="movie-poster spiderman">
-              <div class="movie-overlay">
-                <span class="movie-icon">🕷️</span>
-              </div>
-            </div>
-            <div class="movie-info">
-              <div class="movie-title">스파이더맨</div>
-              <div class="movie-actors">피터파커, MJ, 네드</div>
+          <label class="ratio-option">
+            <input type="radio" name="aspectRatio" value="9:16">
+            <div class="ratio-card">
+              <div class="ratio-preview ratio-9-16"></div>
+              <span class="ratio-label">9:16</span>
+              <span class="ratio-desc">릴스, 숏츠</span>
             </div>
           </label>
-
-          <label class="movie-card">
-            <input type="radio" name="movie" value="harrypotter">
-            <div class="movie-poster harrypotter">
-              <div class="movie-overlay">
-                <span class="movie-icon">⚡</span>
-              </div>
-            </div>
-            <div class="movie-info">
-              <div class="movie-title">해리포터</div>
-              <div class="movie-actors">해리, 헤르미온느, 론</div>
-            </div>
-          </label>
-
-          <label class="movie-card">
-            <input type="radio" name="movie" value="lotr">
-            <div class="movie-poster lotr">
-              <div class="movie-overlay">
-                <span class="movie-icon">💍</span>
-              </div>
-            </div>
-            <div class="movie-info">
-              <div class="movie-title">반지의 제왕</div>
-              <div class="movie-actors">프로도, 간달프, 아라곤, 레골라스</div>
-            </div>
-          </label>
-
-          <label class="movie-card">
-            <input type="radio" name="movie" value="starwars">
-            <div class="movie-poster starwars">
-              <div class="movie-overlay">
-                <span class="movie-icon">⚔️</span>
-              </div>
-            </div>
-            <div class="movie-info">
-              <div class="movie-title">스타워즈</div>
-              <div class="movie-actors">루크, 레아, 한솔로, 다스베이더</div>
-            </div>
-          </label>
-
-          <label class="movie-card">
-            <input type="radio" name="movie" value="jurassic">
-            <div class="movie-poster jurassic">
-              <div class="movie-overlay">
-                <span class="movie-icon">🦖</span>
-              </div>
-            </div>
-            <div class="movie-info">
-              <div class="movie-title">쥬라기 공원</div>
-              <div class="movie-actors">그랜트 박사, 엘리, 말콤 박사</div>
-            </div>
-          </label>
-        </div>
-      </section>
-
-      <!-- Info -->
-      <div class="info-card mt-xl" data-animate style="animation-delay: 0.3s">
-        <div class="info-content">
-          <span class="info-icon">📸</span>
-          <span class="info-text">영화 촬영장에서 배우들과 셀카를 찍는 8초 영상이 생성됩니다</span>
         </div>
       </div>
 
       <!-- Actions -->
-      <div class="actions-row mt-xl" data-animate style="animation-delay: 0.4s">
+      <div class="actions-row mt-xl" data-animate style="animation-delay: 0.3s">
         <a href="upload.html" class="btn btn-ghost">
           ← 이전
         </a>
-        <button class="btn btn-primary btn-lg" id="nextBtn">
-          영상 만들기
-          <span>🎬</span>
+        <button class="btn btn-primary btn-lg" id="generateBtn">
+          🎬 영상 생성하기
         </button>
       </div>
 
@@ -225,209 +117,101 @@
 
   <script src="/js/app.js"></script>
   <style>
-    /* Select Page Specific Styles */
-    .select-section {
-      margin-bottom: 40px;
+    .page-title {
+      font-size: 2rem;
     }
 
-    .select-section-title {
+    .section-title {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: var(--text-primary);
+    }
+
+    .photo-preview-grid {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 1.125rem;
-      margin-bottom: 20px;
-    }
-
-    .select-section-icon {
-      font-size: 1.25rem;
-    }
-
-    /* Movie Grid */
-    .movie-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      justify-content: center;
       gap: 20px;
     }
 
-    .movie-card {
-      background: var(--bg-secondary);
-      border: 2px solid var(--border-color);
+    .photo-preview-item {
+      text-align: center;
+    }
+
+    .photo-preview-item img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
       border-radius: var(--radius-lg);
+      border: 2px solid var(--border-color);
+    }
+
+    .photo-label {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .photo-preview-plus {
+      font-size: 2rem;
+      color: var(--accent-primary);
+      font-weight: bold;
+    }
+
+    .ratio-options {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .ratio-option {
       cursor: pointer;
-      transition: all 0.3s ease;
-      overflow: hidden;
     }
 
-    .movie-card:hover {
-      border-color: var(--accent-secondary);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(168, 85, 247, 0.2);
-    }
-
-    .movie-card.active {
-      border-color: var(--accent-primary);
-      box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.3);
-    }
-
-    .movie-card input {
+    .ratio-option input {
       display: none;
     }
 
-    .movie-poster {
-      height: 140px;
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .movie-poster.avengers {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-    }
-
-    .movie-poster.spiderman {
-      background: linear-gradient(135deg, #8B0000 0%, #DC143C 50%, #FF4500 100%);
-    }
-
-    .movie-poster.harrypotter {
-      background: linear-gradient(135deg, #1a0a2e 0%, #2d1b4e 50%, #4a1a6b 100%);
-    }
-
-    .movie-poster.lotr {
-      background: linear-gradient(135deg, #2d4a22 0%, #3d5a2e 50%, #556b2f 100%);
-    }
-
-    .movie-poster.starwars {
-      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2a2a2a 100%);
-    }
-
-    .movie-poster.jurassic {
-      background: linear-gradient(135deg, #1a3a1a 0%, #2d5a2d 50%, #228b22 100%);
-    }
-
-    .movie-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.3);
-    }
-
-    .movie-icon {
-      font-size: 3.5rem;
-      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-    }
-
-    .movie-info {
-      padding: 16px;
-      text-align: center;
-    }
-
-    .movie-title {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 6px;
-    }
-
-    .movie-actors {
-      font-size: 0.8rem;
-      color: var(--text-tertiary);
-      line-height: 1.4;
-    }
-
-    /* Ratio Selection */
-    .ratio-cards {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-    }
-
     .ratio-card {
-      flex: 1;
-      max-width: 200px;
       padding: 20px;
-      background: var(--bg-secondary);
       border: 2px solid var(--border-color);
       border-radius: var(--radius-lg);
-      cursor: pointer;
-      transition: all 0.3s ease;
       text-align: center;
+      transition: all 0.3s ease;
+      min-width: 140px;
     }
 
-    .ratio-card:hover {
-      border-color: var(--accent-secondary);
-      background: rgba(168, 85, 247, 0.05);
-    }
-
-    .ratio-card.active {
+    .ratio-option input:checked + .ratio-card {
       border-color: var(--accent-primary);
       background: rgba(168, 85, 247, 0.1);
     }
 
-    .ratio-card input {
-      display: none;
-    }
-
     .ratio-preview {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      margin-bottom: 12px;
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      font-weight: 600;
+      background: var(--bg-tertiary);
+      border-radius: var(--radius-sm);
+      margin: 0 auto 12px;
     }
 
     .ratio-16-9 {
-      width: 100%;
-      aspect-ratio: 16/9;
+      width: 80px;
+      height: 45px;
     }
 
     .ratio-9-16 {
-      width: 56.25%;
-      aspect-ratio: 9/16;
-      margin: 0 auto;
+      width: 45px;
+      height: 80px;
     }
 
     .ratio-label {
-      font-size: 1rem;
+      display: block;
       font-weight: 600;
-      color: var(--text-primary);
       margin-bottom: 4px;
     }
 
     .ratio-desc {
       font-size: 0.8rem;
-      color: var(--text-tertiary);
-    }
-
-    /* Info Card */
-    .info-card {
-      background: rgba(168, 85, 247, 0.1);
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      border-radius: var(--radius-lg);
-      padding: 16px 20px;
-    }
-
-    .info-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      justify-content: center;
-    }
-
-    .info-icon {
-      font-size: 1.5rem;
-    }
-
-    .info-text {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
+      color: var(--text-muted);
     }
 
     .actions-row {
@@ -437,29 +221,17 @@
     }
 
     @media (max-width: 768px) {
-      .movie-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+      .photo-preview-grid {
+        flex-direction: column;
       }
 
-      .movie-poster {
-        height: 100px;
+      .photo-preview-plus {
+        transform: rotate(90deg);
       }
 
-      .movie-icon {
-        font-size: 2.5rem;
-      }
-
-      .movie-info {
-        padding: 12px;
-      }
-
-      .movie-title {
-        font-size: 0.95rem;
-      }
-
-      .movie-actors {
-        font-size: 0.7rem;
+      .ratio-options {
+        flex-direction: column;
+        align-items: center;
       }
 
       .actions-row {
@@ -473,35 +245,24 @@
     }
   </style>
   <script>
-    // Selection functionality
-    const nextBtn = document.getElementById('nextBtn');
+    // 이전 페이지에서 저장한 사진 불러오기
+    const myPhoto = sessionStorage.getItem('myPhoto');
+    const actorPhoto = sessionStorage.getItem('actorPhoto');
 
-    // Movie selection
-    document.querySelectorAll('.movie-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.movie-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-      });
-    });
+    if (!myPhoto || !actorPhoto) {
+      alert('사진을 먼저 업로드해주세요.');
+      window.location.href = 'upload.html';
+    }
 
-    // Ratio selection
-    document.querySelectorAll('.ratio-card').forEach(card => {
-      card.addEventListener('click', () => {
-        document.querySelectorAll('.ratio-card').forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-      });
-    });
+    // 미리보기 표시
+    document.getElementById('myPhotoPreview').src = myPhoto;
+    document.getElementById('actorPhotoPreview').src = actorPhoto;
 
-    // Next button
-    nextBtn.addEventListener('click', () => {
-      const selectedRatio = document.querySelector('[name="ratio"]:checked').value;
-      const selectedMovie = document.querySelector('[name="movie"]:checked').value;
-
-      // Store selections
-      sessionStorage.setItem('selectedRatio', selectedRatio);
-      sessionStorage.setItem('selectedMovie', selectedMovie);
-
-      // Navigate to rewrite page (which will handle generation)
+    // 생성 버튼
+    document.getElementById('generateBtn').addEventListener('click', () => {
+      const aspectRatio = document.querySelector('input[name="aspectRatio"]:checked').value;
+      
+      sessionStorage.setItem('aspectRatio', aspectRatio);
       window.location.href = 'rewrite.html';
     });
   </script>

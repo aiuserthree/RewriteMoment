@@ -61,12 +61,12 @@
         <div class="step-line"></div>
         <div class="step">
           <div class="step-number">2</div>
-          <span class="step-text">선택</span>
+          <span class="step-text">설정</span>
         </div>
         <div class="step-line"></div>
         <div class="step">
           <div class="step-number">3</div>
-          <span class="step-text">Rewrite</span>
+          <span class="step-text">생성</span>
         </div>
         <div class="step-line"></div>
         <div class="step">
@@ -78,51 +78,62 @@
       <!-- Page Header -->
       <div class="page-header" data-animate>
         <h1 class="page-title">
-          <span class="text-gradient">내 사진</span>으로<br>
-          영화를 만들어봐
+          <span class="text-gradient">사진 2장</span>으로<br>
+          함께하는 영상 만들기
         </h1>
         <p class="page-subtitle">
-          정면/밝은 사진 1~3장이 가장 잘 나와요.<br>
-          다양한 표정과 각도가 있으면 더 좋아요.
+          내 사진과 함께하고 싶은 사람의 사진을 업로드하세요.<br>
+          AI가 두 사람이 함께하는 영상을 만들어드려요!
         </p>
       </div>
 
-      <!-- Upload Card -->
-      <div class="card" data-animate style="animation-delay: 0.1s">
-        <!-- Upload Zone -->
-        <div class="upload-zone" id="uploadZone">
-          <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp" multiple>
-          <div class="upload-icon">📸</div>
-          <h3 class="upload-title">사진을 드래그하거나 클릭해서 업로드</h3>
-          <p class="upload-desc">최대 3장까지 선택할 수 있어요</p>
-          <p class="upload-formats">JPG, PNG, WEBP · 최대 10MB</p>
-        </div>
-
-        <!-- Preview (단일 이미지) -->
-        <div class="preview-single" id="previewGrid">
-          <div class="preview-item preview-item-placeholder" data-slot="0">
-            <span>+</span>
-            사진 선택
+      <!-- Upload Cards -->
+      <div class="upload-cards" data-animate style="animation-delay: 0.1s">
+        
+        <!-- 내 사진 업로드 -->
+        <div class="upload-card">
+          <div class="upload-card-header">
+            <span class="upload-card-icon">👤</span>
+            <h3>내 사진</h3>
           </div>
+          <div class="upload-zone" id="uploadZone1">
+            <input type="file" id="fileInput1" accept="image/jpeg,image/png,image/webp">
+            <div class="upload-icon">📸</div>
+            <p class="upload-desc">내 얼굴이 잘 보이는 사진</p>
+          </div>
+          <div class="preview-box" id="preview1"></div>
         </div>
 
-        <!-- Tips -->
-        <div class="upload-tips mt-xl">
+        <!-- 배우 사진 업로드 -->
+        <div class="upload-card">
+          <div class="upload-card-header">
+            <span class="upload-card-icon">⭐</span>
+            <h3>함께할 사람 사진</h3>
+          </div>
+          <div class="upload-zone" id="uploadZone2">
+            <input type="file" id="fileInput2" accept="image/jpeg,image/png,image/webp">
+            <div class="upload-icon">🎬</div>
+            <p class="upload-desc">배우, 유명인, 친구 등</p>
+          </div>
+          <div class="preview-box" id="preview2"></div>
+        </div>
+
+      </div>
+
+      <!-- Tips -->
+      <div class="card mt-lg" data-animate style="animation-delay: 0.15s">
+        <div class="upload-tips">
           <h4 style="font-size: 0.95rem; margin-bottom: 12px; color: var(--text-secondary);">
             💡 좋은 사진 팁
           </h4>
           <div class="tips-grid">
             <div class="tip-item tip-good">
               <span class="tip-icon">✓</span>
-              <span>정면 얼굴이 잘 보이는 사진</span>
+              <span>얼굴이 크게 잘 보이는 사진</span>
             </div>
             <div class="tip-item tip-good">
               <span class="tip-icon">✓</span>
-              <span>밝은 조명에서 찍은 사진</span>
-            </div>
-            <div class="tip-item tip-good">
-              <span class="tip-icon">✓</span>
-              <span>다양한 표정/각도 포함</span>
+              <span>밝은 조명의 선명한 사진</span>
             </div>
             <div class="tip-item tip-bad">
               <span class="tip-icon">✗</span>
@@ -130,11 +141,7 @@
             </div>
             <div class="tip-item tip-bad">
               <span class="tip-icon">✗</span>
-              <span>얼굴이 작게 나온 사진</span>
-            </div>
-            <div class="tip-item tip-bad">
-              <span class="tip-icon">✗</span>
-              <span>심하게 흐릿한 사진</span>
+              <span>흐릿하거나 작은 얼굴</span>
             </div>
           </div>
         </div>
@@ -151,7 +158,7 @@
         <label class="form-check mt-md">
           <input type="checkbox" class="form-check-input" id="consent2">
           <span class="form-check-label">
-            결과물은 <strong>가상의 창작물(Fiction/Simulation)</strong>이며 예측이나 사실이 아님을 이해합니다.
+            결과물은 <strong>가상의 창작물</strong>이며 예측이나 사실이 아님을 이해합니다.
           </span>
         </label>
       </div>
@@ -170,18 +177,124 @@
       <!-- Disclaimer -->
       <div class="disclaimer mt-xl" data-animate style="animation-delay: 0.4s">
         <strong>안내:</strong> 업로드된 사진은 영상 생성 목적으로만 사용되며, 
-        생성 완료 후 서버에서 삭제됩니다. 제3자와 공유되지 않습니다.
+        생성 완료 후 서버에서 삭제됩니다.
       </div>
 
     </div>
   </main>
 
   <script src="/js/app.js"></script>
-  <script src="/js/videoGenerator.js"></script>
   <style>
-    /* Upload Page Specific Styles */
     .page-title {
       font-size: 2.25rem;
+    }
+
+    .upload-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .upload-card {
+      background: var(--bg-secondary);
+      border: var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+    }
+
+    .upload-card-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .upload-card-icon {
+      font-size: 1.5rem;
+    }
+
+    .upload-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .upload-zone {
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .upload-zone:hover {
+      border-color: var(--accent-primary);
+      background: rgba(168, 85, 247, 0.05);
+    }
+
+    .upload-zone.drag-over {
+      border-color: var(--accent-primary);
+      background: rgba(168, 85, 247, 0.1);
+    }
+
+    .upload-zone.has-image {
+      display: none;
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    .upload-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .preview-box {
+      display: none;
+      position: relative;
+    }
+
+    .preview-box.has-image {
+      display: block;
+    }
+
+    .preview-box img {
+      width: 100%;
+      border-radius: var(--radius-lg);
+      aspect-ratio: 1;
+      object-fit: cover;
+    }
+
+    .preview-remove {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .preview-remove:hover {
+      background: var(--error);
     }
 
     .upload-tips {
@@ -242,81 +355,11 @@
       align-items: center;
     }
 
-    /* 단일 이미지 미리보기 */
-    .preview-single {
-      display: flex;
-      justify-content: center;
-      margin-top: 24px;
-    }
-
-    .preview-single .preview-item {
-      width: 280px;
-      height: 280px;
-      border-radius: var(--radius-lg);
-      border: 2px dashed var(--border-color);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .preview-single .preview-item:hover {
-      border-color: var(--accent-primary);
-      background: rgba(168, 85, 247, 0.05);
-    }
-
-    .preview-single .preview-item span {
-      font-size: 3rem;
-      color: var(--text-muted);
-    }
-
-    .preview-single .preview-item-placeholder {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
-
-    /* Preview with images */
-    .preview-item.has-image {
-      cursor: default;
-      border-style: solid;
-      border-color: var(--accent-primary);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .preview-item.has-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .preview-item-remove {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.2s;
-    }
-
-    .preview-item-remove:hover {
-      background: var(--error);
-    }
-
     @media (max-width: 768px) {
+      .upload-cards {
+        grid-template-columns: 1fr;
+      }
+
       .tips-grid {
         grid-template-columns: 1fr;
       }
@@ -332,162 +375,122 @@
     }
   </style>
   <script>
-    // Upload functionality
-    const uploadZone = document.getElementById('uploadZone');
-    const fileInput = document.getElementById('fileInput');
-    const previewGrid = document.getElementById('previewGrid');
+    // 업로드 관련 요소
+    const uploadZone1 = document.getElementById('uploadZone1');
+    const uploadZone2 = document.getElementById('uploadZone2');
+    const fileInput1 = document.getElementById('fileInput1');
+    const fileInput2 = document.getElementById('fileInput2');
+    const preview1 = document.getElementById('preview1');
+    const preview2 = document.getElementById('preview2');
     const nextBtn = document.getElementById('nextBtn');
     const consent1 = document.getElementById('consent1');
     const consent2 = document.getElementById('consent2');
 
-    let uploadedFiles = [];
-    const maxFiles = 1; // 단일 사진만 허용
+    let myPhoto = null;
+    let actorPhoto = null;
 
-    // Drag and drop handlers
-    uploadZone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      uploadZone.classList.add('drag-over');
-    });
-
-    uploadZone.addEventListener('dragleave', () => {
-      uploadZone.classList.remove('drag-over');
-    });
-
-    uploadZone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      uploadZone.classList.remove('drag-over');
-      handleFiles(e.dataTransfer.files);
-    });
-
-    // File input change
-    fileInput.addEventListener('change', (e) => {
-      handleFiles(e.target.files);
-    });
-
-    function handleFiles(files) {
-      const validFiles = Array.from(files).filter(file => {
-        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-        const maxSize = 10 * 1024 * 1024; // 10MB
-        return validTypes.includes(file.type) && file.size <= maxSize;
+    // 드래그 앤 드롭
+    [uploadZone1, uploadZone2].forEach((zone, index) => {
+      zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('drag-over');
       });
 
-      validFiles.forEach(file => {
-        if (uploadedFiles.length < maxFiles) {
-          uploadedFiles.push(file);
-        }
+      zone.addEventListener('dragleave', () => {
+        zone.classList.remove('drag-over');
       });
 
-      updatePreviews();
-      checkCanProceed();
-    }
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file) handleFile(file, index);
+      });
+    });
 
-    function updatePreviews() {
-      const slots = previewGrid.querySelectorAll('.preview-item');
-      
-      slots.forEach((slot, index) => {
-        if (uploadedFiles[index]) {
-          const file = uploadedFiles[index];
-          const reader = new FileReader();
-          
-          reader.onload = (e) => {
-            slot.innerHTML = `
-              <img src="${e.target.result}" alt="Preview ${index + 1}">
-              <button class="preview-item-remove" onclick="removeFile(${index})">×</button>
-            `;
-            slot.classList.add('has-image');
-            slot.classList.remove('preview-item-placeholder');
-          };
-          
-          reader.readAsDataURL(file);
+    // 파일 선택
+    fileInput1.addEventListener('change', (e) => {
+      if (e.target.files[0]) handleFile(e.target.files[0], 0);
+    });
+
+    fileInput2.addEventListener('change', (e) => {
+      if (e.target.files[0]) handleFile(e.target.files[0], 1);
+    });
+
+    function handleFile(file, index) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      const maxSize = 10 * 1024 * 1024;
+
+      if (!validTypes.includes(file.type)) {
+        alert('JPG, PNG, WEBP 이미지만 업로드 가능합니다.');
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert('파일 크기는 10MB 이하여야 합니다.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = e.target.result;
+        
+        if (index === 0) {
+          myPhoto = imageData;
+          showPreview(preview1, uploadZone1, imageData, 0);
         } else {
-          slot.innerHTML = `
-            <span>+</span>
-            사진 선택
-          `;
-          slot.classList.remove('has-image');
-          slot.classList.add('preview-item-placeholder');
+          actorPhoto = imageData;
+          showPreview(preview2, uploadZone2, imageData, 1);
         }
-      });
+        
+        checkCanProceed();
+      };
+      reader.readAsDataURL(file);
     }
 
-    function removeFile(index) {
-      uploadedFiles.splice(index, 1);
-      updatePreviews();
+    function showPreview(previewEl, zoneEl, imageData, index) {
+      previewEl.innerHTML = `
+        <img src="${imageData}" alt="Preview">
+        <button class="preview-remove" onclick="removeImage(${index})">×</button>
+      `;
+      previewEl.classList.add('has-image');
+      zoneEl.classList.add('has-image');
+    }
+
+    function removeImage(index) {
+      if (index === 0) {
+        myPhoto = null;
+        preview1.classList.remove('has-image');
+        uploadZone1.classList.remove('has-image');
+        fileInput1.value = '';
+      } else {
+        actorPhoto = null;
+        preview2.classList.remove('has-image');
+        uploadZone2.classList.remove('has-image');
+        fileInput2.value = '';
+      }
       checkCanProceed();
     }
 
-    // Make removeFile globally accessible
-    window.removeFile = removeFile;
+    window.removeImage = removeImage;
 
     function checkCanProceed() {
-      const hasFiles = uploadedFiles.length >= 1;
+      const hasPhotos = myPhoto && actorPhoto;
       const hasConsent = consent1.checked && consent2.checked;
-      nextBtn.disabled = !(hasFiles && hasConsent);
+      nextBtn.disabled = !(hasPhotos && hasConsent);
     }
 
     consent1.addEventListener('change', checkCanProceed);
     consent2.addEventListener('change', checkCanProceed);
 
-    // 이미지를 16:9 비율로 크롭하는 함수
-    function cropTo16x9(file) {
-      return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const img = new Image();
-          img.onload = () => {
-            // 16:9 비율 계산
-            const targetRatio = 16 / 9;
-            const imgRatio = img.width / img.height;
-            
-            let cropWidth, cropHeight, cropX, cropY;
-            
-            if (imgRatio > targetRatio) {
-              // 이미지가 더 넓음 - 좌우 크롭
-              cropHeight = img.height;
-              cropWidth = img.height * targetRatio;
-              cropX = (img.width - cropWidth) / 2;
-              cropY = 0;
-            } else {
-              // 이미지가 더 높음 - 상하 크롭
-              cropWidth = img.width;
-              cropHeight = img.width / targetRatio;
-              cropX = 0;
-              cropY = (img.height - cropHeight) / 2;
-            }
-            
-            // 캔버스에 16:9로 크롭
-            const canvas = document.createElement('canvas');
-            canvas.width = Math.min(1280, cropWidth);  // 최대 1280px
-            canvas.height = canvas.width / targetRatio;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(
-              img,
-              cropX, cropY, cropWidth, cropHeight,  // 소스 영역
-              0, 0, canvas.width, canvas.height      // 대상 영역
-            );
-            
-            resolve(canvas.toDataURL('image/jpeg', 0.9));
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      });
-    }
-
-    // Next button click
-    nextBtn.addEventListener('click', async () => {
+    // 다음 버튼
+    nextBtn.addEventListener('click', () => {
       if (!nextBtn.disabled) {
-        // 이미지를 16:9로 크롭하고 base64로 저장
-        const imagePromises = uploadedFiles.map(file => cropTo16x9(file));
-        
-        const images = await Promise.all(imagePromises);
-        sessionStorage.setItem('uploadedImages', JSON.stringify(images));
-        sessionStorage.setItem('uploadedCount', uploadedFiles.length);
+        sessionStorage.setItem('myPhoto', myPhoto);
+        sessionStorage.setItem('actorPhoto', actorPhoto);
         window.location.href = 'select.html';
       }
     });
   </script>
 </body>
 </html>
-

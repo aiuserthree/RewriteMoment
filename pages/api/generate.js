@@ -14,34 +14,35 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { imageUrl, aspectRatio = '16:9', movie } = req.body;
+    const { myPhoto, actorPhoto, aspectRatio = '16:9' } = req.body;
 
-    if (!imageUrl) {
-      return res.status(400).json({ error: 'Image is required' });
+    if (!myPhoto || !actorPhoto) {
+      return res.status(400).json({ error: '사진 2장이 필요합니다' });
     }
 
     if (!credentials) {
       return res.status(500).json({ error: 'Google Cloud credentials not configured' });
     }
 
-    const movieInfo = getMovieInfo(movie);
-
-    console.log('=== Veo 영상 생성 ===');
-    console.log('Movie:', movieInfo.koreanTitle);
+    console.log('=== 2장 합성 → Veo 영상화 ===');
 
     // 이미지 Base64 처리
-    let userImageBase64 = imageUrl;
-    let mimeType = 'image/jpeg';
-    
-    if (imageUrl.startsWith('data:')) {
-      const matches = imageUrl.match(/^data:([^;]+);base64,(.+)$/);
-      if (matches) {
-        mimeType = matches[1];
-        userImageBase64 = matches[2];
-      } else {
-        userImageBase64 = imageUrl.split(',')[1];
+    function extractBase64(imageUrl) {
+      if (imageUrl.startsWith('data:')) {
+        const matches = imageUrl.match(/^data:([^;]+);base64,(.+)$/);
+        if (matches) {
+          return { mimeType: matches[1], base64: matches[2] };
+        }
+        return { mimeType: 'image/jpeg', base64: imageUrl.split(',')[1] };
       }
+      return { mimeType: 'image/jpeg', base64: imageUrl };
     }
+
+    const myPhotoData = extractBase64(myPhoto);
+    const actorPhotoData = extractBase64(actorPhoto);
+
+    console.log('내 사진 length:', myPhotoData.base64?.length);
+    console.log('배우 사진 length:', actorPhotoData.base64?.length);
 
     // Google Auth
     const auth = new GoogleAuth({
@@ -51,31 +52,118 @@ export default async function handler(req, res) {
     const client = await auth.getClient();
     const accessToken = await client.getAccessToken();
 
-    // 프롬프트 - 사용자 얼굴 절대 보존!
-    const videoPrompt = `Animate this exact photo into an 8-second video.
+    // ========================================
+    // STEP 1: Gemini로 두 사진 합성
+    // ========================================
+    console.log('\n=== STEP 1: Gemini 합성 ===');
 
-THE PERSON IN THIS PHOTO IS THE STAR. DO NOT CHANGE THEIR FACE AT ALL.
-- Keep their exact face shape
-- Keep their exact eyes, nose, mouth
-- Keep their exact skin tone
-- Keep their exact hair
-- Keep their exact clothing
+    const geminiPrompt = `You are an expert photo editor.
 
-ANIMATION:
-This person is on ${movieInfo.background}.
-They are holding up their phone taking a selfie video.
+I'm giving you TWO photos:
+1. Photo 1 (first image): This is ME - the main person
+2. Photo 2 (second image): This is another person I want to take a photo WITH
 
-0-2 sec: They smile and wave at the camera
-2-4 sec: ${movieInfo.actors} walk up behind them and join the frame
-4-6 sec: Everyone poses together for a group photo, arms around each other
-6-8 sec: They all laugh, high-five, and wave goodbye
+Create a NEW composite image where:
+- I (from Photo 1) am on the LEFT side, holding up my phone like taking a selfie
+- The person from Photo 2 is on the RIGHT side, posing with me
+- We are both smiling at the camera like friends taking a selfie together
+- The background is a movie set with professional lighting equipment visible
 
-The person from this photo must be in the CENTER and CLEARLY VISIBLE the entire time.
-Their face must look EXACTLY like in this input photo - do not generate a different face.
+CRITICAL REQUIREMENTS:
+- My face (from Photo 1) must look EXACTLY the same - same face shape, eyes, nose, mouth, skin tone
+- The other person's face (from Photo 2) must also look EXACTLY the same
+- DO NOT change or morph either face
+- Make it look like a natural selfie photo
 
-Style: Candid vlog footage, natural warm lighting, slight camera shake.`;
+Style: Candid selfie photo, warm natural lighting, friendly atmosphere, 8K quality`;
 
-    console.log('Prompt ready, length:', videoPrompt.length);
+    const geminiEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/gemini-2.0-flash-exp:generateContent`;
+
+    const geminiResponse = await fetch(geminiEndpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken.token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                mimeType: myPhotoData.mimeType,
+                data: myPhotoData.base64,
+              }
+            },
+            {
+              inlineData: {
+                mimeType: actorPhotoData.mimeType,
+                data: actorPhotoData.base64,
+              }
+            },
+            { text: geminiPrompt }
+          ]
+        }],
+        generationConfig: {
+          responseModalities: ['IMAGE', 'TEXT'],
+          temperature: 1.0,
+        },
+      }),
+    });
+
+    const geminiData = await geminiResponse.json();
+
+    if (!geminiResponse.ok) {
+      console.error('Gemini Error:', JSON.stringify(geminiData, null, 2));
+      return res.status(500).json({ 
+        error: 'Gemini 합성 실패', 
+        details: geminiData.error?.message 
+      });
+    }
+
+    // 합성된 이미지 추출
+    let compositeImageBase64 = null;
+    let compositeImageMimeType = 'image/png';
+
+    if (geminiData.candidates?.[0]?.content?.parts) {
+      for (const part of geminiData.candidates[0].content.parts) {
+        if (part.inlineData) {
+          compositeImageBase64 = part.inlineData.data;
+          compositeImageMimeType = part.inlineData.mimeType || 'image/png';
+          console.log('합성 이미지 생성됨, length:', compositeImageBase64?.length);
+          break;
+        }
+      }
+    }
+
+    // Gemini가 이미지를 생성하지 않으면 내 사진으로 진행
+    if (!compositeImageBase64) {
+      console.log('Gemini가 이미지를 생성하지 않음, 내 사진으로 진행');
+      compositeImageBase64 = myPhotoData.base64;
+      compositeImageMimeType = myPhotoData.mimeType;
+    }
+
+    // ========================================
+    // STEP 2: Veo로 영상 생성
+    // ========================================
+    console.log('\n=== STEP 2: Veo 영상화 ===');
+
+    const videoPrompt = `Animate this photo into an 8-second video.
+
+CRITICAL: Both people's faces must stay EXACTLY the same throughout the video.
+- Do NOT change any facial features
+- Do NOT morph faces
+- Keep faces identical to this input image
+
+Animation:
+0-2 sec: Both people smile and pose for the selfie
+2-4 sec: The person holding the phone adjusts the angle
+4-6 sec: Both laugh naturally, share a moment
+6-8 sec: They high-five and wave goodbye to camera
+
+Style: Behind-the-scenes vlog footage, candid and warm, natural lighting, slight handheld camera shake.
+
+IMPORTANT: Both faces must remain 100% identical to the input image!`;
 
     const veoEndpoint = `https://${LOCATION}-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/${LOCATION}/publishers/google/models/veo-2.0-generate-001:predictLongRunning`;
 
@@ -89,8 +177,8 @@ Style: Candid vlog footage, natural warm lighting, slight camera shake.`;
         instances: [{
           prompt: videoPrompt,
           image: {
-            bytesBase64Encoded: userImageBase64,
-            mimeType: mimeType,
+            bytesBase64Encoded: compositeImageBase64,
+            mimeType: compositeImageMimeType,
           },
         }],
         parameters: {
@@ -108,7 +196,7 @@ Style: Candid vlog footage, natural warm lighting, slight camera shake.`;
       console.error('Veo Error:', JSON.stringify(veoData, null, 2));
       return res.status(500).json({ 
         error: 'Veo 영상 생성 실패',
-        details: veoData.error?.message || JSON.stringify(veoData)
+        details: veoData.error?.message
       });
     }
 
@@ -117,7 +205,7 @@ Style: Candid vlog footage, natural warm lighting, slight camera shake.`;
     return res.status(200).json({
       id: veoData.name,
       status: 'processing',
-      message: '영상 생성 시작',
+      message: '합성 완료 → 영상 생성 중',
       provider: 'google-veo',
     });
 
@@ -130,45 +218,9 @@ Style: Candid vlog footage, natural warm lighting, slight camera shake.`;
   }
 }
 
-function getMovieInfo(movie) {
-  const settings = {
-    avengers: {
-      koreanTitle: '어벤저스',
-      background: 'the Avengers movie set with Iron Man suits on display and high-tech screens',
-      actors: 'Two actors in superhero costumes - one in a red and gold Iron Man suit (like Robert Downey Jr with goatee), one in a blue Captain America suit with shield (like Chris Evans, blonde muscular)',
-    },
-    spiderman: {
-      koreanTitle: '스파이더맨',
-      background: 'the Spider-Man movie set with New York City backdrop',
-      actors: 'Two actors - a young man in red-blue Spider-Man suit (like Tom Holland), and a young woman with curly hair (like Zendaya)',
-    },
-    harrypotter: {
-      koreanTitle: '해리포터',
-      background: 'the Hogwarts Great Hall movie set with floating candles',
-      actors: 'Two actors in Hogwarts robes - a young man with round glasses and messy black hair (like Daniel Radcliffe as Harry), a young woman with wavy brown hair (like Emma Watson as Hermione)',
-    },
-    lotr: {
-      koreanTitle: '반지의 제왕',
-      background: 'the Lord of the Rings Rivendell movie set with elven architecture',
-      actors: 'Two actors - an elderly man with long grey beard and wizard hat (like Ian McKellen as Gandalf), a rugged man with dark hair and sword (like Viggo Mortensen as Aragorn)',
-    },
-    starwars: {
-      koreanTitle: '스타워즈',
-      background: 'the Star Wars movie set inside the Millennium Falcon cockpit',
-      actors: 'Two actors - a young man in Jedi robes with lightsaber (like Mark Hamill as Luke), a woman with side-bun hairstyle in white robes (like Carrie Fisher as Leia)',
-    },
-    jurassic: {
-      koreanTitle: '쥬라기 공원',
-      background: 'the Jurassic Park movie set with dinosaur props and jungle',
-      actors: 'Two actors - a man in khaki paleontologist clothes with hat (like Sam Neill), a tall man in black leather jacket (like Jeff Goldblum)',
-    },
-  };
-  return settings[movie] || settings.avengers;
-}
-
 export const config = {
   api: {
-    bodyParser: { sizeLimit: '10mb' },
+    bodyParser: { sizeLimit: '20mb' }, // 이미지 2장이므로 크기 증가
     responseLimit: false,
   },
 };
