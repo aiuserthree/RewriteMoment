@@ -81,7 +81,7 @@
           🎉 <span class="text-gradient">영상이 완성</span>되었어요!
         </h1>
         <p class="page-subtitle" id="pageSubtitle">
-          어벤저스 촬영장에서의 셀카
+          함께하는 특별한 순간
         </p>
       </div>
 
@@ -104,11 +104,11 @@
             <!-- Video Info -->
             <div class="video-info">
               <div class="video-caption" id="videoCaption">
-                "나의 특별한 순간"
+                "함께하는 순간"
               </div>
               <div class="video-meta" id="videoMeta">
-                <span>🦸 어벤저스</span>
-                <span>📸 셀카</span>
+                <span>👥 함께</span>
+                <span>🎬 AI 영상</span>
                 <span>⏱️ 8초</span>
               </div>
             </div>
@@ -143,20 +143,20 @@
 
           <!-- Regenerate -->
           <div class="card result-card" data-animate style="animation-delay: 0.3s">
-            <h3 class="result-card-title">다른 영화로 다시 만들기</h3>
-            <p class="result-card-desc">다른 영화 촬영장에서 셀카를 찍어보세요!</p>
-            <a href="select.html" class="btn btn-secondary w-full">
-              <span>🎬</span> 다른 영화 선택하기
+            <h3 class="result-card-title">다른 사진으로 다시 만들기</h3>
+            <p class="result-card-desc">다른 사진으로 새로운 영상을 만들어보세요!</p>
+            <a href="upload.html" class="btn btn-secondary w-full">
+              <span>📸</span> 새 사진 업로드하기
             </a>
           </div>
 
-          <!-- Movie Info Card -->
+          <!-- Info Card -->
           <div class="card result-card movie-info-result" data-animate style="animation-delay: 0.4s" id="movieInfoCard">
             <div class="movie-result-header">
-              <span class="movie-result-icon" id="movieResultIcon">🦸</span>
+              <span class="movie-result-icon" id="movieResultIcon">✨</span>
               <div>
-                <h3 class="movie-result-title" id="movieResultTitle">어벤저스</h3>
-                <p class="movie-result-actors" id="movieResultActors">아이언맨, 캡틴, 토르, 블랙위도우</p>
+                <h3 class="movie-result-title" id="movieResultTitle">AI 합성 영상</h3>
+                <p class="movie-result-actors" id="movieResultActors">두 사람이 함께하는 특별한 순간</p>
             </div>
             </div>
           </div>
@@ -463,16 +463,6 @@
     }
   </style>
   <script>
-    // 영화 정보 매핑
-    const movieInfo = {
-      avengers: { icon: '🦸', title: '어벤저스', actors: '아이언맨, 캡틴 아메리카, 토르, 블랙위도우' },
-      spiderman: { icon: '🕷️', title: '스파이더맨', actors: '피터 파커, MJ, 네드' },
-      harrypotter: { icon: '⚡', title: '해리포터', actors: '해리, 헤르미온느, 론' },
-      lotr: { icon: '💍', title: '반지의 제왕', actors: '프로도, 간달프, 아라곤, 레골라스' },
-      starwars: { icon: '⚔️', title: '스타워즈', actors: '루크, 레아, 한 솔로' },
-      jurassic: { icon: '🦖', title: '쥬라기 공원', actors: '그랜트 박사, 엘리, 말콤 박사' },
-    };
-
     // Result page functionality
     const videoCaption = document.getElementById('videoCaption');
     const shareModal = document.getElementById('shareModal');
@@ -512,22 +502,20 @@
     }
 
     // 저장된 설정 로드
-    const aspectRatio = sessionStorage.getItem('selectedRatio') || '16:9';
-    const selectedMovie = sessionStorage.getItem('selectedMovie') || 'avengers';
-    const movie = movieInfo[selectedMovie] || movieInfo.avengers;
+    const aspectRatio = sessionStorage.getItem('aspectRatio') || '16:9';
 
     // 페이지 정보 업데이트
-    document.getElementById('pageSubtitle').textContent = `${movie.title} 촬영장에서의 셀카 · ${aspectRatio}`;
-    document.getElementById('videoCaption').textContent = `"${movie.title} 촬영장에서"`;
-    document.getElementById('movieResultIcon').textContent = movie.icon;
-    document.getElementById('movieResultTitle').textContent = movie.title;
-    document.getElementById('movieResultActors').textContent = movie.actors;
+    document.getElementById('pageSubtitle').textContent = `함께하는 특별한 순간 · ${aspectRatio}`;
+    document.getElementById('videoCaption').textContent = `"함께하는 순간"`;
+    document.getElementById('movieResultIcon').textContent = '✨';
+    document.getElementById('movieResultTitle').textContent = 'AI 합성 영상';
+    document.getElementById('movieResultActors').textContent = '두 사람이 함께하는 특별한 순간';
 
     // 비디오 메타 업데이트
     if (videoMeta) {
       videoMeta.innerHTML = `
-        <span>${movie.icon} ${movie.title}</span>
-        <span>📸 셀카</span>
+        <span>👥 함께</span>
+        <span>🎬 AI 영상</span>
         <span>⏱️ 8초</span>
       `;
     }
@@ -585,7 +573,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${movie.title}_셀카_${Date.now()}.mp4`;
+        a.download = `ClipLife_${Date.now()}.mp4`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
