@@ -136,11 +136,14 @@ Style: Candid selfie photo, warm natural lighting, friendly atmosphere, 8K quali
       }
     }
 
-    // Gemini가 이미지를 생성하지 않으면 내 사진으로 진행
+    // Gemini가 이미지를 생성하지 않으면 에러
     if (!compositeImageBase64) {
-      console.log('Gemini가 이미지를 생성하지 않음, 내 사진으로 진행');
-      compositeImageBase64 = myPhotoData.base64;
-      compositeImageMimeType = myPhotoData.mimeType;
+      console.error('Gemini가 합성 이미지를 생성하지 않음');
+      console.error('Gemini response:', JSON.stringify(geminiData, null, 2));
+      return res.status(500).json({ 
+        error: '이미지 합성 실패', 
+        details: 'Gemini가 합성 이미지를 생성하지 못했습니다. 다른 사진으로 다시 시도해주세요.' 
+      });
     }
 
     // ========================================
